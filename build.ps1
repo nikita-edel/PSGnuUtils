@@ -3,7 +3,11 @@
     Build, test and publish automation for PSGnuUtils.
 
 .DESCRIPTION
-    Tasks (run in the order given):
+    Run tasks with switches (./build.ps1 -Test -Install) or by name (./build.ps1 -Task Test, Install).
+    Switches run in the order listed below; -Task values run in the order given, before any switches.
+    Without any task, Analyze and Test run.
+
+    Tasks:
       Bootstrap  Install Pester (>= 5.5) and PSScriptAnalyzer for the current user.
       Manifest   Regenerate FunctionsToExport in the module manifest from src/PSGnuUtils/Utils/*.ps1.
       Analyze    Run PSScriptAnalyzer (incl. PowerShell 5.1 / 7 syntax compatibility rules) on src/.
@@ -23,25 +27,38 @@
     Runs Analyze and Test (the default).
 
 .EXAMPLE
-    ./build.ps1 -Task Test -TestPath tests/Utils/head.Tests.ps1
+    ./build.ps1 -Test -TestPath tests/Utils/head.Tests.ps1
     Runs a single test file.
 
 .EXAMPLE
-    ./build.ps1 -Task Test -CodeCoverage
+    ./build.ps1 -Test -CodeCoverage
     Runs all tests, writes out/coverage.xml (JaCoCo) and fails below 98% line coverage.
 
 .EXAMPLE
-    ./build.ps1 Install
+    ./build.ps1 -Install
     Builds and installs the module for the current user (open a new session, then: Import-Module PSGnuUtils).
 
 .EXAMPLE
-    ./build.ps1 -Task Publish -NuGetApiKey $env:PSGALLERY_API_KEY
+    ./build.ps1 -Publish -NuGetApiKey $env:PSGALLERY_API_KEY
 #>
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Script parameters are used by the task functions below.')]
 [CmdletBinding()]
 param(
+    # Tasks by name (for scripts and CI). The switches below do the same: ./build.ps1 -Install
     [ValidateSet('Bootstrap', 'Manifest', 'Analyze', 'Test', 'Build', 'TestBuild', 'Install', 'Uninstall', 'Publish', 'Clean')]
-    [string[]]$Task = @('Analyze', 'Test'),
+    [string[]]$Task,
+
+    [switch]$Bootstrap,
+    [switch]$Clean,
+    [switch]$Manifest,
+    [switch]$Analyze,
+    [switch]$Test,
+    [switch]$Build,
+    [switch]$TestBuild,
+    [switch]$Install,
+    [switch]$Uninstall,
+    [switch]$Publish,
+
 
     [string[]]$TestPath,
 
@@ -252,7 +269,15 @@ function Invoke-Publish {
     Publish-Module -Path $OutputDir -NuGetApiKey $NuGetApiKey -Repository $Repository
 }
 
-foreach ($name in $Task) {
+# Switches run in a fixed, sensible order; without any task the default is Analyze + Test.
+$selected = New-Object 'System.Collections.Generic.List[string]'
+foreach ($name in @($Task)) { if ($name -and -not $selected.Contains($name)) { $selected.Add($name) } }
+foreach ($name in @('Bootstrap', 'Clean', 'Manifest', 'Analyze', 'Test', 'Build', 'TestBuild', 'Install', 'Uninstall', 'Publish')) {
+    if ($PSBoundParameters.ContainsKey($name) -and $PSBoundParameters[$name] -and -not $selected.Contains($name)) { $selected.Add($name) }
+}
+if ($selected.Count -eq 0) { $selected.AddRange([string[]]@('Analyze', 'Test')) }
+
+foreach ($name in $selected) {
     switch ($name) {
         'Bootstrap' { Invoke-Bootstrap }
         'Manifest' { Invoke-Manifest }

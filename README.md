@@ -16,9 +16,9 @@ Install-Module PSGnuUtils -Scope CurrentUser      # once published to the PowerS
 From source:
 
 ```powershell
-./build.ps1 Install            # build and install for the current user (Windows PowerShell 5.1 and PowerShell 7)
+./build.ps1 -Install            # build and install for the current user (Windows PowerShell 5.1 and PowerShell 7)
 Import-Module PSGnuUtils       # in a new session
-./build.ps1 Uninstall          # remove it again
+./build.ps1 -Uninstall          # remove it again
 
 Import-Module ./src/PSGnuUtils/PSGnuUtils.psd1   # or load the source tree directly, without installing
 ```
@@ -103,9 +103,9 @@ Use `-NoClobber` to enable only names that do not exist yet, or `-Exclude` to ke
 ## Development
 
 ```powershell
-./build.ps1 -Task Bootstrap   # Pester >= 5.5, PSScriptAnalyzer
+./build.ps1 -Bootstrap   # Pester >= 5.5, PSScriptAnalyzer
 ./build.ps1                   # analyze + test
-./build.ps1 -Task Build       # out/PSGnuUtils (single-file module)
+./build.ps1 -Build       # out/PSGnuUtils (single-file module)
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [docs/AGENTS.md](docs/AGENTS.md), [docs/PLAN.md](docs/PLAN.md) and

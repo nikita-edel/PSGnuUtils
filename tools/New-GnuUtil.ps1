@@ -100,7 +100,7 @@ Describe '$Name' {
 $utf8 = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($utilPath, $util.Replace("`r`n", "`n"), $utf8)
 [System.IO.File]::WriteAllText($testPath, $test.Replace("`r`n", "`n"), $utf8)
-& (Join-Path $repoRoot 'build.ps1') -Task Manifest
+& (Join-Path $repoRoot 'build.ps1') -Manifest
 
 Write-Host "Created $utilPath"
 Write-Host "Created $testPath"

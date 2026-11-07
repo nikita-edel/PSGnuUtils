@@ -5,7 +5,7 @@ next. Keep entries short and factual so the next person (or LLM) can continue wi
 
 ## 2026-11-07 (night) - 100% coverage
 
-- Coverage 98.9% -> 100% (4449/4449 commands on PowerShell 7.6 / Windows). `./build.ps1 -Task Test -CodeCoverage`
+- Coverage 98.9% -> 100% (4449/4449 commands on PowerShell 7.6 / Windows). `./build.ps1 -Test -CodeCoverage`
   now fails below 98% (Linux/macOS cannot run the Windows-only branches and vice versa).
 - Made environment-dependent code injectable instead of untestable: `Test-GnuOSPlatform`, `Get-GnuRuntimeInformation`
   (reflection, no try/catch), `Get-GnuUnixModeMethod`, `Get-GnuLinkTarget`, `Get-GnuModuleVersion -Module -ManifestPath`,
@@ -38,10 +38,10 @@ next. Keep entries short and factual so the next person (or LLM) can continue wi
 ## 2026-11-07 (later) - First test run, all green on 5.1 and 7
 
 **Results** (Windows 11, Windows PowerShell 5.1.26100 + Pester 5.x, PowerShell 7.6.7 + Pester 6.2.0)
-- `./build.ps1 -Task Test`: 698 passed, 0 failed, 4 skipped on both 5.1 and 7 (skips: 3 symlink tests need admin or
+- `./build.ps1 -Test`: 698 passed, 0 failed, 4 skipped on both 5.1 and 7 (skips: 3 symlink tests need admin or
   developer mode, 1 Unix-only mode test).
-- `./build.ps1 -Task Build, TestBuild`: the merged single-file module passes the same 698 tests on both.
-- `./build.ps1 -Task Analyze`: no issues.
+- `./build.ps1 -Build -TestBuild`: the merged single-file module passes the same 698 tests on both.
+- `./build.ps1 -Analyze`: no issues.
 - `-CodeCoverage`: 95.6% of 3211 commands. Remaining gaps: Linux/macOS branches in Platform.ps1/Path.ps1 and the
   skipped symlink paths (CI on Linux/macOS will exercise them).
 
@@ -98,7 +98,7 @@ existing aliases (user's request mid-session).
 **Unverified**
 - Nothing in the Pester suite has been run yet; PSScriptAnalyzer has not been run. Expect some failures on first run.
 - The CI workflow (`defaults.run.shell: ${{ matrix.shell }}`) has not run on GitHub yet.
-- `./build.ps1 -Task Build` (merged psm1) has not been run.
+- `./build.ps1 -Build` (merged psm1) has not been run.
 
 **Next**
 - See TODO.md.

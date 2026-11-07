@@ -8,7 +8,7 @@ Thanks for helping! The short version of the rules is in [docs/AGENTS.md](docs/A
 ```powershell
 git clone <repo>
 cd PS-GnuUtils
-./build.ps1 -Task Bootstrap     # Pester >= 5.5, PSScriptAnalyzer
+./build.ps1 -Bootstrap     # Pester >= 5.5, PSScriptAnalyzer
 ./build.ps1                     # analyze + test
 ```
 
