@@ -17,5 +17,5 @@ All notable changes to this project are documented here. The format follows
   whoami yes`.
 - Batch 2 (first part): `comm cut expand fold nl paste pathchk uniq`.
 - `rm` (pulled forward from batch 3): `-f -i -I --interactive -r -R -d -v --preserve-root --no-preserve-root --one-file-system`.
-- Daily-use utils: `touch which ln mv cp sort ls`.
+- Daily-use utils: `touch which ln mv cp sort ls grep`.
 - Build script (Bootstrap, Manifest, Analyze, Test, Build, TestBuild, Install, Uninstall, Publish, Clean).

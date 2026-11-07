@@ -27,6 +27,7 @@
         'Invoke-GnuExpand',
         'Invoke-GnuFalse',
         'Invoke-GnuFold',
+        'Invoke-GnuGrep',
         'Invoke-GnuHead',
         'Invoke-GnuHostname',
         'Invoke-GnuLink',

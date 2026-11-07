@@ -3,6 +3,16 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-08 (evening) - grep
+
+- grep with Private/Lib/Regex.ps1 (POSIX BRE/ERE -> .NET, reusable for sed); one line engine for streamed pipeline
+  input and files: -A/-B/-C/-NUM with '--', -c -l -L -o -q -m -n -b -H -h -Z --label, -r/-R with
+  --include/--exclude/--exclude-dir, binary detection (-a, -I, --binary-files), -z, --color; exit 0/1/2.
+- Found: .NET Framework regex errors are localized (German here), so unbalanced groups are detected by
+  Get-GnuParenthesisBalance instead of parsing messages. NUL characters in a failing test's message break
+  Pester's NUnit XML export (only on failures).
+- Results: 1232 tests green on 5.1, 1237 on 7.6, 99.8% coverage, analyzer clean.
+
 ## 2026-11-08 (later) - sort and ls
 
 - sort: keys, separators, n/g/h/V/M orders, -u/-s/-c/-C/-o/-z, GNU's last-resort whole-line comparison, exit code 2 on trouble.

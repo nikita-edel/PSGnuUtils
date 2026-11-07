@@ -165,7 +165,7 @@ implemented util is listed here).
 
 | Util | Status | Scope | Difficulty | Batch | Notes |
 |---|---|---|---|---|---|
-| `grep` | planned | full | 4 | 4 | BRE/ERE translated to .NET regex, `-F` via `IndexOf`, `-P` native; see the grep design in PLAN.md. |
+| `grep` | done | full | 4 | 4 | BRE/ERE translated to .NET regex (POSIX classes, `\<` `\>`, backreferences); `-P` is .NET syntax; pipeline objects are matched as displayed; piped input is searched as it arrives. |
 | `sed` | planned | subset | 4 | 4 | `s///` with flags, `d p q a i c y =`, addresses and ranges, `-n -i -E -s`; no hold space (`h H g G x`), labels/branching (`b t :`) or `N D P`. |
 | `find` | planned | subset | 4 | 4 | Expression parser (`! -o -a ( )`), `-name -iname -path -type -size -mtime -mmin -newer -maxdepth -mindepth -empty -print -print0 -exec -delete`; no `-printf -perm -user -group -newerXY`. |
 | `xargs` | planned | full | 4 | 4 | Windows command-line quoting rules make it tricky but it is essential for pipelines. |
