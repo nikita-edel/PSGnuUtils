@@ -3,6 +3,22 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-07 (evening) - GPL, coverage, batch 2 part 1
+
+- License changed to GPL-3.0-or-later (same as GNU coreutils) at the user's request; LICENSE is the GPLv3 text,
+  `--version` prints the GNU style license notice, README credits GNU's help-text wording.
+- Coverage 95.6% -> 98.9%: junction fallback for link tests (no admin needed on Windows), console stdin via
+  `[Console]::SetIn`, locked-file read errors, mocked alias failures, platform branches with explicit input.
+  Remaining misses: Linux/macOS-only branches, mktemp name-collision retries, the endless `sleep inf` loop.
+- Bugs found: `mkdir 'bad|name'` threw on .NET Framework (`GetDirectoryName`), parsed option keys were
+  case-insensitive (`-p`/`-P` collided) -> the options hashtable is now ordinal.
+- New utils: pathchk, fold, expand (shared `Private/Lib/TabStop.ps1`), nl, uniq, cut, paste, comm.
+  GNU details checked while writing tests: `uniq -f` keeps the blanks before a field, `uniq --group=append`
+  separates groups too, `paste` stops without output when a file cannot be opened.
+- Results: 893 tests green on Windows PowerShell 5.1, 892 on PowerShell 7.6 (each skips one test for the other
+  runtime), analyzer clean.
+- Open: `.github/workflows` were deleted in the working tree by the user (not committed); waiting for a decision.
+
 ## 2026-11-07 (later) - First test run, all green on 5.1 and 7
 
 **Results** (Windows 11, Windows PowerShell 5.1.26100 + Pester 5.x, PowerShell 7.6.7 + Pester 6.2.0)

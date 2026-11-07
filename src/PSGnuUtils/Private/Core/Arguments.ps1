@@ -114,13 +114,15 @@ function ConvertFrom-GnuArgument {
     Hashtable with Options (hashtable), Operands (List[string]) and Error (message or $null).
     Parsing stops at the first error and right after --help / --version.
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseLiteralInitializerForHashtable', '', Justification = 'Option keys must be case-sensitive (-p vs -P).')]
     param(
         [Parameter(Mandatory)][hashtable]$Spec,
         [AllowEmptyCollection()][string[]]$Arguments = @()
     )
 
+    # Ordinal (case-sensitive) keys: option keys such as 'p' and 'P' must not collide.
     $result = @{
-        Options  = @{}
+        Options  = New-Object System.Collections.Hashtable -ArgumentList ([System.StringComparer]::Ordinal)
         Operands = New-Object 'System.Collections.Generic.List[string]'
         Error    = $null
     }

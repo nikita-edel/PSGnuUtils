@@ -12,7 +12,8 @@ Concrete next steps, most important first. Keep this list short and current; his
 ## Next
 
 - [ ] Release 0.1.0: set ProjectUri in the manifest, add the PSGALLERY_API_KEY secret, tag `v0.1.0`.
-- [ ] Batch 2 (see docs/PLAN.md), starting with `pathchk fold expand unexpand nl uniq cut paste comm`.
+- [ ] Batch 2 (see docs/PLAN.md), next: `unexpand tsort shuf tr cksum sum readlink realpath touch`.
+      unexpand: replicate GNU's pending-blank rules exactly (one blank before a tab stop stays a space).
 - [ ] `tail -f/-F/--pid/--retry/-s`.
 
 ## Ideas

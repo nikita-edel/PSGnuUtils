@@ -58,7 +58,7 @@ implemented util is listed here).
 |---|---|---|---|---|---|
 | `cat` | done | full | 1 | 1 | |
 | `tac` | done | full | 1 | 1 | `-r` uses .NET regular expressions. |
-| `nl` | planned | full | 2 | 2 | |
+| `nl` | done | full | 2 | 2 | `-b p` uses .NET regular expressions. |
 | `od` | planned | subset | 3 | 3 | `-A -t -N -j -v -c -x -o -d`; `Format-Hex` covers the rest. |
 | `base64` | done | full | 1 | 1 | Decoded output is written as UTF-8 text lines. |
 | `base32` | done | full | 1 | 1 | |
@@ -68,7 +68,7 @@ implemented util is listed here).
 | `split` | planned | full | 3 | 3 | |
 | `csplit` | planned | full | 3 | 3 | |
 | `fmt` | planned | full | 3 | 3 | |
-| `fold` | planned | full | 2 | 2 | |
+| `fold` | done | full | 2 | 2 | `-b` counts characters (UTF-16 code units), not UTF-8 bytes. |
 | `pr` | skip | - | - | - | Dozens of pagination options for line printers; nobody prints with it anymore. |
 
 ## Text processing
@@ -76,13 +76,13 @@ implemented util is listed here).
 | Util | Status | Scope | Difficulty | Batch | Notes |
 |---|---|---|---|---|---|
 | `sort` | planned | subset | 3 | 3 | `-n -r -u -k -t -f -h -V -s -o -c`; no exact locale collation, no `-M`, no external merge for files larger than RAM. |
-| `uniq` | planned | full | 2 | 2 | |
-| `cut` | planned | full | 2 | 2 | |
-| `paste` | planned | full | 2 | 2 | |
+| `uniq` | done | full | 2 | 2 | |
+| `cut` | done | full | 2 | 2 | `-c` counts characters (GNU treats `-c` like `-b`); `-b` counts UTF-8 bytes. |
+| `paste` | done | full | 2 | 2 | |
 | `join` | planned | full | 3 | 3 | |
-| `comm` | planned | full | 2 | 2 | |
+| `comm` | done | full | 2 | 2 | Ordinal comparison (like `LC_ALL=C`), not locale collation. |
 | `tr` | planned | full | 3 | 2 | Character classes and ranges. |
-| `expand` | planned | full | 2 | 2 | |
+| `expand` | done | full | 2 | 2 | |
 | `unexpand` | planned | full | 2 | 2 | |
 | `wc` | done | full | 1 | 1 | Word and width rules approximate GNU's locale handling (whitespace = `\s`, tabs to multiples of 8). |
 | `tsort` | planned | full | 2 | 2 | |
@@ -110,7 +110,7 @@ implemented util is listed here).
 |---|---|---|---|---|---|
 | `basename` | done | full | 1 | 1 | On Windows `\` is a separator too. |
 | `dirname` | done | full | 1 | 1 | On Windows `\` is a separator too; `C:\foo` gives `C:\`. |
-| `pathchk` | planned | full | 1 | 2 | |
+| `pathchk` | done | full | 1 | 2 | Default limits: 255 bytes per component, 4096 per name. |
 | `pwd` | done | full | 1 | 1 | Default is `-P` like coreutils (bash's builtin defaults to `-L`). |
 
 ## Shell helpers and logic

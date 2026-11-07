@@ -21,7 +21,9 @@ Next step: rewrite help texts in our own words, check CI on Linux/macOS, then re
 
 ## Batch 2 - easy (difficulty 1-3, mostly line filters)
 
-Order: `pathchk fold expand unexpand nl uniq cut paste comm tsort shuf tr cksum sum readlink realpath touch
+Done 2026-11-07: `pathchk fold expand nl uniq cut paste comm`.
+
+Order: `unexpand tsort shuf tr cksum sum readlink realpath touch
 sync install shred dircolors basenc sha224sum printf test expr factor env nice nohup timeout kill id groups uptime
 date` and `tail -f/-F/--pid/--retry/-s`.
 
