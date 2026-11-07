@@ -16,5 +16,5 @@ All notable changes to this project are documented here. The format follows
   printenv pwd rmdir seq sha1sum sha256sum sha384sum sha512sum sleep tac tail tee true truncate uname unlink wc
   whoami yes`.
 - Batch 2 (first part): `comm cut expand fold nl paste pathchk uniq`.
-- Build script (Bootstrap, Manifest, Analyze, Test, Build, TestBuild, Publish, Clean), CI for Windows PowerShell 5.1
+- Build script (Bootstrap, Manifest, Analyze, Test, Build, TestBuild, Install, Uninstall, Publish, Clean), CI for Windows PowerShell 5.1
   and PowerShell 7 on Windows, Linux and macOS, tag-triggered publishing to the PowerShell Gallery.

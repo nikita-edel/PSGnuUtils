@@ -18,6 +18,7 @@ PowerShell for **Windows PowerShell 5.1 and PowerShell 7+ on Windows, Linux and 
 ./build.ps1 -Task Test -TestPath tests/Utils/head.Tests.ps1
 ./build.ps1 -Task Manifest                      # regenerate FunctionsToExport after adding/removing a util
 ./build.ps1 -Task Build, TestBuild              # build out/PSGnuUtils and test the built module
+./build.ps1 Install                             # build and install into the user's module folder(s); Uninstall removes it
 ./tools/New-GnuUtil.ps1 -Name cut -Category 'Text processing' -Synopsis 'Remove sections from each line of files.'
 ```
 

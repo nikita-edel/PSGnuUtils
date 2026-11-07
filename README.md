@@ -16,7 +16,11 @@ Install-Module PSGnuUtils -Scope CurrentUser      # once published to the PowerS
 From source:
 
 ```powershell
-Import-Module ./src/PSGnuUtils/PSGnuUtils.psd1
+./build.ps1 Install            # build and install for the current user (Windows PowerShell 5.1 and PowerShell 7)
+Import-Module PSGnuUtils       # in a new session
+./build.ps1 Uninstall          # remove it again
+
+Import-Module ./src/PSGnuUtils/PSGnuUtils.psd1   # or load the source tree directly, without installing
 ```
 
 ## Usage

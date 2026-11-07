@@ -10,6 +10,11 @@
       Test       Run the Pester tests against the source module (tests/).
       Build      Create out/PSGnuUtils: manifest + a single merged psm1 + LICENSE/README.
       TestBuild  Run the Pester tests against the built module in out/PSGnuUtils.
+      Install    Build, then copy the module into the current user's module folder(s), so that
+                 'Import-Module PSGnuUtils' works in new sessions. On Windows both Windows PowerShell 5.1
+                 (Documents\WindowsPowerShell\Modules) and PowerShell 7 (Documents\PowerShell\Modules);
+                 on Linux/macOS ~/.local/share/powershell/Modules. -ModulePath overrides the target.
+      Uninstall  Remove the installed copy of the current version again.
       Publish    Build, then publish out/PSGnuUtils to the PowerShell Gallery.
       Clean      Remove out/.
 
@@ -26,12 +31,16 @@
     Runs all tests, writes out/coverage.xml (JaCoCo) and fails below 98% line coverage.
 
 .EXAMPLE
+    ./build.ps1 Install
+    Builds and installs the module for the current user (open a new session, then: Import-Module PSGnuUtils).
+
+.EXAMPLE
     ./build.ps1 -Task Publish -NuGetApiKey $env:PSGALLERY_API_KEY
 #>
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Script parameters are used by the task functions below.')]
 [CmdletBinding()]
 param(
-    [ValidateSet('Bootstrap', 'Manifest', 'Analyze', 'Test', 'Build', 'TestBuild', 'Publish', 'Clean')]
+    [ValidateSet('Bootstrap', 'Manifest', 'Analyze', 'Test', 'Build', 'TestBuild', 'Install', 'Uninstall', 'Publish', 'Clean')]
     [string[]]$Task = @('Analyze', 'Test'),
 
     [string[]]$TestPath,
@@ -39,6 +48,9 @@ param(
     [switch]$CodeCoverage,
 
     [string]$NuGetApiKey = $env:PSGALLERY_API_KEY,
+
+    # Install/Uninstall: module folder(s) to use instead of the current user's default module folder(s).
+    [string[]]$ModulePath,
 
     [string]$Repository = 'PSGallery'
 )
@@ -189,6 +201,50 @@ function Invoke-Build {
     Write-Host "Built $OutputDir"
 }
 
+function Get-InstallRoot {
+    if ($ModulePath) { return $ModulePath }
+    # $IsWindows does not exist in Windows PowerShell 5.1; -or stops before reading it there.
+    if ($PSVersionTable.PSEdition -eq 'Desktop' -or $IsWindows) {
+        $documents = [Environment]::GetFolderPath('MyDocuments')
+        return @((Join-Path $documents 'PowerShell/Modules'), (Join-Path $documents 'WindowsPowerShell/Modules'))
+    }
+    $dataHome = $env:XDG_DATA_HOME
+    if (-not $dataHome) { $dataHome = Join-Path $HOME '.local/share' }
+    Join-Path $dataHome 'powershell/Modules'
+}
+
+function Get-ModuleVersion {
+    [string](Import-PowerShellDataFile -Path $ManifestPath).ModuleVersion
+}
+
+function Invoke-Install {
+    Invoke-Build
+    $version = Get-ModuleVersion
+    foreach ($root in @(Get-InstallRoot)) {
+        $target = Join-Path (Join-Path $root 'PSGnuUtils') $version
+        Write-Step "Install -> $target"
+        if (Test-Path -LiteralPath $target) { Remove-Item -LiteralPath $target -Recurse -Force }
+        $null = New-Item -ItemType Directory -Force -Path $target
+        Copy-Item -Path (Join-Path $OutputDir '*') -Destination $target -Recurse -Force
+    }
+    Write-Host "Installed PSGnuUtils $version. In a new session: Import-Module PSGnuUtils"
+}
+
+function Invoke-Uninstall {
+    $version = Get-ModuleVersion
+    foreach ($root in @(Get-InstallRoot)) {
+        $moduleRoot = Join-Path $root 'PSGnuUtils'
+        $target = Join-Path $moduleRoot $version
+        if (-not (Test-Path -LiteralPath $target)) {
+            Write-Host "PSGnuUtils $version is not installed in $root."
+            continue
+        }
+        Write-Step "Uninstall $target"
+        Remove-Item -LiteralPath $target -Recurse -Force
+        if (@(Get-ChildItem -LiteralPath $moduleRoot -Force).Count -eq 0) { Remove-Item -LiteralPath $moduleRoot -Force }
+    }
+}
+
 function Invoke-Publish {
     if (-not $NuGetApiKey) { throw 'Publish needs -NuGetApiKey or $env:PSGALLERY_API_KEY.' }
     Invoke-Build
@@ -204,6 +260,8 @@ foreach ($name in $Task) {
         'Test' { Invoke-Test -ModuleManifest $ManifestPath }
         'Build' { Invoke-Build }
         'TestBuild' { Invoke-Test -ModuleManifest (Join-Path $OutputDir 'PSGnuUtils.psd1') }
+        'Install' { Invoke-Install }
+        'Uninstall' { Invoke-Uninstall }
         'Publish' { Invoke-Publish }
         'Clean' {
             Write-Step 'Clean'
