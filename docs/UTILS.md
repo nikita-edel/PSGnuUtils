@@ -16,7 +16,7 @@ implemented util is listed here).
 | `ls` | planned | subset | 4 | 3 | `-l -a -A -h -R -t -S -r -1 -d -F --color`; multi-column layout is the tricky part. |
 | `cp` | planned | subset | 3 | 3 | `-r -p -f -i -n -u -v -a -T -t`; no SELinux / reflink options. |
 | `mv` | planned | subset | 2 | 3 | `-f -i -n -u -v -T -t -b`. |
-| `rm` | planned | full | 2 | 3 | `-r -f -i -I -d -v --preserve-root`. |
+| `rm` | done | full | 2 | 3 | Links and junctions are removed, never followed; drive roots are protected like `/`; read-only files are removed; piped `Get-ChildItem` objects are extra operands. |
 | `rmdir` | done | full | 1 | 1 | |
 | `mkdir` | done | full | 1 | 1 | Only octal `-m` modes; modes applied on Unix with PowerShell 7.3+, ignored on Windows; `-Z` accepted and ignored. |
 | `ln` | planned | full | 2 | 3 | Symlinks need admin or developer mode on Windows. |

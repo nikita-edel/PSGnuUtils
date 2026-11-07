@@ -125,17 +125,26 @@ function New-TestDirectoryLink {
 function Use-TestConsoleInput {
     <#
     .SYNOPSIS
-    Runs Script with [Console]::In reading Text, to test utils that read the console without pipeline input.
+    Runs Script with [Console]::In reading Text (and [Console]::Error captured as .ConsoleError of the result).
     #>
     param(
         [Parameter(Mandatory)][AllowEmptyString()][string]$Text,
         [Parameter(Mandatory)][scriptblock]$Script
     )
 
-    $original = [System.Console]::In
+    $originalIn = [System.Console]::In
+    $originalError = [System.Console]::Error
+    $errorWriter = New-Object System.IO.StringWriter
     [System.Console]::SetIn((New-Object System.IO.StringReader -ArgumentList $Text))
-    try { & $Script }
-    finally { [System.Console]::SetIn($original) }
+    [System.Console]::SetError($errorWriter)
+    try { $result = & $Script }
+    finally {
+        [System.Console]::SetIn($originalIn)
+        [System.Console]::SetError($originalError)
+    }
+    # Prompts (rm -i) go to the console's stderr; attach them to Invoke-TestGnu results.
+    if ($result -is [pscustomobject]) { Add-Member -InputObject $result -NotePropertyName 'ConsoleError' -NotePropertyValue $errorWriter.ToString() -Force }
+    $result
 }
 
 function Lock-TestFile {

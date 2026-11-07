@@ -21,7 +21,7 @@ Next step: rewrite help texts in our own words, check CI on Linux/macOS, then re
 
 ## Batch 2 - easy (difficulty 1-3, mostly line filters)
 
-Done 2026-11-07: `pathchk fold expand nl uniq cut paste comm`.
+Done 2026-11-07: `pathchk fold expand nl uniq cut paste comm`, plus `rm` from batch 3 (the user tried `rm -rf`).
 
 Order: `unexpand tsort shuf tr cksum sum readlink realpath touch
 sync install shred dircolors basenc sha224sum printf test expr factor env nice nohup timeout kill id groups uptime
@@ -36,7 +36,7 @@ Shared work for this batch:
 
 ## Batch 3 - medium
 
-`cmp which mv rm cp ln df du stat split csplit fmt numfmt join sort od dd ls`
+`cmp which mv cp ln df du stat split csplit fmt numfmt join sort od dd ls`
 
 * sort: key specs (`-k POS1[,POS2]` with `bnr...` modifiers), `-t`, stable merge; ordinal vs culture comparison
   needs a decision (GNU uses the locale; LC_ALL=C is ordinal).

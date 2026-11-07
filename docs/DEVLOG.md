@@ -3,6 +3,17 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-07 (late night) - rm, build switches, Install
+
+- The user ran `rm -rf meow` and got Remove-Item: rm was not implemented yet (batch 3), so Enable-GnuUtil had
+  nothing to alias. Implemented rm now: -f -i -I --interactive[=WHEN] -r -R -d -v --preserve-root[=all]
+  --no-preserve-root --one-file-system. Links/junctions are deleted, never followed; '/' and drive roots refused
+  (tests simulate roots via a mocked Test-GnuRootPath, a real root is never touched); '.'/'..' refused; read-only
+  files removed; prompts go to the console's stderr and read [Console]::In; piped FileSystemInfo objects are operands.
+- build.ps1: Install/Uninstall tasks (user module folders, both editions on Windows) and one switch per task
+  (`./build.ps1 -Install`); the user found `-Task Install` clumsy.
+- Results: 945 tests green on 5.1, 951 on 7.6, 100% coverage (4650 commands), analyzer clean.
+
 ## 2026-11-07 (night) - 100% coverage
 
 - Coverage 98.9% -> 100% (4449/4449 commands on PowerShell 7.6 / Windows). `./build.ps1 -Test -CodeCoverage`

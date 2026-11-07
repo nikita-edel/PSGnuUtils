@@ -38,6 +38,7 @@
         'Invoke-GnuPathchk',
         'Invoke-GnuPrintenv',
         'Invoke-GnuPwd',
+        'Invoke-GnuRm',
         'Invoke-GnuRmdir',
         'Invoke-GnuSeq',
         'Invoke-GnuSha1sum',
