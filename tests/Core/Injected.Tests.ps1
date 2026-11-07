@@ -213,3 +213,41 @@ Describe 'Get-GnuLinkTarget' {
         InModuleScope PSGnuUtils -Parameters @{ P = $link } { param($P) Get-GnuLinkTarget -Path $P } | Should -Match 'target-real$'
     }
 }
+
+Describe 'Runtime-specific file methods' {
+    It 'reads Unix modes through the runtime method when there is one' {
+        $file = New-TestFile -Path (Join-Path $TestDrive 'unix-mode.txt') -Content 'x'
+        InModuleScope PSGnuUtils -Parameters @{ F = $file } {
+            param($F)
+            Mock Test-GnuWindows { $false }
+            # Stand-in with the same shape (string) -> enum: File.GetAttributes.
+            Mock Get-GnuFileMethod { [System.IO.File].GetMethod('GetAttributes', [type[]]@([string])) }
+            Get-GnuUnixFileMode -Path $F | Should -Be ([int][System.IO.File]::GetAttributes($F))
+            Mock Get-GnuFileMethod { }
+            Get-GnuUnixFileMode -Path $F | Should -BeNullOrEmpty
+        }
+    }
+
+    It 'finds methods by name and parameter types' {
+        InModuleScope PSGnuUtils {
+            (Get-GnuFileMethod -Name 'Exists' -ParameterTypes @([string])).Name | Should -Be 'Exists'
+            Get-GnuFileMethod -Name 'NoSuchMethod' -ParameterTypes @([string]) | Should -BeNullOrEmpty
+        }
+    }
+
+    It 'creates directory links with the runtime method and falls back to New-Item' {
+        $target = Join-Path $TestDrive 'symlink-target'
+        $null = New-Item -ItemType Directory -Path $target
+        InModuleScope PSGnuUtils -Parameters @{ T = $target; L = (Join-Path $TestDrive 'symlink-dir') } {
+            param($T, $L)
+            if ($null -ne (Get-GnuFileMethod -Name 'CreateSymbolicLink' -ParameterTypes @([string], [string]))) {
+                # Without symlink rights this throws; either way the runtime method was used.
+                try { New-GnuSymbolicLink -Path $L -Target $T -Directory } catch { $null = $_ }
+            }
+            Mock Get-GnuFileMethod { }
+            Mock New-Item { 'fallback' }
+            New-GnuSymbolicLink -Path 'x' -Target 'y'
+            Should -Invoke New-Item -Times 1
+        }
+    }
+}

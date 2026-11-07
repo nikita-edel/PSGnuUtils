@@ -242,4 +242,62 @@ Describe 'ls helpers' {
             $null = $fake
         }
     }
+
+
 }
+
+Describe 'ls edge cases' {
+    It 'marks only files as executable and uses default extensions without PATHEXT' {
+        $dir = Join-Path $TestDrive 'ls-exec'
+        $null = New-Item -ItemType Directory -Path $dir
+        $exe = New-TestFile -Path (Join-Path $dir 'tool.exe') -Content 'x'
+        InModuleScope PSGnuUtils -Parameters @{ D = $dir; E = $exe } {
+            param($D, $E)
+            Test-GnuLsExecutable -Item (Get-Item -LiteralPath $D) | Should -BeFalse
+            Mock Test-GnuWindows { $true }
+            $saved = $env:PATHEXT
+            try {
+                Remove-Item Env:\PATHEXT -ErrorAction SilentlyContinue
+                Test-GnuLsExecutable -Item (Get-Item -LiteralPath $E) | Should -BeTrue
+            }
+            finally { $env:PATHEXT = $saved }
+        }
+    }
+
+    It 'reads owners from User and Group properties (Unix)' {
+        $file = New-TestFile -Path (Join-Path $TestDrive 'owned.txt') -Content 'x'
+        InModuleScope PSGnuUtils -Parameters @{ F = $file } {
+            param($F)
+            $item = Get-Item -LiteralPath $F
+            Add-Member -InputObject $item -NotePropertyName User -NotePropertyValue 'alice' -Force
+            Add-Member -InputObject $item -NotePropertyName Group -NotePropertyValue 'staff' -Force
+            $owner = Get-GnuLsOwner -Item $item
+            $owner.Owner | Should -Be 'alice'
+            $owner.Group | Should -Be 'staff'
+        }
+    }
+
+    It 'skips entries that vanish while listing' {
+        $dir = Join-Path $TestDrive 'ls-vanish'
+        $null = New-TestFile -Path (Join-Path $dir 'stays.txt') -Content 'x'
+        $null = New-TestFile -Path (Join-Path $dir 'vanish.txt') -Content 'x'
+        InModuleScope PSGnuUtils -Parameters @{ D = $dir } {
+            param($D)
+            $real = Get-Command -Name Get-Item -CommandType Cmdlet
+            Mock Get-Item { & $real @PesterBoundParameters }
+            Mock Get-Item { } -ParameterFilter { $LiteralPath -like '*vanish.txt' }
+            $entries = Get-GnuLsEntry -Path $D -Settings @{ Show = 'visible'; Sort = 'name'; Reverse = $false }
+            @($entries | ForEach-Object { $_.Name }) | Should -Be @('stays.txt')
+        }
+    }
+
+    It 'breaks name ties ordinally and leaves short last columns empty' {
+        InModuleScope PSGnuUtils {
+            $sorted = Get-GnuLsSortedEntry -Entries @(@{ Name = 'a' }, @{ Name = 'A' }) -Settings @{ Sort = 'name'; Reverse = $false }
+            @($sorted | ForEach-Object { $_.Name }) | Should -Be @('A', 'a')
+            $names = [string[]]@('aa', 'bb', 'cc', 'dd', 'ee')
+            @(Format-GnuLsColumns -Names $names -Lengths ([int[]]@(2, 2, 2, 2, 2)) -Width 10) | Should -Be @('aa  cc  ee', 'bb  dd')
+        }
+    }
+}
+

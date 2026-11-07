@@ -127,7 +127,7 @@ function New-GnuSymbolicLink {
         [switch]$Directory
     )
 
-    if ($null -ne [System.IO.File].GetMethod('CreateSymbolicLink')) {
+    if ($null -ne (Get-GnuFileMethod -Name 'CreateSymbolicLink' -ParameterTypes @([string], [string]))) {
         if ($Directory) { $null = [System.IO.Directory]::CreateSymbolicLink($Path, $Target) }
         else { $null = [System.IO.File]::CreateSymbolicLink($Path, $Target) }
         return

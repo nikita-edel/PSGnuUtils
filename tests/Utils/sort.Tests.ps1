@@ -165,4 +165,9 @@ Describe 'sort' {
             ConvertTo-GnuSortValue -Text '-inf' -Key @{ Mode = 'general'; Blanks = $false } | Should -Be ([double]::NegativeInfinity)
         }
     }
+
+    It 'skips runs of blanks between default fields and honors b on end positions' {
+        (Invoke-TestGnu sort '-k', '3' -InputObject 'x  y  b', 'x  y  a').Output | Should -Be @('x  y  a', 'x  y  b')
+        (Invoke-TestGnu sort '-k', '2,2.1b' -InputObject 'a   z', 'b   y').Output | Should -Be @('b   y', 'a   z')
+    }
 }

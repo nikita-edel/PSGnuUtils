@@ -190,7 +190,16 @@ function Get-GnuUnixFileMode {
     #>
     param([Parameter(Mandatory)][string]$Path)
     if (Test-GnuWindows) { return }
-    $method = [System.IO.File].GetMethod('GetUnixFileMode', [type[]]@([string]))
+    $method = Get-GnuFileMethod -Name 'GetUnixFileMode' -ParameterTypes @([string])
     if ($null -eq $method) { return }
     [int]$method.Invoke($null, @($Path))
+}
+
+function Get-GnuFileMethod {
+    <#
+    .SYNOPSIS
+    A static System.IO.File method by name and parameter types, or nothing if this runtime does not have it.
+    #>
+    param([Parameter(Mandatory)][string]$Name, [Parameter(Mandatory)][type[]]$ParameterTypes)
+    [System.IO.File].GetMethod($Name, $ParameterTypes)
 }
