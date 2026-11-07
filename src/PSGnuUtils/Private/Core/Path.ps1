@@ -131,3 +131,13 @@ function Get-GnuPathPrefix {
     }
     $trimmed
 }
+
+function Get-GnuParentPath {
+    <#
+    .SYNOPSIS
+    [System.IO.Path]::GetDirectoryName without exceptions: .NET Framework throws for characters such as '|'
+    that are invalid in Windows paths; the file system call that follows reports the real error.
+    #>
+    param([Parameter(Mandatory)][AllowEmptyString()][string]$Path)
+    try { [System.IO.Path]::GetDirectoryName($Path) } catch { $null }
+}

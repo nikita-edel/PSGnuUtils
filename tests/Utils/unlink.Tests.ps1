@@ -19,12 +19,11 @@ Describe 'unlink' {
         Test-Path -LiteralPath $directory | Should -BeTrue
     }
 
-    It 'removes a symbolic link to a directory but not the directory' {
-        if (-not (Test-CanCreateSymbolicLink -Directory $TestDrive)) { Set-ItResult -Skipped -Because 'symbolic links cannot be created here' }
+    It 'removes a link to a directory (symlink or junction) but not the directory' {
         $target = Join-Path $TestDrive 'link-target'
         $link = Join-Path $TestDrive 'dir-link'
         $null = New-Item -ItemType Directory -Path $target
-        $null = New-Item -ItemType SymbolicLink -Path $link -Value $target
+        if (-not (New-TestDirectoryLink -Path $link -Target $target)) { Set-ItResult -Skipped -Because 'directory links cannot be created here' }
         (Invoke-TestGnu unlink $link).ExitCode | Should -Be 0
         Test-Path -LiteralPath $link | Should -BeFalse
         Test-Path -LiteralPath $target | Should -BeTrue

@@ -95,25 +95,62 @@ function Test-IsWindowsPlatform {
     $PSVersionTable.PSEdition -ne 'Core' -or [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
 }
 
-function Test-CanCreateSymbolicLink {
+function New-TestDirectoryLink {
     <#
     .SYNOPSIS
-    $true if a symbolic link can be created in Directory (needs admin or developer mode on Windows).
+    Creates a link Path -> Target directory: a symbolic link if allowed, else (Windows) a junction,
+    which needs neither admin rights nor developer mode. Returns $false if neither works.
     #>
-    param([Parameter(Mandatory)][string]$Directory)
+    param(
+        [Parameter(Mandatory)][string]$Path,
+        [Parameter(Mandatory)][string]$Target
+    )
 
-    $target = Join-Path $Directory ('symlink-probe-target-' + [guid]::NewGuid())
-    $link = Join-Path $Directory ('symlink-probe-link-' + [guid]::NewGuid())
-    $null = New-Item -ItemType Directory -Path $target
     try {
-        $null = New-Item -ItemType SymbolicLink -Path $link -Value $target -ErrorAction Stop
-        Remove-Item -LiteralPath $link -Force
+        $null = New-Item -ItemType SymbolicLink -Path $Path -Value $Target -ErrorAction Stop
+        return $true
+    }
+    catch {
+        if (-not (Test-IsWindowsPlatform)) { return $false }
+    }
+    try {
+        $null = New-Item -ItemType Junction -Path $Path -Value $Target -ErrorAction Stop
         $true
     }
     catch {
         $false
     }
-    finally {
-        Remove-Item -LiteralPath $target -Force -Recurse -ErrorAction SilentlyContinue
+}
+
+function Use-TestConsoleInput {
+    <#
+    .SYNOPSIS
+    Runs Script with [Console]::In reading Text, to test utils that read the console without pipeline input.
+    #>
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string]$Text,
+        [Parameter(Mandatory)][scriptblock]$Script
+    )
+
+    $original = [System.Console]::In
+    [System.Console]::SetIn((New-Object System.IO.StringReader -ArgumentList $Text))
+    try { & $Script }
+    finally { [System.Console]::SetIn($original) }
+}
+
+function Lock-TestFile {
+    <#
+    .SYNOPSIS
+    Opens Path exclusively and returns the stream (dispose it to unlock), or nothing if the OS does not enforce the lock.
+    #>
+    param([Parameter(Mandatory)][string]$Path)
+
+    $stream = [System.IO.File]::Open($Path, [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+    try {
+        $null = [System.IO.File]::ReadAllBytes($Path)
+        $stream.Dispose()
+    }
+    catch {
+        $stream
     }
 }

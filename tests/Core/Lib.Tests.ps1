@@ -134,6 +134,7 @@ Describe 'Checksum line parsing' {
             (ConvertFrom-GnuChecksumLine -Line "$hash *bin.dat" -Tag 'MD5' -HexLength 32).Name | Should -Be 'bin.dat'
             (ConvertFrom-GnuChecksumLine -Line "MD5 (x y) = $hash" -Tag 'MD5' -HexLength 32).Name | Should -Be 'x y'
             (ConvertFrom-GnuChecksumLine -Line ("\$hash  a\\b\nc") -Tag 'MD5' -HexLength 32).Name | Should -BeExactly "a\b`nc"
+            (ConvertFrom-GnuChecksumLine -Line ("\$hash  a\rb\qc") -Tag 'MD5' -HexLength 32).Name | Should -BeExactly "a`rb\qc"
             ConvertFrom-GnuChecksumLine -Line 'garbage' -Tag 'MD5' -HexLength 32 | Should -BeNullOrEmpty
             ConvertFrom-GnuChecksumLine -Line "abc  short" -Tag 'MD5' -HexLength 32 | Should -BeNullOrEmpty
         }

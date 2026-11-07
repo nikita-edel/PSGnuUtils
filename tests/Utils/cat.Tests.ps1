@@ -80,4 +80,10 @@ Describe 'cat' {
         $r.ErrorText | Should -BeExactly 'cat: missing.txt: No such file or directory'
         $r.ExitCode | Should -Be 1
     }
+
+    It 'prints nothing for an empty file in -A mode' {
+        $null = New-TestFile -Path (Join-Path $dir 'empty.txt') -Content ''
+        $r = Invoke-TestGnu cat '-A', 'empty.txt', 'b.txt' -WorkingDirectory $dir
+        $r.Output | Should -Be @('three$')
+    }
 }

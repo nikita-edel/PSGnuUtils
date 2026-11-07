@@ -46,19 +46,30 @@ function Get-GnuMachineName {
     <#
     .SYNOPSIS
     Hardware name as printed by 'uname -m' (x86_64, aarch64, arm64 on macOS, i686, armv7l).
+    .PARAMETER Architecture
+    .NET / Windows architecture name (X64, Arm64, AMD64, ...). Detected when omitted.
+    .PARAMETER Platform
+    Result of Get-GnuPlatform. Detected when omitted.
     #>
-    $architecture = $null
-    try { $architecture = [string][System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture }
-    catch { $architecture = $null }
-    if (-not $architecture) { $architecture = [string]$env:PROCESSOR_ARCHITECTURE }
+    param(
+        [AllowEmptyString()][string]$Architecture,
+        [string]$Platform
+    )
 
-    switch -Regex ($architecture) {
+    if (-not $PSBoundParameters.ContainsKey('Architecture')) {
+        try { $Architecture = [string][System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture }
+        catch { $Architecture = '' }
+        if (-not $Architecture) { $Architecture = [string]$env:PROCESSOR_ARCHITECTURE }
+    }
+    if (-not $Platform) { $Platform = Get-GnuPlatform }
+
+    switch -Regex ($Architecture) {
         '^(X64|AMD64)$' { return 'x86_64' }
         '^X86$' { return 'i686' }
-        '^ARM64$' { if ((Get-GnuPlatform) -eq 'MacOS') { return 'arm64' } else { return 'aarch64' } }
+        '^ARM64$' { if ($Platform -eq 'MacOS') { return 'arm64' } else { return 'aarch64' } }
         '^ARM$' { return 'armv7l' }
     }
-    if ($architecture) { return $architecture.ToLowerInvariant() }
+    if ($Architecture) { return $Architecture.ToLowerInvariant() }
     'unknown'
 }
 
@@ -66,15 +77,27 @@ function Get-GnuOsInfo {
     <#
     .SYNOPSIS
     Collects the fields printed by uname.
+    .PARAMETER Platform
+    Result of Get-GnuPlatform. Detected when omitted.
+    .PARAMETER Description
+    RuntimeInformation.OSDescription. Detected when omitted.
     #>
-    $platform = Get-GnuPlatform
-    $description = ''
-    try { $description = [string][System.Runtime.InteropServices.RuntimeInformation]::OSDescription }
-    catch { $description = '' }
+    param(
+        [string]$Platform,
+        [AllowEmptyString()][string]$Description
+    )
+
+    if (-not $Platform) { $Platform = Get-GnuPlatform }
+    if (-not $PSBoundParameters.ContainsKey('Description')) {
+        try { $Description = [string][System.Runtime.InteropServices.RuntimeInformation]::OSDescription }
+        catch { $Description = '' }
+    }
+    $platform = $Platform
+    $description = $Description
 
     $info = @{
         NodeName         = [System.Net.Dns]::GetHostName()
-        Machine          = Get-GnuMachineName
+        Machine          = Get-GnuMachineName -Platform $platform
         Processor        = 'unknown'
         HardwarePlatform = 'unknown'
     }

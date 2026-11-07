@@ -30,4 +30,23 @@ Describe 'sleep' {
         $r.ExitCode | Should -Be 1
         $r.ErrorText | Should -Match 'missing operand'
     }
+
+    It 'parses intervals into seconds' -ForEach @(
+        @{ Text = '2'; Seconds = 2 }
+        @{ Text = '1.5m'; Seconds = 90 }
+        @{ Text = '2h'; Seconds = 7200 }
+        @{ Text = '1d'; Seconds = 86400 }
+        @{ Text = '.5s'; Seconds = 0.5 }
+        @{ Text = '1e1'; Seconds = 10 }
+    ) {
+        InModuleScope PSGnuUtils -Parameters @{ T = $Text } { param($T) ConvertFrom-GnuSleepInterval -Text $T } | Should -Be $Seconds
+    }
+
+    It 'parses inf and infinity as an endless sleep' {
+        InModuleScope PSGnuUtils {
+            [double]::IsPositiveInfinity((ConvertFrom-GnuSleepInterval -Text 'inf')) | Should -BeTrue
+            [double]::IsPositiveInfinity((ConvertFrom-GnuSleepInterval -Text 'infinity')) | Should -BeTrue
+            ConvertFrom-GnuSleepInterval -Text '-1' | Should -BeNullOrEmpty
+        }
+    }
 }

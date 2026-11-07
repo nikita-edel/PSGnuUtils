@@ -222,11 +222,10 @@ Describe 'Path helpers' {
     }
 
     It 'resolves physical paths through symbolic links' {
-        if (-not (Test-CanCreateSymbolicLink -Directory $TestDrive)) { Set-ItResult -Skipped -Because 'symbolic links cannot be created here' }
         $real = Join-Path $TestDrive 'real'
         $null = New-Item -ItemType Directory -Path (Join-Path $real 'child') -Force
         $link = Join-Path $TestDrive 'link'
-        $null = New-Item -ItemType SymbolicLink -Path $link -Value $real
+        if (-not (New-TestDirectoryLink -Path $link -Target $real)) { Set-ItResult -Skipped -Because 'directory links cannot be created here' }
         $resolved = InModuleScope PSGnuUtils -Parameters @{ P = (Join-Path $link 'child') } { param($P) Resolve-GnuPhysicalPath -Path $P }
         $resolved | Should -Be ([System.IO.Path]::GetFullPath((Join-Path $real 'child')))
     }

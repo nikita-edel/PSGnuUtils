@@ -77,7 +77,7 @@ function Invoke-GnuMkdir {
                             Write-GnuError -Context $ctx -Message "cannot create directory '$directory': $reason"
                             break
                         }
-                        $parent = [System.IO.Path]::GetDirectoryName($path)
+                        $parent = Get-GnuParentPath -Path $path
                         if (-not $parents -and $parent -and -not [System.IO.Directory]::Exists($parent)) {
                             Write-GnuError -Context $ctx -Message "cannot create directory '$display': No such file or directory"
                             break

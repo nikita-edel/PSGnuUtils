@@ -18,12 +18,11 @@ Describe 'pwd' {
         (Invoke-TestGnu pwd '--physical' -WorkingDirectory $TestDrive).Output | Should -Be $r.Output
     }
 
-    It 'resolves symbolic links with -P but not with -L' {
-        if (-not (Test-CanCreateSymbolicLink -Directory $TestDrive)) { Set-ItResult -Skipped -Because 'symbolic links cannot be created here' }
+    It 'resolves symbolic links and junctions with -P but not with -L' {
         $real = Join-Path $TestDrive 'pwd-real'
         $link = Join-Path $TestDrive 'pwd-link'
         $null = New-Item -ItemType Directory -Path $real
-        $null = New-Item -ItemType SymbolicLink -Path $link -Value $real
+        if (-not (New-TestDirectoryLink -Path $link -Target $real)) { Set-ItResult -Skipped -Because 'directory links cannot be created here' }
         (Invoke-TestGnu pwd '-P' -WorkingDirectory $link).Output[0] | Should -Be ([System.IO.Path]::GetFullPath($real))
         (Invoke-TestGnu pwd '-L' -WorkingDirectory $link).Output[0] | Should -Be ([System.IO.Path]::GetFullPath($link))
     }

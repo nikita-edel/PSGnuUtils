@@ -174,10 +174,10 @@ function ConvertTo-GnuVisibleText {
             $chunk += $Text[$i]
             $i++
         }
+        # UTF-8 bytes of non-ASCII characters are 0x80-0xF4, so 'M-^?' (byte 0xFF) cannot occur here.
         foreach ($byte in $script:GnuUtf8.GetBytes($chunk)) {
             $low = $byte - 128
             if ($low -lt 32) { [void]$builder.Append('M-^').Append([char]($low + 64)) }
-            elseif ($low -eq 127) { [void]$builder.Append('M-^?') }
             else { [void]$builder.Append('M-').Append([char]$low) }
         }
     }

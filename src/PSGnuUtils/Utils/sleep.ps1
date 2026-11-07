@@ -39,19 +39,10 @@ function Invoke-GnuSleep {
             $infinite = $false
             $invalid = @()
             foreach ($operand in $operands) {
-                if ($operand -notmatch '^(?<number>(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?|inf|infinity)(?<unit>[smhd]?)$') {
-                    $invalid += $operand
-                    continue
-                }
-                $number = $Matches['number']
-                if ($number -like 'inf*') { $infinite = $true; continue }
-                $value = [double]::Parse($number, [System.Globalization.CultureInfo]::InvariantCulture)
-                switch ($Matches['unit']) {
-                    'm' { $value *= 60 }
-                    'h' { $value *= 3600 }
-                    'd' { $value *= 86400 }
-                }
-                $seconds += $value
+                $value = ConvertFrom-GnuSleepInterval -Text $operand
+                if ($null -eq $value) { $invalid += $operand }
+                elseif ([double]::IsPositiveInfinity($value)) { $infinite = $true }
+                else { $seconds += $value }
             }
 
             if ($operands.Count -eq 0) {
@@ -75,4 +66,24 @@ function Invoke-GnuSleep {
         }
         Complete-GnuUtil -Context $ctx
     }
+}
+
+function ConvertFrom-GnuSleepInterval {
+    <#
+    .SYNOPSIS
+    Parses NUMBER[smhd] (or inf/infinity) into seconds. Returns nothing if the text is invalid.
+    #>
+    param([Parameter(Mandatory)][AllowEmptyString()][string]$Text)
+
+    if ($Text -notmatch '^(?<number>(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?|inf|infinity)(?<unit>[smhd]?)$') { return }
+    $number = $Matches['number']
+    if ($number -like 'inf*') { return [double]::PositiveInfinity }
+
+    $value = [double]::Parse($number, [System.Globalization.CultureInfo]::InvariantCulture)
+    switch ($Matches['unit']) {
+        'm' { $value *= 60 }
+        'h' { $value *= 3600 }
+        'd' { $value *= 86400 }
+    }
+    $value
 }

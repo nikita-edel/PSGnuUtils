@@ -50,4 +50,15 @@ Describe 'tac' {
         $r.ExitCode | Should -Be 1
         $r.ErrorText | Should -Match "failed to open 'missing.txt' for reading: No such file or directory"
     }
+
+    It 'prints nothing for an empty file' {
+        $null = New-TestFile -Path (Join-Path $dir 'empty.txt') -Content ''
+        $r = Invoke-TestGnu tac 'empty.txt' -WorkingDirectory $dir
+        $r.Output.Count | Should -Be 0
+        $r.ExitCode | Should -Be 0
+    }
+
+    It 'ignores empty regex matches' {
+        (Invoke-TestGnu tac '-r', '-s', 'x*' -InputObject 'abc').Output | Should -Be @('abc')
+    }
 }

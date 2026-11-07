@@ -75,4 +75,11 @@ Describe 'truncate' {
         $r.ExitCode | Should -Be 1
         $r.ErrorText | Should -Match "cannot open 'no/parent.bin' for writing"
     }
+
+    It 'treats a directory reference as size 0' {
+        $null = New-Item -ItemType Directory -Path (Join-Path $TestDrive 'ref-dir') -Force
+        $null = New-TestFile -Path (Join-Path $TestDrive 'from-dir.bin') -Bytes (New-Object byte[] 5)
+        $null = Invoke-TestGnu truncate '-r', 'ref-dir', '-s', '+2', 'from-dir.bin' -WorkingDirectory $TestDrive
+        Get-TestSize 'from-dir.bin' | Should -Be 2
+    }
 }

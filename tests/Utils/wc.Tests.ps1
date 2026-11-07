@@ -70,4 +70,10 @@ Describe 'wc' {
         $r.Output | Should -Contain '1 g.txt'
         $r.ExitCode | Should -Be 1
     }
+
+    It 'counts a character outside the BMP as width 1 for -L' {
+        $emoji = [char]::ConvertFromUtf32(0x1F600)
+        (Invoke-TestGnu wc '-L' -InputObject ($emoji + 'a')).Output | Should -Be @('2')
+        (Invoke-TestGnu wc '-m' -InputObject $emoji).Output | Should -Be @('2')
+    }
 }

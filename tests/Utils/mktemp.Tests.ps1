@@ -82,4 +82,16 @@ Describe 'mktemp' {
         $r.Errors.Count | Should -Be 0
         Test-Path -LiteralPath (Join-Path $TestDrive 'missing-dir') | Should -BeFalse
     }
+
+    It 'uses the system temp directory when TMPDIR is not set' {
+        Remove-Item Env:\TMPDIR -ErrorAction SilentlyContinue
+        $expected = [System.IO.Path]::GetTempPath().TrimEnd([char[]]@([char]92, [char]47))
+        [System.IO.Path]::GetDirectoryName((Invoke-TestGnu mktemp '-u').Output[0]).TrimEnd([char[]]@([char]92, [char]47)) | Should -Be $expected
+    }
+
+    It 'keeps a TMPDIR that is a file system root' {
+        $env:TMPDIR = [System.IO.Path]::GetPathRoot($TestDrive)
+        $name = (Invoke-TestGnu mktemp '-u').Output[0]
+        [System.IO.Path]::GetDirectoryName($name) | Should -Be ([System.IO.Path]::GetPathRoot($TestDrive))
+    }
 }
