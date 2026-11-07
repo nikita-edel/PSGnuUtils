@@ -79,4 +79,11 @@ Describe 'uniq' {
         $r.ExitCode | Should -Be 1
         (Invoke-TestGnu uniq (Join-Path $TestDrive 'missing')).ErrorText | Should -Match 'No such file or directory'
     }
+
+    It 'writes NUL-terminated records to OUTPUT with -z' {
+        $in = New-TestFile -Path (Join-Path $TestDrive 'zin.txt') -Content "a`0a`0b`0"
+        $out = Join-Path $TestDrive 'zout.txt'
+        $null = Invoke-TestGnu uniq '-z', $in, $out
+        [System.IO.File]::ReadAllText($out) | Should -BeExactly "a`0b`0"
+    }
 }

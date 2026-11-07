@@ -14,11 +14,9 @@ function Get-GnuPlatform {
 
     $platform = 'Windows'
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        $runtime = [System.Runtime.InteropServices.RuntimeInformation]
-        $os = [System.Runtime.InteropServices.OSPlatform]
-        if ($runtime::IsOSPlatform($os::Windows)) { $platform = 'Windows' }
-        elseif ($runtime::IsOSPlatform($os::Linux)) { $platform = 'Linux' }
-        elseif ($runtime::IsOSPlatform($os::OSX)) { $platform = 'MacOS' }
+        if (Test-GnuOSPlatform -Name 'Windows') { $platform = 'Windows' }
+        elseif (Test-GnuOSPlatform -Name 'Linux') { $platform = 'Linux' }
+        elseif (Test-GnuOSPlatform -Name 'OSX') { $platform = 'MacOS' }
         else { $platform = 'Unix' }
     }
     $script:GnuPlatformCache = $platform
@@ -57,8 +55,7 @@ function Get-GnuMachineName {
     )
 
     if (-not $PSBoundParameters.ContainsKey('Architecture')) {
-        try { $Architecture = [string][System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture }
-        catch { $Architecture = '' }
+        $Architecture = Get-GnuRuntimeInformation -Property 'OSArchitecture'
         if (-not $Architecture) { $Architecture = [string]$env:PROCESSOR_ARCHITECTURE }
     }
     if (-not $Platform) { $Platform = Get-GnuPlatform }
@@ -89,8 +86,7 @@ function Get-GnuOsInfo {
 
     if (-not $Platform) { $Platform = Get-GnuPlatform }
     if (-not $PSBoundParameters.ContainsKey('Description')) {
-        try { $Description = [string][System.Runtime.InteropServices.RuntimeInformation]::OSDescription }
-        catch { $Description = '' }
+        $Description = Get-GnuRuntimeInformation -Property 'OSDescription'
     }
     $platform = $Platform
     $description = $Description
@@ -140,12 +136,49 @@ function Set-GnuUnixMode {
     )
 
     if (Test-GnuWindows) { return $false }
-    $method = [System.IO.File].GetMethods() |
-        Where-Object { $_.Name -eq 'SetUnixFileMode' -and $_.GetParameters()[0].ParameterType -eq [string] } |
-        Select-Object -First 1
+    $method = Get-GnuUnixModeMethod
     if ($null -eq $method) { return $false }
 
     $enumType = $method.GetParameters()[1].ParameterType
     [void]$method.Invoke($null, @($Path, [System.Enum]::ToObject($enumType, $Mode)))
     $true
+}
+
+function Test-GnuOSPlatform {
+    <#
+    .SYNOPSIS
+    RuntimeInformation.IsOSPlatform for an OSPlatform name (Windows, Linux, OSX, FreeBSD). PowerShell 7 only.
+    #>
+    param([Parameter(Mandatory)][string]$Name)
+    [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::$Name)
+}
+
+function Get-GnuRuntimeInformation {
+    <#
+    .SYNOPSIS
+    A static property of RuntimeInformation (OSArchitecture, OSDescription, ...) as string, or '' if unavailable.
+    .PARAMETER TypeName
+    The type to read from (default: System.Runtime.InteropServices.RuntimeInformation, which very old
+    .NET Framework versions do not have).
+    #>
+    param(
+        [Parameter(Mandatory)][string]$Property,
+        [string]$TypeName = 'System.Runtime.InteropServices.RuntimeInformation'
+    )
+
+    $type = $TypeName -as [type]
+    if ($null -eq $type) { return '' }
+    $info = $type.GetProperty($Property)
+    if ($null -eq $info) { return '' }
+    [string]$info.GetValue($null, $null)
+}
+
+function Get-GnuUnixModeMethod {
+    <#
+    .SYNOPSIS
+    The File.SetUnixFileMode(string, UnixFileMode) method (.NET 7+), or nothing on older runtimes.
+    #>
+    [System.IO.File].GetMethods() |
+        Where-Object { $_.Name -eq 'SetUnixFileMode' -and $_.GetParameters()[0].ParameterType -eq [string] } |
+        Select-Object -First 1
 }

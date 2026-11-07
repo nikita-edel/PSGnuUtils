@@ -65,4 +65,13 @@ Describe 'comm' {
         $r.ErrorText | Should -Match 'missing.txt: No such file or directory'
         $r.Output.Count | Should -Be 0
     }
+
+    It 'uses NUL for an empty --output-delimiter' {
+        (Invoke-TestGnu comm '--output-delimiter=', 'one.txt', 'two.txt' -WorkingDirectory $dir).Output[1] | Should -BeExactly ("`0`0" + 'b')
+    }
+
+    It 'prints the rest of a longer first file' {
+        $null = New-TestFile -Path (Join-Path $dir 'long.txt') -Content "b`nx`ny`n"
+        (Invoke-TestGnu comm 'long.txt', 'two.txt' -WorkingDirectory $dir).Output | Should -Be @("`t`tb", "`tc", "`td", 'x', 'y')
+    }
 }

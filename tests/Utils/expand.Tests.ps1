@@ -47,4 +47,8 @@ Describe 'expand' {
         $r.ErrorText | Should -Match "'/' specifier only allowed with the last value"
         $r.ExitCode | Should -Be 1
     }
+
+    It 'reads the console without pipeline input' {
+        (Use-TestConsoleInput -Text "a`tb`n" -Script { Invoke-TestGnu expand '-t', '2' }).Output | Should -Be @('a b')
+    }
 }

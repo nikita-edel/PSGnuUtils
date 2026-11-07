@@ -111,11 +111,20 @@ function Get-GnuModuleVersion {
     The module version from the manifest.
     .NOTES
     Read at call time: while the psm1 is still loading, the module's Version is 0.0.
+    .PARAMETER Module
+    The module info to read (default: this module).
+    .PARAMETER ManifestPath
+    Manifest used when the module has no version yet (default: the manifest of the source tree).
     #>
-    $module = $ExecutionContext.SessionState.Module
-    if ($null -ne $module -and $null -ne $module.Version -and $module.Version -ne [version]'0.0') { return $module.Version.ToString() }
-    $manifest = Join-Path -Path (Split-Path -Parent $PSScriptRoot) -ChildPath '../PSGnuUtils.psd1'
-    if (Test-Path -LiteralPath $manifest) { return [string](Import-PowerShellDataFile -Path $manifest).ModuleVersion }
+    param(
+        [AllowNull()][object]$Module,
+        [string]$ManifestPath
+    )
+
+    if (-not $PSBoundParameters.ContainsKey('Module')) { $Module = $ExecutionContext.SessionState.Module }
+    if (-not $ManifestPath) { $ManifestPath = Join-Path -Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) -ChildPath 'PSGnuUtils.psd1' }
+    if ($null -ne $Module -and $null -ne $Module.Version -and $Module.Version -ne [version]'0.0') { return $Module.Version.ToString() }
+    if (Test-Path -LiteralPath $ManifestPath) { return [string](Import-PowerShellDataFile -Path $ManifestPath).ModuleVersion }
     '0.0.0'
 }
 

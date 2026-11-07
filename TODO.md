@@ -5,7 +5,7 @@ Concrete next steps, most important first. Keep this list short and current; his
 ## Now
 
 - [x] Bootstrap, Analyze, Test on 5.1 and 7, Build + TestBuild (all green, 2026-11-07; see docs/DEVLOG.md).
-- [x] Coverage: 95.6% (target 90%).
+- [x] Coverage: 100% on Windows / PowerShell 7 (build fails below 98% with -CodeCoverage).
 - [ ] Push to GitHub and check the CI matrix (Linux/macOS especially: symlinks, `/` vs `\`, Unix modes).
 - [ ] Run the symlink tests once with developer mode enabled (they are skipped otherwise on Windows).
 

@@ -23,7 +23,7 @@
 
 .EXAMPLE
     ./build.ps1 -Task Test -CodeCoverage
-    Runs all tests and writes out/coverage.xml (JaCoCo).
+    Runs all tests, writes out/coverage.xml (JaCoCo) and fails below 98% line coverage.
 
 .EXAMPLE
     ./build.ps1 -Task Publish -NuGetApiKey $env:PSGALLERY_API_KEY
@@ -54,6 +54,8 @@ $OutputDir = Join-Path $OutputRoot 'PSGnuUtils'
 $TestsDir = Join-Path $RepoRoot 'tests'
 $PesterMinimumVersion = [version]'5.5.0'
 $AnalyzerMinimumVersion = [version]'1.21.0'
+# 100% on Windows; Linux/macOS cannot run the Windows-only branches (and vice versa).
+$CoverageMinimum = 98
 
 function Write-Step([string]$Message) {
     Write-Host "==> $Message" -ForegroundColor Cyan
@@ -137,7 +139,7 @@ function Invoke-Test([string]$ModuleManifest) {
         $configuration.CodeCoverage.Enabled = $true
         $configuration.CodeCoverage.Path = @(Get-ChildItem -LiteralPath $SourceDir -Recurse -Filter '*.ps1' | ForEach-Object { $_.FullName })
         $configuration.CodeCoverage.OutputPath = Join-Path $OutputRoot 'coverage.xml'
-        $configuration.CodeCoverage.CoveragePercentTarget = 90
+        $configuration.CodeCoverage.CoveragePercentTarget = $CoverageMinimum
     }
 
     try {
@@ -148,6 +150,9 @@ function Invoke-Test([string]$ModuleManifest) {
     }
     if ($result.FailedCount -gt 0 -or $result.Result -ne 'Passed') {
         throw "$($result.FailedCount) test(s) failed."
+    }
+    if ($CodeCoverage -and $result.CodeCoverage.CoveragePercent -lt $CoverageMinimum) {
+        throw "Code coverage $([Math]::Round($result.CodeCoverage.CoveragePercent, 2))% is below the minimum of $CoverageMinimum%."
     }
 }
 

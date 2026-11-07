@@ -106,7 +106,6 @@ function ConvertFrom-GnuCutList {
         if ($from -eq 0 -or $to -eq 0) {
             $what = 'bytes'
             if ($Unit -eq 'field') { $what = 'fields' }
-            if ($Unit -eq 'character position') { $what = 'characters' }
             return @{ Error = "$what are numbered from 1" }
         }
         if ($to -lt $from) { return @{ Error = 'invalid decreasing range' } }

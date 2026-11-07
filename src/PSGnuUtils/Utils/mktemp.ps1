@@ -113,50 +113,43 @@ function New-GnuTemporaryItem {
         }
     }
 
-    $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    $random = [System.Security.Cryptography.RandomNumberGenerator]::Create()
     $stem = $template.Substring(0, $template.Length - $xCount)
+    $dryRun = Test-GnuOption -Context $Context -Key 'dry-run'
     $lastError = $null
-    try {
-        for ($attempt = 0; $attempt -lt 100; $attempt++) {
-            $bytes = New-Object byte[] $xCount
-            $random.GetBytes($bytes)
-            $letters = foreach ($byte in $bytes) { $alphabet[$byte % $alphabet.Length] }
-            $name = $stem + (-join $letters) + $suffix
-            $display = $name
-            if ($directory) { $display = [System.IO.Path]::Combine($directory, $name) }
-            $path = Resolve-GnuPath -Path $display
+    for ($attempt = 0; $attempt -lt 100; $attempt++) {
+        $name = $stem + (New-GnuRandomText -Length $xCount) + $suffix
+        $display = $name
+        if ($directory) { $display = [System.IO.Path]::Combine($directory, $name) }
+        $path = Resolve-GnuPath -Path $display
 
-            if ([System.IO.File]::Exists($path) -or [System.IO.Directory]::Exists($path)) { continue }
-            if (Test-GnuOption -Context $Context -Key 'dry-run') { return $display }
+        # Directories and dry runs need an explicit check; for files, CreateNew detects collisions atomically.
+        $taken = [System.IO.File]::Exists($path) -or [System.IO.Directory]::Exists($path)
+        if ($taken -and ($makeDirectory -or $dryRun -or [System.IO.Directory]::Exists($path))) { continue }
+        if ($dryRun) { return $display }
 
-            try {
-                if ($makeDirectory) {
-                    $parent = [System.IO.Path]::GetDirectoryName($path)
-                    if ($parent -and -not [System.IO.Directory]::Exists($parent)) { throw (New-Object System.IO.DirectoryNotFoundException $parent) }
-                    $null = [System.IO.Directory]::CreateDirectory($path)
-                    $null = Set-GnuUnixMode -Path $path -Mode 448     # 0700
-                }
-                else {
-                    $stream = New-Object System.IO.FileStream -ArgumentList $path, ([System.IO.FileMode]::CreateNew), ([System.IO.FileAccess]::Write)
-                    $stream.Dispose()
-                    $null = Set-GnuUnixMode -Path $path -Mode 384     # 0600
-                }
-                return $display
+        try {
+            if ($makeDirectory) {
+                $parent = Get-GnuParentPath -Path $path
+                if ($parent -and -not [System.IO.Directory]::Exists($parent)) { throw (New-Object System.IO.DirectoryNotFoundException $parent) }
+                $null = [System.IO.Directory]::CreateDirectory($path)
+                $null = Set-GnuUnixMode -Path $path -Mode 448     # 0700
             }
-            catch [System.IO.IOException] {
-                $lastError = $_.Exception
-                if ([System.IO.File]::Exists($path)) { continue }
-                break
+            else {
+                $stream = New-Object System.IO.FileStream -ArgumentList $path, ([System.IO.FileMode]::CreateNew), ([System.IO.FileAccess]::Write)
+                $stream.Dispose()
+                $null = Set-GnuUnixMode -Path $path -Mode 384     # 0600
             }
-            catch {
-                $lastError = $_.Exception
-                break
-            }
+            return $display
         }
-    }
-    finally {
-        $random.Dispose()
+        catch {
+            $lastError = $_.Exception
+            if ([System.IO.File]::Exists($path)) {
+                # The name was taken: not an error, try another one.
+                $lastError = $null
+                continue
+            }
+            break
+        }
     }
 
     $kind = 'file'
@@ -169,4 +162,19 @@ function New-GnuTemporaryItem {
     else {
         Write-GnuError -Context $Context -Message "failed to create $kind via template '$($template + $suffix)': $reason"
     }
+}
+
+function New-GnuRandomText {
+    <#
+    .SYNOPSIS
+    Length random characters from [A-Za-z0-9], from a cryptographic random number generator.
+    #>
+    param([Parameter(Mandatory)][int]$Length)
+
+    $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    $bytes = New-Object byte[] $Length
+    $random = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+    try { $random.GetBytes($bytes) }
+    finally { $random.Dispose() }
+    -join @(foreach ($byte in $bytes) { $alphabet[$byte % $alphabet.Length] })
 }

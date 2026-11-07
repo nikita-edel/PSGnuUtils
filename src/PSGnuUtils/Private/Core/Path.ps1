@@ -17,9 +17,10 @@ function Resolve-GnuPath {
     catch {
         # e.g. 'a:b' on Unix is parsed as a drive that does not exist.
         $base = $ExecutionContext.SessionState.Path.CurrentFileSystemLocation.ProviderPath
-        $combined = [System.IO.Path]::Combine($base, $Path)
-        # .NET Framework's GetFullPath rejects ':' inside names; the unnormalized path is still usable.
-        try { return [System.IO.Path]::GetFullPath($combined) } catch { return $combined }
+        # .NET Framework rejects ':' and control characters in Combine/GetFullPath; fall back to plain joining,
+        # the file system call that follows reports the real problem.
+        try { return [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($base, $Path)) }
+        catch { return $base.TrimEnd((Get-GnuPathSeparator)) + [System.IO.Path]::DirectorySeparatorChar + $Path }
     }
 }
 
@@ -47,11 +48,9 @@ function Resolve-GnuPhysicalPath {
 
     while ($index -lt $parts.Count) {
         $candidate = [System.IO.Path]::Combine($current, $parts[$index])
-        $item = Get-Item -LiteralPath $candidate -Force -ErrorAction SilentlyContinue
-        $isLink = $null -ne $item -and ($item.LinkType -eq 'SymbolicLink' -or $item.LinkType -eq 'Junction')
-        if ($isLink -and $hops -lt 40) {
+        $target = Get-GnuLinkTarget -Path $candidate
+        if ($null -ne $target -and $hops -lt 40) {
             $hops++
-            $target = [string](@($item.Target)[0])
             if (-not [System.IO.Path]::IsPathRooted($target)) { $target = [System.IO.Path]::Combine($current, $target) }
             $target = [System.IO.Path]::GetFullPath($target)
 
@@ -139,5 +138,19 @@ function Get-GnuParentPath {
     that are invalid in Windows paths; the file system call that follows reports the real error.
     #>
     param([Parameter(Mandatory)][AllowEmptyString()][string]$Path)
-    try { [System.IO.Path]::GetDirectoryName($Path) } catch { $null }
+    if ($Path.Length -eq 0 -or $Path.IndexOfAny([System.IO.Path]::GetInvalidPathChars()) -ge 0) { return $null }
+    [System.IO.Path]::GetDirectoryName($Path)
+}
+
+function Get-GnuLinkTarget {
+    <#
+    .SYNOPSIS
+    The target of a symbolic link or junction (as stored, possibly relative), or nothing for other paths.
+    #>
+    param([Parameter(Mandatory)][string]$Path)
+
+    $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+    if ($null -ne $item -and ($item.LinkType -eq 'SymbolicLink' -or $item.LinkType -eq 'Junction')) {
+        [string](@($item.Target)[0])
+    }
 }

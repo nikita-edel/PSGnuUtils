@@ -78,4 +78,13 @@ Describe 'cut' {
         $r.ExitCode | Should -Be 1
         $r.ErrorText | Should -Match ([regex]::Escape($Message))
     }
+
+    It 'renders pipeline objects before cutting them' {
+        $r = Invoke-TestGnu cut '-c', '1-5' -InputObject ([pscustomobject]@{ Key = 'value1' })
+        $r.Output | Should -Contain 'value'
+    }
+
+    It 'reads the console without pipeline input' {
+        (Use-TestConsoleInput -Text "a,b`n" -Script { Invoke-TestGnu cut '-d', ',', '-f', '2' }).Output | Should -Be @('b')
+    }
 }

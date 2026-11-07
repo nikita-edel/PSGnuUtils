@@ -37,7 +37,7 @@ function Get-GnuUtil {
     param(
         [Parameter(Position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)]
         [SupportsWildcards()]
-        [string[]]$Name = @('*'),
+        [string[]]$Name,
 
         [SupportsWildcards()]
         [string]$Category = '*',
@@ -46,7 +46,9 @@ function Get-GnuUtil {
     )
 
     process {
-        foreach ($utilName in @(Resolve-GnuUtilName -Name $Name)) {
+        $patterns = $Name
+        if ($null -eq $patterns -or $patterns.Count -eq 0) { $patterns = @('*') }
+        foreach ($utilName in @(Resolve-GnuUtilName -Name $patterns)) {
             $spec = Get-GnuUtilSpec -Name $utilName
             if ($spec.Category -notlike $Category) { continue }
             $isEnabled = $script:GnuEnabledUtils.ContainsKey($utilName)

@@ -148,13 +148,6 @@ Describe 'Platform helpers with explicit input' {
         }
     }
 
-    It 'Set-GnuUnixMode reports unsupported runtimes' {
-        if ($PSVersionTable.PSEdition -eq 'Core') { Set-ItResult -Skipped -Because 'needs a runtime without File.SetUnixFileMode' }
-        InModuleScope PSGnuUtils {
-            Mock Test-GnuWindows { $false }
-            Set-GnuUnixMode -Path 'x' -Mode 384 | Should -BeFalse
-        }
-    }
 }
 
 Describe 'Framework error paths' {

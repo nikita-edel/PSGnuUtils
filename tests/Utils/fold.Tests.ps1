@@ -46,4 +46,13 @@ Describe 'fold' {
         $r.ErrorText | Should -Match "invalid number of columns: 'x'"
         (Invoke-TestGnu fold '-w', '0' -InputObject 'a').ErrorText | Should -Match "invalid number of columns: '0'"
     }
+
+    It 'keeps backspace at column 0' {
+        (Invoke-TestGnu fold '-w', '1' -InputObject "`ba").Output | Should -Be @("`ba")
+    }
+
+    It 'renders pipeline objects and reads the console' {
+        (Invoke-TestGnu fold '-w', '3' -InputObject ([pscustomobject]@{ Key = 'value1' })).Output | Should -Contain 'val'
+        (Use-TestConsoleInput -Text "abcd`n" -Script { Invoke-TestGnu fold '-w', '2' }).Output | Should -Be @('ab', 'cd')
+    }
 }

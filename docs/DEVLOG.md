@@ -3,6 +3,22 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-07 (night) - 100% coverage
+
+- Coverage 98.9% -> 100% (4449/4449 commands on PowerShell 7.6 / Windows). `./build.ps1 -Task Test -CodeCoverage`
+  now fails below 98% (Linux/macOS cannot run the Windows-only branches and vice versa).
+- Made environment-dependent code injectable instead of untestable: `Test-GnuOSPlatform`, `Get-GnuRuntimeInformation`
+  (reflection, no try/catch), `Get-GnuUnixModeMethod`, `Get-GnuLinkTarget`, `Get-GnuModuleVersion -Module -ManifestPath`,
+  mktemp's `New-GnuRandomText`. Tests live in `tests/Core/Injected.Tests.ps1`.
+- mktemp: file creation now relies on `FileMode.CreateNew` to detect collisions atomically (no check-then-create race);
+  a taken name is retried and is not reported as an error.
+- Bug fixed: `Resolve-GnuPath` could still throw on Windows PowerShell 5.1 for names with control characters
+  (`Path.Combine` validates on .NET Framework).
+- Pester notes: coverage does not see default parameter values (set defaults in the body); Pester 6 does not fall back to
+  the real command when a filtered mock does not match, and a module-qualified call inside a mock recurses into the mock.
+- A test without `Push-Location` created an empty `cAAA` in the repo root; removed, and the test fixed.
+- Results: 918 tests green on 5.1, 923 on 7.6, analyzer clean.
+
 ## 2026-11-07 (evening) - GPL, coverage, batch 2 part 1
 
 - License changed to GPL-3.0-or-later (same as GNU coreutils) at the user's request; LICENSE is the GPLv3 text,
