@@ -6,9 +6,9 @@ $script:GnuBase64Alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy
 function ConvertTo-GnuBase32 {
     <#
     .SYNOPSIS
-    Encodes bytes as RFC 4648 base32 with '=' padding.
+    Encodes bytes as RFC 4648 base32 with '=' padding (or base32hex with the extended hex alphabet).
     #>
-    param([Parameter(Mandatory)][AllowEmptyCollection()][byte[]]$Bytes)
+    param([Parameter(Mandatory)][AllowEmptyCollection()][byte[]]$Bytes, [string]$Alphabet = $script:GnuBase32Alphabet)
 
     $builder = New-Object System.Text.StringBuilder
     for ($offset = 0; $offset -lt $Bytes.Length; $offset += 5) {
@@ -22,7 +22,7 @@ function ConvertTo-GnuBase32 {
         for ($k = 0; $k -lt 8; $k++) {
             if ($k -lt $dataChars) {
                 $index = [int](($buffer -shr (35 - 5 * $k)) -band 31)
-                [void]$builder.Append($script:GnuBase32Alphabet[$index])
+                [void]$builder.Append($Alphabet[$index])
             }
             else {
                 [void]$builder.Append('=')
@@ -37,7 +37,7 @@ function ConvertFrom-GnuBase32 {
     .SYNOPSIS
     Decodes RFC 4648 base32 (whitespace already removed). Returns one byte[] (not unrolled), or nothing if invalid.
     #>
-    param([Parameter(Mandatory)][AllowEmptyString()][string]$Text)
+    param([Parameter(Mandatory)][AllowEmptyString()][string]$Text, [string]$Alphabet = $script:GnuBase32Alphabet)
 
     if ($Text.Length % 8 -ne 0) { return }
     $output = New-Object 'System.Collections.Generic.List[byte]'
@@ -54,7 +54,7 @@ function ConvertFrom-GnuBase32 {
         for ($k = 0; $k -lt 8; $k++) {
             $value = 0
             if ($k -lt $dataChars) {
-                $value = $script:GnuBase32Alphabet.IndexOf($block[$k])
+                $value = $Alphabet.IndexOf($block[$k])
                 if ($value -lt 0) { return }
             }
             $buffer = ($buffer -shl 5) -bor $value

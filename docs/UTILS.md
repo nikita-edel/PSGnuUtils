@@ -49,8 +49,8 @@ implemented util is listed here).
 | `stat` | planned | subset | 3 | 3 | Default output plus `--format` fields that exist on Windows; inode/mode/uid fields only on Unix. |
 | `df` | planned | subset | 2 | 3 | `-h -H -T -t -x --output`. |
 | `du` | planned | subset | 2 | 3 | `-s -h -a -c -d --max-depth -x --apparent-size`. |
-| `readlink` | planned | full | 2 | 2 | |
-| `realpath` | planned | full | 2 | 2 | |
+| `readlink` | done | full | 2 | 2 | Junctions count as links; a dangling link is canonicalized as a missing file. |
+| `realpath` | done | full | 2 | 2 | `..` is always resolved before links, so `-L` = `-P`. |
 
 ## Viewing file contents
 
@@ -62,7 +62,7 @@ implemented util is listed here).
 | `od` | planned | subset | 3 | 3 | `-A -t -N -j -v -c -x -o -d`; `Format-Hex` covers the rest. |
 | `base64` | done | full | 1 | 1 | Decoded output is written as UTF-8 text lines. |
 | `base32` | done | full | 1 | 1 | |
-| `basenc` | planned | full | 2 | 2 | Reuses the base64/base32 code; adds base16, base2, z85. |
+| `basenc` | done | full | 2 | 2 | All encodings incl. base16, base2msbf/lsbf, z85; base16 decoding accepts lower case (coreutils 9.x). |
 | `head` | done | full | 1 | 1 | Cannot stop an endless producer (see ARCHITECTURE.md, "Stopping upstream"). |
 | `tail` | done | subset | 2 | 1 | `-f/-F/--pid/--retry/-s` are planned for batch 2. |
 | `split` | planned | full | 3 | 3 | |
@@ -83,10 +83,10 @@ implemented util is listed here).
 | `comm` | done | full | 2 | 2 | Ordinal comparison (like `LC_ALL=C`), not locale collation. |
 | `tr` | planned | full | 3 | 2 | Character classes and ranges. |
 | `expand` | done | full | 2 | 2 | |
-| `unexpand` | planned | full | 2 | 2 | |
+| `unexpand` | done | full | 2 | 2 | Exact port of GNU's pending-blank algorithm (verified against GNU). |
 | `wc` | done | full | 1 | 1 | Word and width rules approximate GNU's locale handling (whitespace = `\s`, tabs to multiples of 8). |
-| `tsort` | planned | full | 2 | 2 | |
-| `shuf` | planned | full | 2 | 2 | |
+| `tsort` | done | full | 2 | 2 | Port of the GNU algorithm: same order and loop reports as GNU. |
+| `shuf` | done | full | 2 | 2 | `--random-source` seeds the generator (reproducible, not GNU's order); `-r -o` needs `-n`. |
 | `numfmt` | planned | subset | 3 | 3 | `--to/--from si/iec/iec-i`, `--suffix`, `--padding`, `--field`. |
 | `ptx` | skip | - | - | - | Builds permuted indexes for books; essentially unused. |
 
@@ -99,9 +99,9 @@ implemented util is listed here).
 | `sha256sum` | done | full | 1 | 1 | |
 | `sha384sum` | done | full | 1 | 1 | |
 | `sha512sum` | done | full | 1 | 1 | |
-| `sha224sum` | planned | full | 3 | 2 | .NET has no SHA-224; needs a small SHA-256 variant implementation. |
-| `cksum` | planned | full | 2 | 2 | POSIX CRC-32; `-a` algorithms map to the *sum utils. |
-| `sum` | planned | full | 2 | 2 | BSD and SysV checksums. |
+| `sha224sum` | done | full | 3 | 2 | SHA-224 implemented in PowerShell (.NET has none). |
+| `cksum` | done | full | 2 | 2 | POSIX CRC; `-a sysv/bsd/crc/md5/sha1/sha224/sha256/sha384/sha512`, `--untagged`, `-c`; no blake2b/sm3/`--base64`/`--raw`/`-l`. |
+| `sum` | done | full | 2 | 2 | BSD and SysV checksums. |
 | `b2sum` | skip | - | - | - | .NET has no BLAKE2; a hand-written crypto hash that is subtly wrong is worse than none. Use `sha256sum`. |
 
 ## Paths and names
@@ -125,7 +125,7 @@ implemented util is listed here).
 | `test` | planned | full | 3 | 2 | Only as `test`; `[` cannot be called from PowerShell. |
 | `expr` | planned | full | 3 | 2 | |
 | `seq` | done | full | 2 | 1 | `inf` and hexadecimal operands are not supported yet. |
-| `factor` | planned | full | 3 | 2 | Needs Pollard rho + Miller-Rabin for 64-bit inputs. |
+| `factor` | done | full | 3 | 2 | BigInteger, Miller-Rabin, Pollard rho; `-h`; slow when two prime factors both have more than ~12 digits. |
 | `sleep` | done | full | 1 | 1 | |
 | `tee` | done | full | 1 | 1 | `-i` and `--output-error` are accepted but have no effect. |
 | `[` | skip | - | - | - | PowerShell parses `[` as the start of a type literal, so it cannot be called as a command. Use `test`. |

@@ -6,6 +6,7 @@ $script:GnuChecksumAlgorithms = @{
     sha256sum = @{ Tag = 'SHA256'; Bits = 256; Factory = { [System.Security.Cryptography.SHA256]::Create() } }
     sha384sum = @{ Tag = 'SHA384'; Bits = 384; Factory = { [System.Security.Cryptography.SHA384]::Create() } }
     sha512sum = @{ Tag = 'SHA512'; Bits = 512; Factory = { [System.Security.Cryptography.SHA512]::Create() } }
+    sha224sum = @{ Tag = 'SHA224'; Bits = 224; Compute = { param([byte[]]$Bytes) Get-GnuSha224 -Bytes $Bytes } }
 }
 
 function New-GnuChecksumSpec {
@@ -61,13 +62,21 @@ function Get-GnuChecksumHex {
 
     $stream = Open-GnuInputStream -Context $Context -Operand $Operand -Quiet:$Quiet
     if ($null -eq $stream) { return }
-    $hasher = & $Algorithm.Factory
-    try {
-        $digest = $hasher.ComputeHash($stream)
+    if ($Algorithm.ContainsKey('Compute')) {
+        # Algorithms .NET does not have are implemented in PowerShell and hash a byte array.
+        $buffer = New-Object System.IO.MemoryStream
+        try { $stream.CopyTo($buffer) } finally { $stream.Dispose() }
+        $digest = & $Algorithm.Compute $buffer.ToArray()
     }
-    finally {
-        $hasher.Dispose()
-        $stream.Dispose()
+    else {
+        $hasher = & $Algorithm.Factory
+        try {
+            $digest = $hasher.ComputeHash($stream)
+        }
+        finally {
+            $hasher.Dispose()
+            $stream.Dispose()
+        }
     }
     [System.BitConverter]::ToString($digest).Replace('-', '').ToLowerInvariant()
 }

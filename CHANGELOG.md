@@ -18,4 +18,5 @@ All notable changes to this project are documented here. The format follows
 - Batch 2 (first part): `comm cut expand fold nl paste pathchk uniq`.
 - `rm` (pulled forward from batch 3): `-f -i -I --interactive -r -R -d -v --preserve-root --no-preserve-root --one-file-system`.
 - Daily-use utils: `touch which ln mv cp sort ls grep`.
+- Batch A: `readlink realpath basenc unexpand tsort shuf sha224sum cksum sum factor`.
 - Build script (Bootstrap, Manifest, Analyze, Test, Build, TestBuild, Install, Uninstall, Publish, Clean).

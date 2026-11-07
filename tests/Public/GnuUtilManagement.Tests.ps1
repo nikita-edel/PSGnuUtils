@@ -11,7 +11,7 @@ Describe 'Get-GnuUtil' {
     }
 
     It 'filters by name wildcard and category' {
-        @(Get-GnuUtil -Name 'sha*sum').Count | Should -Be 4
+        @(Get-GnuUtil -Name 'sha*sum').Count | Should -Be 5
         @(Get-GnuUtil -Category 'Checksums').Name | Should -Contain 'md5sum'
         @(Get-GnuUtil -Category 'Checksums').Name | Should -Not -Contain 'cat'
     }

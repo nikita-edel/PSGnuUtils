@@ -3,6 +3,21 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-08 (night) - Batch A: readlink realpath basenc unexpand tsort shuf sha224sum cksum sum factor
+
+- New libs: Private/Lib/Canonical.ps1 (Get-GnuCanonicalPath for readlink -f/-e/-m and realpath), Sha224.ps1
+  (SHA-224 in PowerShell; the checksum engine takes algorithms with a `Compute` scriptblock). Base32 takes an
+  alphabet (base32hex).
+- Compared with the GNU coreutils 8.32 binaries of Git for Windows: cksum, sum (-r/-s), unexpand (all tab list
+  forms), basenc (all encodings) and tsort give byte-identical output. tsort is a port of GNU's algorithm (strcmp
+  order, successors newest first, GNU's loop detection), so order and loop reports match. `cksum -a` and
+  `factor -h` are 9.x features and could not be compared.
+- Found: a help line starting with `.NET` breaks comment-based help; Pollard rho in PowerShell cannot factor
+  numbers with two large (17+ digit) prime factors in reasonable time (documented, test replaced); `shuf -r -o`
+  without `-n` looped forever (now a usage error). Added to ARCHITECTURE.md.
+- Results: full suites 1440 passed on 7.6 / 1435 on 5.1 with 2 failures (the help trap and a hard-coded
+  `sha*sum` count), both fixed and re-run green; coverage 99.95%; analyzer clean.
+
 ## 2026-11-08 (evening) - grep
 
 - grep with Private/Lib/Regex.ps1 (POSIX BRE/ERE -> .NET, reusable for sed); one line engine for streamed pipeline
