@@ -44,7 +44,7 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Script parameters are used by the task functions below.')]
 [CmdletBinding()]
 param(
-    # Tasks by name (for scripts and CI). The switches below do the same: ./build.ps1 -Install
+    # Tasks by name (for scripts). The switches below do the same: ./build.ps1 -Install
     [ValidateSet('Bootstrap', 'Manifest', 'Analyze', 'Test', 'Build', 'TestBuild', 'Install', 'Uninstall', 'Publish', 'Clean')]
     [string[]]$Task,
 

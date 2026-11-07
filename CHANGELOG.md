@@ -17,5 +17,4 @@ All notable changes to this project are documented here. The format follows
   whoami yes`.
 - Batch 2 (first part): `comm cut expand fold nl paste pathchk uniq`.
 - `rm` (pulled forward from batch 3): `-f -i -I --interactive -r -R -d -v --preserve-root --no-preserve-root --one-file-system`.
-- Build script (Bootstrap, Manifest, Analyze, Test, Build, TestBuild, Install, Uninstall, Publish, Clean), CI for Windows PowerShell 5.1
-  and PowerShell 7 on Windows, Linux and macOS, tag-triggered publishing to the PowerShell Gallery.
+- Build script (Bootstrap, Manifest, Analyze, Test, Build, TestBuild, Install, Uninstall, Publish, Clean).

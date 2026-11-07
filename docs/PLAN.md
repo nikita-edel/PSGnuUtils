@@ -5,7 +5,7 @@ every util is tracked in [UTILS.md](UTILS.md); this file explains the order and 
 
 ## Phase 0 - Foundation (done, 2026-11-07)
 
-- [x] Repository structure, build script, CI (Windows PowerShell 5.1, PowerShell 7 on Windows/Linux/macOS), publish workflow
+- [x] Repository structure, build script (no CI by decision of the user, 2026-11-07)
 - [x] Framework: getopt_long parser, util registry, contexts, help/version, errors and exit codes
 - [x] Input model (pipeline = stdin, files, wildcards) and output model (lines, NUL records)
 - [x] `Get-GnuUtil`, `Enable-GnuUtil`, `Disable-GnuUtil`, import-time configuration, alias restore on module removal
@@ -17,7 +17,7 @@ every util is tracked in [UTILS.md](UTILS.md); this file explains the order and 
 `true false yes echo basename dirname pwd sleep arch nproc whoami hostname printenv uname link unlink mkdir rmdir
 truncate mktemp cat tac head tail tee wc seq base64 base32 md5sum sha1sum sha256sum sha384sum sha512sum`
 
-Next step: rewrite help texts in our own words, check CI on Linux/macOS, then release 0.1.0.
+Next step: run the suite once on Linux/macOS, then release 0.1.0.
 
 ## Batch 2 - easy (difficulty 1-3, mostly line filters)
 
@@ -59,9 +59,9 @@ grep design:
 
 ## Release
 
-* 0.1.0: batch 1 green on all CI targets.
+* 0.1.0: tests green on Windows PowerShell 5.1 and PowerShell 7 (Windows, ideally Linux/macOS too).
 * Before the first publish: set `ProjectUri` in the manifest (needs the public repository URL),
-  add the `PSGALLERY_API_KEY` secret, tag `v0.1.0`.
+  then `./build.ps1 -Publish -NuGetApiKey <key>` and tag `v0.1.0`.
 * Versioning: semantic versioning; every batch is a minor release.
 
 ## Open questions

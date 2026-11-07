@@ -12,8 +12,8 @@ cd PS-GnuUtils
 ./build.ps1                     # analyze + test
 ```
 
-Test with both Windows PowerShell 5.1 (`powershell`) and PowerShell 7 (`pwsh`) when you can; CI also runs Linux
-and macOS.
+Test with both Windows PowerShell 5.1 (`powershell`) and PowerShell 7 (`pwsh`), and on Linux/macOS when you can
+(there is no CI).
 
 ## Adding a util
 

@@ -44,7 +44,7 @@ next. Keep entries short and factual so the next person (or LLM) can continue wi
   separates groups too, `paste` stops without output when a file cannot be opened.
 - Results: 893 tests green on Windows PowerShell 5.1, 892 on PowerShell 7.6 (each skips one test for the other
   runtime), analyzer clean.
-- Open: `.github/workflows` were deleted in the working tree by the user (not committed); waiting for a decision.
+- `.github/workflows` were deleted by the user; decided later the same day: no CI (deletion committed).
 
 ## 2026-11-07 (later) - First test run, all green on 5.1 and 7
 

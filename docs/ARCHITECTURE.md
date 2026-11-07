@@ -186,4 +186,5 @@ Ideas for later: a tiny C# cmdlet compiled with `Add-Type` that head pipes into 
 
 `./build.ps1 -Build` writes `out/PSGnuUtils/` with the manifest and a single merged `PSGnuUtils.psm1` (the
 `#region Loader` block is replaced by all source files in load order), which loads much faster than dot-sourcing
-dozens of files. `-Task TestBuild` runs the full test suite against that output; CI does both.
+dozens of files. `-TestBuild` runs the full test suite against that output. There is no CI: run `-Test` and `-Build -TestBuild` on
+Windows PowerShell 5.1 and PowerShell 7 before committing.
