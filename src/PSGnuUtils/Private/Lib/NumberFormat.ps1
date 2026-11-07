@@ -26,7 +26,7 @@ function Remove-GnuTrailingZero {
     Removes trailing fractional zeros (and a dangling '.') from a %g mantissa.
     #>
     param([Parameter(Mandatory)][string]$Text)
-    if ($Text.IndexOf('.') -lt 0) { return $Text }
+    if ($Text.IndexOf('.', [System.StringComparison]::Ordinal) -lt 0) { return $Text }
     $Text.TrimEnd('0').TrimEnd('.')
 }
 
@@ -59,12 +59,12 @@ function Format-GnuFloat {
         $exponent = 0
         if ($magnitude -ne 0) {
             $probe = Format-GnuExponent -Value $magnitude -Precision ($significant - 1)
-            $exponent = [int]$probe.Substring($probe.IndexOf('e') + 1)
+            $exponent = [int]$probe.Substring($probe.IndexOf('e', [System.StringComparison]::Ordinal) + 1)
         }
         if ($exponent -lt -4 -or $exponent -ge $significant) {
             $body = Format-GnuExponent -Value $magnitude -Precision ($significant - 1)
             if (-not $Flags.Contains('#')) {
-                $split = $body.IndexOf('e')
+                $split = $body.IndexOf('e', [System.StringComparison]::Ordinal)
                 $body = (Remove-GnuTrailingZero -Text $body.Substring(0, $split)) + $body.Substring($split)
             }
         }

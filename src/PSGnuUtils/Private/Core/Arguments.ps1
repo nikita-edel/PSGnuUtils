@@ -55,7 +55,7 @@ function Find-GnuLongOption {
     }
 
     $candidates = @()
-    if ($Name -ne '') {
+    if (-not [string]::IsNullOrEmpty($Name)) {
         $candidates = @($withLong | Where-Object { $_.Long.StartsWith($Name, [System.StringComparison]::Ordinal) })
     }
     if ($candidates.Count -eq 0) {
@@ -133,7 +133,7 @@ function ConvertFrom-GnuArgument {
         $argument = $Arguments[$index]
         $index++
 
-        $isOperand = $endOfOptions -or $argument.Length -lt 2 -or -not $argument.StartsWith('-')
+        $isOperand = $endOfOptions -or $argument.Length -lt 2 -or -not $argument.StartsWith('-', [System.StringComparison]::Ordinal)
         if (-not $isOperand -and $Spec.NegativeNumberOperands -and $argument -match '^-(\d|\.\d)') { $isOperand = $true }
         if ($isOperand) {
             $result.Operands.Add($argument)
@@ -146,11 +146,11 @@ function ConvertFrom-GnuArgument {
             continue
         }
 
-        if ($argument.StartsWith('--')) {
+        if ($argument.StartsWith('--', [System.StringComparison]::Ordinal)) {
             $name = $argument.Substring(2)
             $value = $null
             $hasValue = $false
-            $equals = $name.IndexOf('=')
+            $equals = $name.IndexOf('=', [System.StringComparison]::Ordinal)
             if ($equals -ge 0) {
                 $value = $name.Substring($equals + 1)
                 $name = $name.Substring(0, $equals)

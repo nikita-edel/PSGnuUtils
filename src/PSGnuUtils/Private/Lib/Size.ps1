@@ -16,7 +16,7 @@ function ConvertFrom-GnuSize {
     if (-not [decimal]::TryParse($Matches[1], [System.Globalization.NumberStyles]::None, [System.Globalization.CultureInfo]::InvariantCulture, [ref]$number)) {
         return [decimal]::MaxValue
     }
-    if ($suffix -eq '') { return $number }
+    if ([string]::IsNullOrEmpty($suffix)) { return $number }
     if ($suffix -ceq 'b') { return $number * 512 }
 
     $letter = $suffix.Substring(0, 1).ToUpperInvariant()

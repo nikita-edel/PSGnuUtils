@@ -84,7 +84,7 @@ Every util supports `--help` and `--version`; `Get-Help Invoke-GnuHead -Full` sh
 ./build.ps1 -Task Build       # out/PSGnuUtils (single-file module)
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md), [AGENTS.md](AGENTS.md), [docs/PLAN.md](docs/PLAN.md) and
+See [CONTRIBUTING.md](CONTRIBUTING.md), [docs/AGENTS.md](docs/AGENTS.md), [docs/PLAN.md](docs/PLAN.md) and
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## License

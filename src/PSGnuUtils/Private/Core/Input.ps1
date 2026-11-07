@@ -33,7 +33,7 @@ function ConvertFrom-GnuPipelineItem {
             return
         }
         $text = [string]$InputObject
-        if ($text -eq '') {
+        if ([string]::IsNullOrEmpty($text)) {
             ''
             return
         }
@@ -57,8 +57,8 @@ function Complete-GnuPipelineInput {
 
     $first = 0
     $last = $lines.Count - 1
-    while ($first -le $last -and $lines[$first].Trim() -eq '') { $first++ }
-    while ($last -ge $first -and $lines[$last].Trim() -eq '') { $last-- }
+    while ($first -le $last -and [string]::IsNullOrEmpty($lines[$first].Trim())) { $first++ }
+    while ($last -ge $first -and [string]::IsNullOrEmpty($lines[$last].Trim())) { $last-- }
     for ($i = $first; $i -le $last; $i++) { $lines[$i].TrimEnd() }
 }
 
@@ -130,12 +130,12 @@ function Get-GnuReadablePath {
     )
 
     $path = ''
-    if ($Operand -ne '') { $path = Resolve-GnuPath -Path $Operand }
-    if ($path -ne '' -and [System.IO.Directory]::Exists($path)) {
+    if (-not [string]::IsNullOrEmpty($Operand)) { $path = Resolve-GnuPath -Path $Operand }
+    if (-not [string]::IsNullOrEmpty($path) -and [System.IO.Directory]::Exists($path)) {
         if (-not $Quiet) { Write-GnuError -Context $Context -Message ($Context.Spec.ReadErrorFormat -f $Operand, 'Is a directory') }
         return
     }
-    if ($path -eq '' -or -not [System.IO.File]::Exists($path)) {
+    if ([string]::IsNullOrEmpty($path) -or -not [System.IO.File]::Exists($path)) {
         if (-not $Quiet) { Write-GnuError -Context $Context -Message ($Context.Spec.OpenErrorFormat -f $Operand, 'No such file or directory') }
         return
     }
@@ -278,7 +278,7 @@ function Expand-GnuWildcard {
     param([AllowEmptyCollection()][string[]]$Operands = @())
 
     foreach ($operand in $Operands) {
-        if ($operand -eq '-' -or $operand -eq '' -or -not [System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters($operand)) {
+        if ($operand -eq '-' -or [string]::IsNullOrEmpty($operand) -or -not [System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters($operand)) {
             $operand
             continue
         }
@@ -316,7 +316,7 @@ function Get-GnuWildcardMatch {
     }
 
     $directory = Resolve-GnuPath -Path '.'
-    if ($parent -ne '') { $directory = Resolve-GnuPath -Path $parent }
+    if (-not [string]::IsNullOrEmpty($parent)) { $directory = Resolve-GnuPath -Path $parent }
     if (-not [System.IO.Directory]::Exists($directory)) { return }
 
     $options = [System.Management.Automation.WildcardOptions]::None
@@ -326,7 +326,7 @@ function Get-GnuWildcardMatch {
     $names = New-Object 'System.Collections.Generic.List[string]'
     foreach ($entry in [System.IO.Directory]::GetFileSystemEntries($directory)) {
         $name = [System.IO.Path]::GetFileName($entry)
-        if ($name.StartsWith('.') -and -not $leaf.StartsWith('.')) { continue }
+        if ($name.StartsWith('.', [System.StringComparison]::Ordinal) -and -not $leaf.StartsWith('.', [System.StringComparison]::Ordinal)) { continue }
         if ($wildcard.IsMatch($name)) { $names.Add($name) }
     }
     $names.Sort([System.StringComparer]::Ordinal)

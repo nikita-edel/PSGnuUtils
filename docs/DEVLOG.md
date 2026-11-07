@@ -3,6 +3,35 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-07 (later) - First test run, all green on 5.1 and 7
+
+**Results** (Windows 11, Windows PowerShell 5.1.26100 + Pester 5.x, PowerShell 7.6.7 + Pester 6.2.0)
+- `./build.ps1 -Task Test`: 698 passed, 0 failed, 4 skipped on both 5.1 and 7 (skips: 3 symlink tests need admin or
+  developer mode, 1 Unix-only mode test).
+- `./build.ps1 -Task Build, TestBuild`: the merged single-file module passes the same 698 tests on both.
+- `./build.ps1 -Task Analyze`: no issues.
+- `-CodeCoverage`: 95.6% of 3211 commands. Remaining gaps: Linux/macOS branches in Platform.ps1/Path.ps1 and the
+  skipped symlink paths (CI on Linux/macOS will exercise them).
+
+**Bugs found by the first run and fixed**
+- Culture-aware string comparisons: `"a`0b".EndsWith("`0")` is `$true`, and `[char]0x80 -eq ''` is `$true`
+  (control characters are "ignorable"). All `StartsWith/EndsWith/IndexOf(string)` calls now pass `Ordinal`, and
+  empty checks use `[string]::IsNullOrEmpty()`. Rule added to ARCHITECTURE.md and docs/AGENTS.md.
+- `--version` printed `0.0`: the module version is not set while the psm1 is loading -> `Get-GnuModuleVersion`
+  reads it at call time.
+- `mktemp -p DIR` treated DIR as missing (it was modelled as an optional argument; only `--tmpdir` has one).
+- `Resolve-GnuPath` fallback threw on .NET Framework for names containing `:`.
+- Test bugs: `[decimal]'1.50'` drops the trailing zero; `seq -f FMT 2` prints two numbers; 5.1's `Get-ChildItem
+  -Include -Recurse` returns directories; 5.1 does not escape quotes in native arguments (use `-EncodedCommand`);
+  importing the module during Pester discovery hid load-time code from coverage.
+
+**Environment notes**
+- Starting Windows PowerShell from a PowerShell 7 session (or a shell started by one) inherits PS7's
+  `PSModulePath`, so PackageManagement/PowerShellGet do not load. Run it with the default module path
+  (`env -u PSModulePath powershell ...` from bash, or from cmd.exe). The bootstrap now explains this.
+- The user moved `AGENTS.md` to `docs/AGENTS.md` and `CLAUDE.md` to `agents/CLAUDE.md`; links were updated.
+  Note: Claude Code auto-loads `CLAUDE.md` only from the repo root (or `.claude/`), not from `agents/`.
+
 ## 2026-11-07 - Foundation and batch 1
 
 **Context.** The user asked for a PSGallery module of GNU utils: everything tested, utils configurable

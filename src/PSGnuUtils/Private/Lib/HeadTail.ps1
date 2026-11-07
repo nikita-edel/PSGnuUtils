@@ -17,11 +17,11 @@ function New-GnuHeadTailState {
         $state.Unit = [string](Get-GnuOptionValue -Context $Context -Key 'unit' -Default 'lines')
         $original = [string](Get-GnuOptionValue -Context $Context -Key 'count')
         $text = $original
-        if ($text.StartsWith($AllowSuffixSign)) {
+        if ($text.StartsWith($AllowSuffixSign, [System.StringComparison]::Ordinal)) {
             $state.Signed = $true
             $text = $text.Substring(1)
         }
-        elseif ($text.StartsWith('+') -or $text.StartsWith('-')) {
+        elseif ($text.StartsWith('+', [System.StringComparison]::Ordinal) -or $text.StartsWith('-', [System.StringComparison]::Ordinal)) {
             $text = $text.Substring(1)
         }
         $value = ConvertFrom-GnuSize -Text $text

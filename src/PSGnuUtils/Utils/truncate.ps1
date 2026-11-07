@@ -116,7 +116,7 @@ function Invoke-GnuTruncateFile {
             Write-GnuError -Context $Context -Message "cannot stat '$referenceName': No such file or directory"
             return
         }
-        if ($hasSize -and $operator -eq '') {
+        if ($hasSize -and [string]::IsNullOrEmpty($operator)) {
             Write-GnuUsageError -Context $Context -Message "you must specify a relative '--size' with '--reference'"
             return
         }

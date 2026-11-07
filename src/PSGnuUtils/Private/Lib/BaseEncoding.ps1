@@ -135,7 +135,7 @@ function Invoke-GnuBaseEncodingUtil {
     if ($encoding -eq 'base64') { $encoded = [System.Convert]::ToBase64String([byte[]]$data) }
     else { $encoded = ConvertTo-GnuBase32 -Bytes $data }
 
-    if ($encoded -eq '') { return }
+    if ([string]::IsNullOrEmpty($encoded)) { return }
     if ($wrap -eq 0) {
         $encoded
         return

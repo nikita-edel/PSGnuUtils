@@ -15,7 +15,7 @@ function ConvertTo-GnuOutputLine {
     if ([string]::IsNullOrEmpty($Text)) { return }
     $lines = $Text -split "`r?`n"
     $count = $lines.Count
-    if ($Text.EndsWith("`n")) { $count-- }
+    if ($Text.EndsWith("`n", [System.StringComparison]::Ordinal)) { $count-- }
     for ($i = 0; $i -lt $count; $i++) { $lines[$i] }
 }
 
@@ -47,9 +47,9 @@ function Split-GnuRecord {
         [string]$Separator = "`n"
     )
 
-    if ($Text -eq '') { return }
+    if ([string]::IsNullOrEmpty($Text)) { return }
     $parts = $Text.Split([string[]]@($Separator), [System.StringSplitOptions]::None)
     $count = $parts.Length
-    if ($Text.EndsWith($Separator)) { $count-- }
+    if ($Text.EndsWith($Separator, [System.StringComparison]::Ordinal)) { $count-- }
     for ($i = 0; $i -lt $count; $i++) { $parts[$i] }
 }

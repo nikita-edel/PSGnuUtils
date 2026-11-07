@@ -79,7 +79,7 @@ function ConvertTo-GnuChecksumName {
     #>
     param([Parameter(Mandatory)][AllowEmptyString()][string]$Name)
 
-    if ($Name.IndexOf('\') -lt 0 -and $Name.IndexOf("`n") -lt 0 -and $Name.IndexOf("`r") -lt 0) {
+    if ($Name.IndexOf('\', [System.StringComparison]::Ordinal) -lt 0 -and $Name.IndexOf("`n", [System.StringComparison]::Ordinal) -lt 0 -and $Name.IndexOf("`r", [System.StringComparison]::Ordinal) -lt 0) {
         return @{ Name = $Name; Escaped = $false }
     }
     @{ Name = $Name.Replace('\', '\\').Replace("`n", '\n').Replace("`r", '\r'); Escaped = $true }
@@ -97,7 +97,7 @@ function ConvertFrom-GnuChecksumLine {
     )
 
     $escaped = $false
-    if ($Line.StartsWith('\')) {
+    if ($Line.StartsWith('\', [System.StringComparison]::Ordinal)) {
         $escaped = $true
         $Line = $Line.Substring(1)
     }

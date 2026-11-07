@@ -14,7 +14,9 @@ Register-GnuUtil @{
         @{ Short = 'u'; Long = 'dry-run'; Help = 'do not create anything; merely print a name (unsafe)' }
         @{ Short = 'q'; Long = 'quiet'; Help = 'suppress diagnostics about file/dir-creation failure' }
         @{ Long = 'suffix'; Arg = 'SUFF'; Help = 'append SUFF to TEMPLATE; SUFF must not contain a slash' }
-        @{ Short = 'p'; Long = 'tmpdir'; Arg = 'DIR'; OptionalArg = $true; Help = 'interpret TEMPLATE relative to DIR; if DIR is not specified, use $TMPDIR if set, else the system temp directory' }
+        # GNU: -p always takes DIR; only the long form has an optional argument.
+        @{ Short = 'p'; Key = 'tmpdir'; Arg = 'DIR'; Help = 'same as --tmpdir=DIR' }
+        @{ Long = 'tmpdir'; Arg = 'DIR'; OptionalArg = $true; Help = 'interpret TEMPLATE relative to DIR; if DIR is not specified, use $TMPDIR if set, else the system temp directory' }
         @{ Short = 't'; Help = 'interpret TEMPLATE as a single file name component, relative to a directory: $TMPDIR, if set; else the directory specified via -p; else the system temp directory [deprecated]' }
     )
     Notes       = @('PowerShell note: the system temp directory is [System.IO.Path]::GetTempPath() (e.g. %TEMP% on Windows, /tmp on Linux).')
@@ -53,7 +55,7 @@ function Get-GnuTempDirectory {
     $directory = [string]$env:TMPDIR
     if (-not $directory) { $directory = [System.IO.Path]::GetTempPath() }
     $trimmed = $directory.TrimEnd((Get-GnuPathSeparator))
-    if ($trimmed -eq '' -or $trimmed -match '^[A-Za-z]:$') { return $directory }
+    if ([string]::IsNullOrEmpty($trimmed) -or $trimmed -match '^[A-Za-z]:$') { return $directory }
     $trimmed
 }
 

@@ -18,11 +18,6 @@ param(
 
 Set-StrictMode -Version Latest
 
-$script:GnuModuleVersion = '0.0.0'
-if ($ExecutionContext.SessionState.Module -and $ExecutionContext.SessionState.Module.Version) {
-    $script:GnuModuleVersion = $ExecutionContext.SessionState.Module.Version.ToString()
-}
-
 #region Loader
 foreach ($folder in @('Private', 'Utils', 'Public')) {
     $folderPath = Join-Path -Path $PSScriptRoot -ChildPath $folder

@@ -30,7 +30,7 @@ function Invoke-GnuUnlink {
                 $name = $operands[0]
                 $path = Resolve-GnuPath -Path $name
                 $item = $null
-                if ($path -ne '') { $item = Get-Item -LiteralPath $path -Force -ErrorAction SilentlyContinue }
+                if (-not [string]::IsNullOrEmpty($path)) { $item = Get-Item -LiteralPath $path -Force -ErrorAction SilentlyContinue }
                 $isLink = $null -ne $item -and ($item.LinkType -eq 'SymbolicLink' -or $item.LinkType -eq 'Junction')
                 try {
                     if ($null -eq $item) {

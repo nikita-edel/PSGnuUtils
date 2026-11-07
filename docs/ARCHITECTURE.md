@@ -176,6 +176,11 @@ Ideas for later: a tiny C# cmdlet compiled with `Add-Type` that head pipes into 
   strings with `[char]0xE9`. The built module is written with a UTF-8 BOM anyway. A meta test enforces this.
 * Number parsing and formatting use `[System.Globalization.CultureInfo]::InvariantCulture` (the developer machine
   runs a German locale).
+* **String comparisons on content must be ordinal.** .NET's culture-aware comparisons treat control characters
+  (NUL, U+0080, ...) as ignorable: `"a`0b".EndsWith("`0")` and `"\u0080".EndsWith("`n")` are `$true`, and PowerShell's
+  `-eq` is culture-aware too (`[char]0x80 -eq ''` is `$true`). Always pass `[System.StringComparison]::Ordinal` to
+  `StartsWith` / `EndsWith` / `IndexOf(string)`, and test emptiness with `[string]::IsNullOrEmpty()`, never `-eq ''`.
+  (Found by the first test run, 2026-11-07.)
 
 ## Build
 

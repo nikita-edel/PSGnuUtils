@@ -148,7 +148,9 @@ Remove-Module PSGnuUtils
 "`$enabled|`$(`$null -eq `$after)"
 "@
         $powershell = (Get-Process -Id $PID).Path
-        $result = & $powershell -NoProfile -NonInteractive -Command $script
+        # -EncodedCommand: Windows PowerShell 5.1 does not escape embedded quotes for native arguments.
+        $encoded = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($script))
+        $result = & $powershell -NoProfile -NonInteractive -EncodedCommand $encoded
         $result | Should -Be 'Invoke-GnuTac|True'
     }
 }

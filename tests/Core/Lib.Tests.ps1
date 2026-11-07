@@ -118,8 +118,10 @@ Describe 'Format-GnuFloat' {
 
     It 'reads the scale of decimals' {
         InModuleScope PSGnuUtils {
-            Get-GnuDecimalScale -Value ([decimal]'1.50') | Should -Be 2
-            Get-GnuDecimalScale -Value ([decimal]'7') | Should -Be 0
+            # [decimal]'1.50' would drop the trailing zero; Parse keeps the scale.
+            $invariant = [System.Globalization.CultureInfo]::InvariantCulture
+            Get-GnuDecimalScale -Value ([decimal]::Parse('1.50', $invariant)) | Should -Be 2
+            Get-GnuDecimalScale -Value ([decimal]::Parse('7', $invariant)) | Should -Be 0
         }
     }
 }

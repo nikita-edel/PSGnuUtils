@@ -37,7 +37,7 @@ Describe 'seq' {
         (Invoke-TestGnu seq '-f', '%.2f', '1', '2').Output | Should -Be @('1.00', '2.00')
         (Invoke-TestGnu seq '--format=x%gy', '1').Output | Should -Be @('x1y')
         (Invoke-TestGnu seq '-f', '%e', '1').Output | Should -Be @('1.000000e+00')
-        (Invoke-TestGnu seq '-f', '100%% %03g', '2').Output | Should -Be @('100% 002')
+        (Invoke-TestGnu seq '-f', '100%% %03g', '2').Output | Should -Be @('100% 001', '100% 002')
         (Invoke-TestGnu seq '-f', '%g', '0.1', '0.1', '0.3').Output | Should -Be @('0.1', '0.2', '0.3')
     }
 

@@ -1,4 +1,4 @@
-# Meta tests: enforce the repository rules from AGENTS.md / CONTRIBUTING.md for every util.
+# Meta tests: enforce the repository rules from docs/AGENTS.md / CONTRIBUTING.md for every util.
 #   * the manifest is valid and exports exactly the public commands plus one function per util
 #   * every util has a test file, and every option of the util is exercised in its tests
 #   * every util has comment-based help (synopsis + example), --help and --version
@@ -6,11 +6,17 @@
 #   * all source and test files are ASCII (Windows PowerShell 5.1 reads BOM-less files as ANSI)
 
 BeforeDiscovery {
-    . (Join-Path -Path $PSScriptRoot -ChildPath 'TestHelpers.ps1')
-    $script:utilCases = @(Get-GnuUtil | ForEach-Object { @{ Name = $_.Name; Command = $_.Command } })
+    # Do not import the module during discovery: code run before the run phase is invisible to code coverage.
     $repoRoot = Split-Path -Parent $PSScriptRoot
+    $script:utilCases = @(
+        Get-ChildItem -LiteralPath (Join-Path $repoRoot 'src/PSGnuUtils/Utils') -Filter '*.ps1' | ForEach-Object {
+            $name = $_.BaseName
+            @{ Name = $name; Command = 'Invoke-Gnu' + $name.Substring(0, 1).ToUpperInvariant() + $name.Substring(1) }
+        }
+    )
     $script:fileCases = @(
         Get-ChildItem -LiteralPath (Join-Path $repoRoot 'src'), (Join-Path $repoRoot 'tests'), (Join-Path $repoRoot 'tools') -Recurse -Include '*.ps1', '*.psm1', '*.psd1' |
+            Where-Object { -not $_.PSIsContainer } |   # Windows PowerShell 5.1 also returns directories here
             ForEach-Object { @{ Path = $_.FullName; Name = $_.FullName.Substring($repoRoot.Length + 1) } }
     )
 }

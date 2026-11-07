@@ -98,9 +98,23 @@ function Set-GnuHelpOutput {
 
 function Set-GnuVersionOutput {
     param([Parameter(Mandatory)][hashtable]$Context)
-    $Context.Output.Add("$($Context.Name) (PSGnuUtils) $script:GnuModuleVersion")
+    $Context.Output.Add("$($Context.Name) (PSGnuUtils) $(Get-GnuModuleVersion)")
     $Context.Output.Add("PowerShell implementation of the GNU '$($Context.Name)' utility. MIT License.")
     $Context.Done = $true
+}
+
+function Get-GnuModuleVersion {
+    <#
+    .SYNOPSIS
+    The module version from the manifest.
+    .NOTES
+    Read at call time: while the psm1 is still loading, the module's Version is 0.0.
+    #>
+    $module = $ExecutionContext.SessionState.Module
+    if ($null -ne $module -and $null -ne $module.Version -and $module.Version -ne [version]'0.0') { return $module.Version.ToString() }
+    $manifest = Join-Path -Path (Split-Path -Parent $PSScriptRoot) -ChildPath '../PSGnuUtils.psd1'
+    if (Test-Path -LiteralPath $manifest) { return [string](Import-PowerShellDataFile -Path $manifest).ModuleVersion }
+    '0.0.0'
 }
 
 function Test-GnuOption {

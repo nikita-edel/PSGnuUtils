@@ -4,13 +4,12 @@ Concrete next steps, most important first. Keep this list short and current; his
 
 ## Now
 
-- [ ] Run `./build.ps1 -Task Bootstrap` on Windows PowerShell 5.1 and PowerShell 7.
-- [ ] Run `./build.ps1 -Task Analyze` and fix the findings.
-- [ ] Run `./build.ps1 -Task Test` on 5.1 and 7; fix failing tests. The suite was written without being run, so
-      check both sides when a test fails: the expectation may be wrong (compare with real GNU behaviour) or the code.
-- [ ] Run `./build.ps1 -Task Build, TestBuild` (merged single-file module).
+- [x] Bootstrap, Analyze, Test on 5.1 and 7, Build + TestBuild (all green, 2026-11-07; see docs/DEVLOG.md).
+- [x] Coverage: 95.6% (target 90%).
+- [ ] Rewrite the `--help` texts (Description/Notes/option Help in the util specs) in our own words; several are
+      close to GNU's GPL-licensed help text (see docs/DEVLOG.md / license discussion).
 - [ ] Push to GitHub and check the CI matrix (Linux/macOS especially: symlinks, `/` vs `\`, Unix modes).
-- [ ] Measure line coverage: `./build.ps1 -Task Test -CodeCoverage` (target 90%).
+- [ ] Run the symlink tests once with developer mode enabled (they are skipped otherwise on Windows).
 
 ## Next
 

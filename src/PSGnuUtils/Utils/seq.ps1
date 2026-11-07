@@ -80,7 +80,7 @@ function ConvertFrom-GnuSeqFormat {
         $parsed.Precision = 0
         if ($Matches['precision']) { $parsed.Precision = [int]$Matches['precision'] }
     }
-    if ('eEfFgG'.IndexOf($parsed.Conversion) -lt 0 -or $parsed.Conversion -eq '') {
+    if ($parsed.Conversion -cnotmatch '^[eEfFgG]$') {
         $directive = '%' + $Matches['flags'] + $Matches['width'] + $parsed.Conversion
         return @{ Error = "format '$Format' has unknown $directive directive" }
     }

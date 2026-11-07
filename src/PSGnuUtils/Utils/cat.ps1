@@ -67,9 +67,9 @@ function Invoke-GnuCat {
                     if ($cat.Raw -and $operand -ne '-') {
                         # Raw mode keeps CR characters and knows whether the last line was terminated.
                         $text = Get-GnuInputText -Context $ctx -Operand $operand
-                        if ($null -eq $text -or $text -eq '') { continue }
+                        if ($null -eq $text -or [string]::IsNullOrEmpty($text)) { continue }
                         $segments = $text.Split([char]10)
-                        $terminated = $text.EndsWith("`n")
+                        $terminated = $text.EndsWith("`n", [System.StringComparison]::Ordinal)
                         $count = $segments.Length
                         if ($terminated) { $count-- }
                         for ($i = 0; $i -lt $count; $i++) {

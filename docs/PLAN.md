@@ -10,14 +10,14 @@ every util is tracked in [UTILS.md](UTILS.md); this file explains the order and 
 - [x] Input model (pipeline = stdin, files, wildcards) and output model (lines, NUL records)
 - [x] `Get-GnuUtil`, `Enable-GnuUtil`, `Disable-GnuUtil`, import-time configuration, alias restore on module removal
 - [x] Meta tests: exports, help, docs, option coverage, ASCII-only sources
-- [x] Agent handoff docs (AGENTS.md, DEVLOG.md, TODO.md)
+- [x] Agent handoff docs (docs/AGENTS.md, agents/CLAUDE.md, DEVLOG.md, TODO.md)
 
-## Batch 1 - trivial utils (written 2026-11-07, tests written, **not yet run**)
+## Batch 1 - trivial utils (done 2026-11-07: 698 tests green on 5.1 and 7, 95.6% coverage)
 
 `true false yes echo basename dirname pwd sleep arch nproc whoami hostname printenv uname link unlink mkdir rmdir
 truncate mktemp cat tac head tail tee wc seq base64 base32 md5sum sha1sum sha256sum sha384sum sha512sum`
 
-Next step: run `./build.ps1 -Task Bootstrap, Analyze, Test` on 5.1 and 7, fix what fails, then release 0.1.0.
+Next step: rewrite help texts in our own words, check CI on Linux/macOS, then release 0.1.0.
 
 ## Batch 2 - easy (difficulty 1-3, mostly line filters)
 

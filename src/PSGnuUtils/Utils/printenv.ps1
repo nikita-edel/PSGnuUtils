@@ -44,7 +44,7 @@ function Invoke-GnuPrintenv {
             else {
                 foreach ($name in $operands) {
                     $value = $null
-                    if ($name -ne '' -and $name.IndexOf('=') -lt 0) { $value = [System.Environment]::GetEnvironmentVariable($name) }
+                    if (-not [string]::IsNullOrEmpty($name) -and $name.IndexOf('=', [System.StringComparison]::Ordinal) -lt 0) { $value = [System.Environment]::GetEnvironmentVariable($name) }
                     if ($null -eq $value) { $ctx.ExitCode = 1 } else { $records.Add($value) }
                 }
             }

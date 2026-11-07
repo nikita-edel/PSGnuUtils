@@ -5,10 +5,10 @@ PowerShell for **Windows PowerShell 5.1 and PowerShell 7+ on Windows, Linux and 
 
 ## Start here
 
-1. Read [TODO.md](TODO.md): the current, concrete next steps.
-2. Read the latest entries of [docs/DEVLOG.md](docs/DEVLOG.md): what happened, what is unverified.
-3. Check [docs/UTILS.md](docs/UTILS.md) (status of every util) and [docs/PLAN.md](docs/PLAN.md) (order, designs).
-4. Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) before touching `src/PSGnuUtils/Private/Core`.
+1. Read [TODO.md](../TODO.md): the current, concrete next steps.
+2. Read the latest entries of [docs/DEVLOG.md](DEVLOG.md): what happened, what is unverified.
+3. Check [docs/UTILS.md](UTILS.md) (status of every util) and [docs/PLAN.md](PLAN.md) (order, designs).
+4. Read [docs/ARCHITECTURE.md](ARCHITECTURE.md) before touching `src/PSGnuUtils/Private/Core`.
 
 ## Commands
 
@@ -33,7 +33,8 @@ the full suite if they said they are busy with something performance sensitive (
 * Match GNU output, messages and exit codes exactly; document every deliberate difference in the spec `Notes`
   (shown by `--help`), the comment-based help and `docs/UTILS.md`.
 * PowerShell 5.1 compatible syntax only (no `? :`, `??`, `&&`, `||`, `$IsWindows`, ...). ASCII-only source and test
-  files. Invariant culture for numbers. Strict mode safe code (no dot access to possibly missing hashtable keys,
+  files. Invariant culture for numbers. Ordinal string comparisons (`[System.StringComparison]::Ordinal`,
+  `[string]::IsNullOrEmpty()` instead of `-eq ''`; see ARCHITECTURE.md). Strict mode safe code (no dot access to possibly missing hashtable keys,
   `@($x).Count`).
 * Paths: `Resolve-GnuPath` (PowerShell location), never `[Environment]::CurrentDirectory`.
 * Errors: `Write-GnuError` / `Write-GnuUsageError` / `Write-GnuWarning`; never `throw` for user errors, never `exit`.

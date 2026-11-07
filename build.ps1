@@ -28,6 +28,7 @@
 .EXAMPLE
     ./build.ps1 -Task Publish -NuGetApiKey $env:PSGALLERY_API_KEY
 #>
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Script parameters are used by the task functions below.')]
 [CmdletBinding()]
 param(
     [ValidateSet('Bootstrap', 'Manifest', 'Analyze', 'Test', 'Build', 'TestBuild', 'Publish', 'Clean')]
@@ -70,6 +71,10 @@ function Invoke-Bootstrap {
     Write-Step 'Bootstrap'
     if ($PSVersionTable.PSEdition -ne 'Core') {
         [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+        # Get-PackageProvider is missing when Windows PowerShell inherits PowerShell 7's PSModulePath.
+        if (-not (Get-Command -Name Get-PackageProvider -ErrorAction SilentlyContinue)) {
+            throw 'PackageManagement is not available. Start Windows PowerShell with its default PSModulePath (e.g. from cmd.exe, not from pwsh).'
+        }
         if (-not (Get-PackageProvider -ListAvailable -Name NuGet -ErrorAction SilentlyContinue)) {
             Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Scope CurrentUser -Force | Out-Null
         }
@@ -91,7 +96,7 @@ function Invoke-Manifest {
     $list = ($functions | ForEach-Object { "        '$_'" }) -join ",`n"
     $replacement = "FunctionsToExport    = @(`n$list`n    )"
     $content = [System.IO.File]::ReadAllText($ManifestPath)
-    $updated = [regex]::Replace($content, '(?s)FunctionsToExport\s*=\s*@\(.*?\)', [System.Text.RegularExpressions.MatchEvaluator] { param($m) $replacement })
+    $updated = [regex]::Replace($content, '(?s)FunctionsToExport\s*=\s*@\(.*?\)', [System.Text.RegularExpressions.MatchEvaluator] { $replacement })
     if ($updated -ne $content) {
         [System.IO.File]::WriteAllText($ManifestPath, $updated, (New-Object System.Text.UTF8Encoding($false)))
         Write-Host "Updated $ManifestPath ($($functions.Count) functions)."
@@ -164,7 +169,7 @@ function Invoke-Build {
     }
     $merged = $builder.ToString()
     $rootModule = [System.IO.File]::ReadAllText((Join-Path $SourceDir 'PSGnuUtils.psm1'))
-    $rootModule = [regex]::Replace($rootModule, '(?s)#region Loader.*?#endregion Loader', [System.Text.RegularExpressions.MatchEvaluator] { param($m) $merged.TrimEnd() })
+    $rootModule = [regex]::Replace($rootModule, '(?s)#region Loader.*?#endregion Loader', [System.Text.RegularExpressions.MatchEvaluator] { $merged.TrimEnd() })
 
     # UTF-8 with BOM so Windows PowerShell 5.1 never misreads the file.
     $utf8Bom = New-Object System.Text.UTF8Encoding($true)

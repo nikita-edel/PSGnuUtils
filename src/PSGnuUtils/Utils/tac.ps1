@@ -42,7 +42,7 @@ function Invoke-GnuTac {
         if (-not $ctx.Done) {
             $separator = "`n"
             if (Test-GnuOption -Context $ctx -Key 'separator') { $separator = [string](Get-GnuOptionValue -Context $ctx -Key 'separator') }
-            if ($separator -eq '') {
+            if ([string]::IsNullOrEmpty($separator)) {
                 Write-GnuError -Context $ctx -Message 'separator cannot be empty'
             }
             else {
@@ -76,7 +76,7 @@ function ConvertTo-GnuReversedRecord {
         [switch]$Before
     )
 
-    if ($Text -eq '') { return '' }
+    if ([string]::IsNullOrEmpty($Text)) { return '' }
     $records = New-Object 'System.Collections.Generic.List[string]'
     $start = 0
     foreach ($match in [regex]::Matches($Text, $Pattern)) {

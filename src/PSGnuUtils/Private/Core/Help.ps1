@@ -64,6 +64,6 @@ function Get-GnuHelpText {
     }
 
     ''
-    "PSGnuUtils $($script:GnuModuleVersion): PowerShell implementation of GNU $($Spec.Name)."
+    "PSGnuUtils $(Get-GnuModuleVersion): PowerShell implementation of GNU $($Spec.Name)."
     "PowerShell help: Get-Help $($Spec.FunctionName) -Full"
 }

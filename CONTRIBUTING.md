@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping! The short version of the rules is in [AGENTS.md](AGENTS.md); the design is in
+Thanks for helping! The short version of the rules is in [docs/AGENTS.md](docs/AGENTS.md); the design is in
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Setup
