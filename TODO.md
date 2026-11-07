@@ -11,7 +11,7 @@ Concrete next steps, most important first. Keep this list short and current; his
 
 ## Next
 
-- [ ] Daily-use utils still missing: `ls sort grep find sed xargs diff` (then the rest of batch 2/3).
+- [ ] Daily-use utils still missing: `grep find sed xargs diff` (then the rest of batch 2/3).
 
 - [ ] Release 0.1.0: set ProjectUri in the manifest, `./build.ps1 -Publish -NuGetApiKey <key>`, tag `v0.1.0`.
 - [ ] Batch 2 (see docs/PLAN.md), next: `unexpand tsort shuf tr cksum sum readlink realpath touch`.

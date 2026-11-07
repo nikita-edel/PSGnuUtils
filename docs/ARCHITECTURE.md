@@ -181,6 +181,9 @@ Ideas for later: a tiny C# cmdlet compiled with `Add-Type` that head pipes into 
   `-eq` is culture-aware too (`[char]0x80 -eq ''` is `$true`). Always pass `[System.StringComparison]::Ordinal` to
   `StartsWith` / `EndsWith` / `IndexOf(string)`, and test emptiness with `[string]::IsNullOrEmpty()`, never `-eq ''`.
   (Found by the first test run, 2026-11-07.)
+* A `[string]` parameter turns `$null` into `''`, even with `[AllowNull()]`. Test such parameters with
+  `[string]::IsNullOrEmpty()`, never `$null -ne $x` (sort once treated "no -t" as an empty separator).
+* Commas bind tighter than arithmetic: `@($a * $b, $c)` multiplies `$a` with the array `($b, $c)`; write `@(($a * $b), $c)`.
 
 ## Build
 

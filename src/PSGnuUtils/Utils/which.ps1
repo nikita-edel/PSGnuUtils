@@ -58,18 +58,6 @@ function Test-GnuExecutable {
     ($mode -band 73) -ne 0                  # 0111: any execute bit
 }
 
-function Get-GnuUnixFileMode {
-    <#
-    .SYNOPSIS
-    The Unix permission bits of a file (.NET 7+ on Unix), or nothing on Windows and older runtimes.
-    #>
-    param([Parameter(Mandatory)][string]$Path)
-    if (Test-GnuWindows) { return }
-    $method = [System.IO.File].GetMethod('GetUnixFileMode', [type[]]@([string]))
-    if ($null -eq $method) { return }
-    [int]$method.Invoke($null, @($Path))
-}
-
 function Invoke-GnuWhichSearch {
     <#
     .SYNOPSIS

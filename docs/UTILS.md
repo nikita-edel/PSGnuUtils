@@ -13,7 +13,7 @@ implemented util is listed here).
 
 | Util | Status | Scope | Difficulty | Batch | Notes |
 |---|---|---|---|---|---|
-| `ls` | planned | subset | 4 | 3 | `-l -a -A -h -R -t -S -r -1 -d -F --color`; multi-column layout is the tricky part. |
+| `ls` | done | subset | 4 | 3 | `-a -A -l -h -R -t -S -U -r -1 -C -d -F -p -w --color`; columns only when writing to the console; no quoting; link counts 1, directory sizes 0. |
 | `cp` | done | subset | 3 | 3 | `-r -R -p -a -d -f -i -n -u -v -l -s -L -P -T -t --preserve --no-preserve`; no backups or `--parents`. |
 | `mv` | done | subset | 2 | 3 | `-f -i -n -u -v -T -t --strip-trailing-slashes`; no backups. |
 | `rm` | done | full | 2 | 3 | Links and junctions are removed, never followed; drive roots are protected like `/`; read-only files are removed; piped `Get-ChildItem` objects are extra operands. |
@@ -75,7 +75,7 @@ implemented util is listed here).
 
 | Util | Status | Scope | Difficulty | Batch | Notes |
 |---|---|---|---|---|---|
-| `sort` | planned | subset | 3 | 3 | `-n -r -u -k -t -f -h -V -s -o -c`; no exact locale collation, no `-M`, no external merge for files larger than RAM. |
+| `sort` | done | subset | 3 | 3 | `-b -d -f -g -h -i -M -n -r -V -k -t -u -s -c -C -o -m -z --sort --files0-from`; ordinal comparison (like `LC_ALL=C`); no `-R`, `--parallel` or external merge. |
 | `uniq` | done | full | 2 | 2 | |
 | `cut` | done | full | 2 | 2 | `-c` counts characters (GNU treats `-c` like `-b`); `-b` counts UTF-8 bytes. |
 | `paste` | done | full | 2 | 2 | |

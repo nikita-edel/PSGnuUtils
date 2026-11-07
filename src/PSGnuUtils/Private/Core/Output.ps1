@@ -53,3 +53,13 @@ function Split-GnuRecord {
     if ($Text.EndsWith($Separator, [System.StringComparison]::Ordinal)) { $count-- }
     for ($i = 0; $i -lt $count; $i++) { $parts[$i] }
 }
+
+function Test-GnuConsoleOutput {
+    <#
+    .SYNOPSIS
+    $true if a util's output goes straight to the console: it is the last command of its pipeline
+    and the process output is not redirected (GNU's isatty(stdout) check, as far as PowerShell can tell).
+    #>
+    param([Parameter(Mandatory)][System.Management.Automation.InvocationInfo]$Invocation)
+    $Invocation.PipelinePosition -eq $Invocation.PipelineLength -and -not [System.Console]::IsOutputRedirected
+}

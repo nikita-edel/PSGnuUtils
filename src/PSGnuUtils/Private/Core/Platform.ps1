@@ -182,3 +182,15 @@ function Get-GnuUnixModeMethod {
         Where-Object { $_.Name -eq 'SetUnixFileMode' -and $_.GetParameters()[0].ParameterType -eq [string] } |
         Select-Object -First 1
 }
+
+function Get-GnuUnixFileMode {
+    <#
+    .SYNOPSIS
+    The Unix permission bits of a file (.NET 7+ on Unix), or nothing on Windows and older runtimes.
+    #>
+    param([Parameter(Mandatory)][string]$Path)
+    if (Test-GnuWindows) { return }
+    $method = [System.IO.File].GetMethod('GetUnixFileMode', [type[]]@([string]))
+    if ($null -eq $method) { return }
+    [int]$method.Invoke($null, @($Path))
+}

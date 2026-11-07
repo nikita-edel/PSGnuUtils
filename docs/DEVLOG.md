@@ -3,6 +3,15 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-08 (later) - sort and ls
+
+- sort: keys, separators, n/g/h/V/M orders, -u/-s/-c/-C/-o/-z, GNU's last-resort whole-line comparison, exit code 2 on trouble.
+- ls: columns on the console (Test-GnuConsoleOutput: last in pipeline and not redirected), -l with owners
+  (User/Group properties on Unix, Get-Acl on Windows), -h, -R, -t/-S/-U/-r, -F/-p, --color with LS_COLORS.
+- Traps found: a [string] parameter turns $null into '' (sort's "no -t" became an empty separator); commas bind
+  tighter than '*'; Int32.CompareTo(Int64) throws. Added to ARCHITECTURE.md.
+- Results: 1177 tests green on 5.1, 1182 on 7.6, 99.7% coverage, analyzer clean.
+
 ## 2026-11-08 - CI removed, touch/which/ln/mv/cp
 
 - No CI (user decision): workflows deleted, docs updated; publish by hand with ./build.ps1 -Publish.
