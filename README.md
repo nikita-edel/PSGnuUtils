@@ -56,6 +56,26 @@ Import-Module PSGnuUtils -ArgumentList @{ All = $true; Exclude = 'ls', 'rm' }
 
 Every util supports `--help` and `--version`; `Get-Help Invoke-GnuHead -Full` shows the PowerShell help.
 
+### What an enabled name shadows
+
+`Enable-GnuUtil cat` creates a global alias `cat -> Invoke-GnuCat`. Aliases win over everything else
+(alias > function > cmdlet > native program), so while it is enabled `cat` no longer reaches `Get-Content`, and on
+Linux/macOS `cat` no longer runs `/usr/bin/cat`. This applies to the whole session, including scripts and other
+modules that call the name. `Get-GnuUtil` shows in its `Shadows` column what each name would run otherwise.
+
+The originals are still there, under other names:
+
+```powershell
+Get-Content notes.txt                                   # the cmdlet behind the old alias
+sort.exe data.txt                                       # Windows: a name with .exe bypasses the alias
+/usr/bin/cat notes.txt                                  # Linux/macOS: the full path bypasses the alias
+& (Get-Command cat -CommandType Application) notes.txt  # any OS: the native program found in PATH
+Disable-GnuUtil cat                                     # or give the name back
+```
+
+Use `-NoClobber` to enable only names that do not exist yet, or `-Exclude` to keep specific names
+(on Linux/macOS you may prefer to enable nothing and call `Invoke-Gnu*` directly).
+
 ## How it fits into PowerShell
 
 * **Pipeline input is stdin.** Strings are lines; other objects are converted to the text the console would show,
