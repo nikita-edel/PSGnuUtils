@@ -1,0 +1,7 @@
+# Normalize line endings in the repository; PowerShell 5.1 and 7 both read LF scripts.
+* text=auto eol=lf
+*.ps1 text eol=lf
+*.psm1 text eol=lf
+*.psd1 text eol=lf
+*.md text eol=lf
+*.yml text eol=lf

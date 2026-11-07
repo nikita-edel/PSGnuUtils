@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bootstrap
+        shell: pwsh
+        run: ./build.ps1 -Task Bootstrap
+      - name: Analyze
+        shell: pwsh
+        run: ./build.ps1 -Task Manifest, Analyze
+      - name: Manifest is up to date
+        shell: bash
+        run: git diff --exit-code -- src/PSGnuUtils/PSGnuUtils.psd1
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, shell: powershell } # Windows PowerShell 5.1
+          - { os: windows-latest, shell: pwsh }
+          - { os: ubuntu-latest, shell: pwsh }
+          - { os: macos-latest, shell: pwsh }
+    name: test (${{ matrix.os }}, ${{ matrix.shell }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bootstrap
+        run: ./build.ps1 -Task Bootstrap
+      - name: Test (source)
+        run: ./build.ps1 -Task Test
+      - name: Test (built module)
+        run: ./build.ps1 -Task Build, TestBuild
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.shell }}
+          path: out/testResults-*.xml
