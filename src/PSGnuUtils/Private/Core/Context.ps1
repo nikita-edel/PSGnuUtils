@@ -99,7 +99,9 @@ function Set-GnuHelpOutput {
 function Set-GnuVersionOutput {
     param([Parameter(Mandatory)][hashtable]$Context)
     $Context.Output.Add("$($Context.Name) (PSGnuUtils) $(Get-GnuModuleVersion)")
-    $Context.Output.Add("PowerShell implementation of the GNU '$($Context.Name)' utility. MIT License.")
+    $Context.Output.Add('License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.')
+    $Context.Output.Add('This is free software: you are free to change and redistribute it.')
+    $Context.Output.Add('There is NO WARRANTY, to the extent permitted by law.')
     $Context.Done = $true
 }
 

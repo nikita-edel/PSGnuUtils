@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- Licensed under GPL-3.0-or-later (same as GNU coreutils).
 - Module framework: GNU getopt_long compatible argument parsing, generated `--help` / `--version`, GNU style errors
   and exit codes (`$LASTEXITCODE`), pipeline input as stdin, shell-like wildcard expansion.
 - `Get-GnuUtil`, `Enable-GnuUtil`, `Disable-GnuUtil` and import-time configuration

@@ -58,7 +58,7 @@ grep design:
 ## Release
 
 * 0.1.0: batch 1 green on all CI targets.
-* Before the first publish: set `ProjectUri` / `LicenseUri` in the manifest (needs the public repository URL),
+* Before the first publish: set `ProjectUri` in the manifest (needs the public repository URL),
   add the `PSGALLERY_API_KEY` secret, tag `v0.1.0`.
 * Versioning: semantic versioning; every batch is a minor release.
 

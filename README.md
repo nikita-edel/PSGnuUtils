@@ -109,4 +109,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md), [docs/AGENTS.md](docs/AGENTS.md), [docs/
 
 ## License
 
-MIT, see [LICENSE](LICENSE). PSGnuUtils is an independent reimplementation; it contains no GNU source code.
+GNU General Public License version 3 or later (GPL-3.0-or-later), the license of GNU coreutils; see [LICENSE](LICENSE).
+
+PSGnuUtils is an independent PowerShell reimplementation and contains no GNU source code. Option descriptions in the
+`--help` texts follow the wording of GNU coreutils (Copyright Free Software Foundation, Inc., GPL-3.0-or-later).
+PSGnuUtils is not affiliated with or endorsed by the GNU Project or the Free Software Foundation.

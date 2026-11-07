@@ -5,7 +5,7 @@
     GUID                 = '583dc711-22a8-4918-99d9-34c758faf49b'
     Author               = 'Nikita Edel'
     CompanyName          = 'Nikita Edel'
-    Copyright            = '(c) 2026 Nikita Edel. MIT License.'
+    Copyright            = '(c) 2026 Nikita Edel. Licensed under the GNU GPL version 3 or later.'
     Description          = 'GNU coreutils (cat, head, tail, wc, seq, sha256sum, base64, ...) implemented in pure PowerShell. GNU option syntax and output, opt-in per command (Enable-GnuUtil), Windows PowerShell 5.1 and PowerShell 7+ on Windows, Linux and macOS.'
     PowerShellVersion    = '5.1'
 
@@ -56,8 +56,8 @@
     PrivateData          = @{
         PSData = @{
             Tags         = @('GNU', 'coreutils', 'Unix', 'Linux', 'shell', 'cat', 'head', 'tail', 'wc', 'seq', 'sha256sum', 'base64', 'CrossPlatform', 'Windows', 'MacOS', 'PSEdition_Desktop', 'PSEdition_Core')
-            # LicenseUri = 'https://github.com/<owner>/PS-GnuUtils/blob/main/LICENSE'   # TODO: set once the repository is public
-            # ProjectUri = 'https://github.com/<owner>/PS-GnuUtils'                     # TODO: set once the repository is public
+            LicenseUri   = 'https://www.gnu.org/licenses/gpl-3.0.html'
+            # ProjectUri is set once the repository is public.
             ReleaseNotes = 'See CHANGELOG.md'
         }
     }
