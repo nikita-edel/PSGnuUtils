@@ -71,21 +71,6 @@ function Invoke-GnuRm {
     }
 }
 
-function Read-GnuConfirmation {
-    <#
-    .SYNOPSIS
-    Writes a GNU style prompt to standard error and returns $true if the answer starts with y or Y.
-    #>
-    param(
-        [Parameter(Mandatory)][hashtable]$Context,
-        [Parameter(Mandatory)][string]$Question
-    )
-
-    [System.Console]::Error.Write("$($Context.Name): $Question ")
-    $answer = [System.Console]::In.ReadLine()
-    $null -ne $answer -and $answer -match '^[yY]'
-}
-
 function Test-GnuRootPath {
     <#
     .SYNOPSIS

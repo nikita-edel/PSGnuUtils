@@ -64,6 +64,12 @@ Describe 'Util <Name>' -ForEach $utilCases {
         }
     }
 
+    It 'is defined by its own Utils file (no helper function with the same name)' {
+        $file = (Get-Command -Name $Command -Module PSGnuUtils).ScriptBlock.File
+        if ($file) { [System.IO.Path]::GetFileName($file) | Should -Be "$Name.ps1" }
+        else { (Get-Command -Name $Command -Module PSGnuUtils).Definition | Should -Match "Initialize-GnuUtil -Name '$Name'" }
+    }
+
     It 'has a test file' {
         Test-Path -LiteralPath (Join-Path $repoRoot "tests/Utils/$Name.Tests.ps1") | Should -BeTrue
     }

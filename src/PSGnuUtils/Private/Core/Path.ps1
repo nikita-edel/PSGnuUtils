@@ -154,3 +154,14 @@ function Get-GnuLinkTarget {
         [string](@($item.Target)[0])
     }
 }
+
+function Remove-GnuTrailingSeparator {
+    <#
+    .SYNOPSIS
+    Removes trailing slashes ('dir//' -> 'dir'); a name made only of slashes keeps one ('//' -> '/').
+    #>
+    param([Parameter(Mandatory)][AllowEmptyString()][string]$Path)
+    $trimmed = $Path.TrimEnd((Get-GnuPathSeparator))
+    if ([string]::IsNullOrEmpty($trimmed) -and $Path.Length -gt 0) { return [string]$Path[0] }
+    $trimmed
+}

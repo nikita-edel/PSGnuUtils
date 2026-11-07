@@ -14,15 +14,15 @@ implemented util is listed here).
 | Util | Status | Scope | Difficulty | Batch | Notes |
 |---|---|---|---|---|---|
 | `ls` | planned | subset | 4 | 3 | `-l -a -A -h -R -t -S -r -1 -d -F --color`; multi-column layout is the tricky part. |
-| `cp` | planned | subset | 3 | 3 | `-r -p -f -i -n -u -v -a -T -t`; no SELinux / reflink options. |
-| `mv` | planned | subset | 2 | 3 | `-f -i -n -u -v -T -t -b`. |
+| `cp` | done | subset | 3 | 3 | `-r -R -p -a -d -f -i -n -u -v -l -s -L -P -T -t --preserve --no-preserve`; no backups or `--parents`. |
+| `mv` | done | subset | 2 | 3 | `-f -i -n -u -v -T -t --strip-trailing-slashes`; no backups. |
 | `rm` | done | full | 2 | 3 | Links and junctions are removed, never followed; drive roots are protected like `/`; read-only files are removed; piped `Get-ChildItem` objects are extra operands. |
 | `rmdir` | done | full | 1 | 1 | |
 | `mkdir` | done | full | 1 | 1 | Only octal `-m` modes; modes applied on Unix with PowerShell 7.3+, ignored on Windows; `-Z` accepted and ignored. |
-| `ln` | planned | full | 2 | 3 | Symlinks need admin or developer mode on Windows. |
+| `ln` | done | full | 2 | 3 | Symbolic links need admin rights or developer mode on Windows; no backups (`-b`, `-S`). |
 | `link` | done | full | 1 | 1 | |
 | `unlink` | done | full | 1 | 1 | |
-| `touch` | planned | full | 2 | 2 | `-d` uses a subset of GNU date parsing (shared with `date`). |
+| `touch` | done | full | 2 | 2 | `-d` supports @SECONDS, now/today/yesterday/tomorrow, ISO dates and relative items ("2 days ago"), not all of GNU's grammar. |
 | `install` | planned | subset | 2 | 2 | `-d -m -D -t -T -v`; `-o/-g` only on Unix. |
 | `shred` | planned | full | 2 | 2 | Not effective on SSDs / copy-on-write file systems (documented, like GNU). |
 | `dd` | planned | subset | 3 | 3 | File copies with `bs count skip seek conv=notrunc`; no raw disk access (`\\.\PhysicalDrive`): needs admin and one bug wipes a disk. |
@@ -172,7 +172,7 @@ implemented util is listed here).
 | `diff` | planned | subset | 4 | 4 | Myers algorithm, normal / unified / context output, `-r -u -q -i -w -b -N`. |
 | `cmp` | planned | full | 2 | 3 | |
 | `gzip`, `gunzip`, `zcat` | planned | subset | 3 | 4 | `System.IO.Compression.GZipStream`; `-c -d -k -f -l -t -1..-9`. |
-| `which` | planned | full | 2 | 3 | |
+| `which` | done | full | 2 | 3 | PATH programs only (not aliases/functions); PATHEXT on Windows. |
 | `less` | skip | - | - | - | Full-screen interactive pager (raw console input, resize, search). Use `less.exe` from Git for Windows or `Out-Host -Paging`. |
 | `awk` | skip | - | - | - | A complete programming language (parser, interpreter, associative arrays, printf, getline). Use `gawk` from Git for Windows or `ForEach-Object`. |
 | `diff3`, `sdiff` | skip | - | - | - | Three-way and interactive merging are projects of their own. Use `git merge-file`. |

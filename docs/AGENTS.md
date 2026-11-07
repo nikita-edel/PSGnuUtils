@@ -39,6 +39,7 @@ the full suite if they said they are busy with something performance sensitive (
   `@($x).Count`).
 * Paths: `Resolve-GnuPath` (PowerShell location), never `[Environment]::CurrentDirectory`.
 * Errors: `Write-GnuError` / `Write-GnuUsageError` / `Write-GnuWarning`; never `throw` for user errors, never `exit`.
-* Keep functions small; move shared code into `Private/Lib`. Comment the *why*, not the *what*.
+* `Invoke-Gnu<Name>` is reserved for util entry points: never name a helper `Invoke-Gnu<Word>` where Word could be a util
+  (a helper `Invoke-GnuLink` once replaced the `link` util). Keep functions small; move shared code into `Private/Lib`. Comment the *why*, not the *what*.
 * Log every work session in `docs/DEVLOG.md` (date, what changed, what is verified / unverified, next steps) and
   keep `TODO.md` current. Commit in small logical steps with clear messages.

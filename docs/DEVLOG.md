@@ -3,6 +3,16 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-08 - CI removed, touch/which/ln/mv/cp
+
+- No CI (user decision): workflows deleted, docs updated; publish by hand with ./build.ps1 -Publish.
+- New: touch (Private/Lib/Date.ps1), which, ln, mv, cp (Private/Lib/Transfer.ps1: target planning, tree copy/removal,
+  symlink creation); prompts moved to Private/Core/Prompt.ps1.
+- Bugs found: a helper named Invoke-GnuLink replaced the link util (meta test now checks every util function comes
+  from its own file); Directory.Delete(recursive) fails on junctions (Remove-GnuTree removes links itself).
+- Results: 1110 tests green on 5.1, 1115 on 7.6, 99.9% coverage, analyzer clean.
+- Next: ls, sort, grep (see TODO.md).
+
 ## 2026-11-07 (late night) - rm, build switches, Install
 
 - The user ran `rm -rf meow` and got Remove-Item: rm was not implemented yet (batch 3), so Enable-GnuUtil had
