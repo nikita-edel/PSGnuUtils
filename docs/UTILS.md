@@ -65,7 +65,7 @@ implemented util is listed here).
 | `basenc` | done | full | 2 | 2 | All encodings incl. base16, base2msbf/lsbf, z85; base16 decoding accepts lower case (coreutils 9.x). |
 | `head` | done | full | 1 | 1 | Cannot stop an endless producer (see ARCHITECTURE.md, "Stopping upstream"). |
 | `tail` | done | full | 2 | 1 | `-f/-F/--follow=name/--pid/--retry/-s` poll the files; an unfinished last line is printed when the file stops growing. |
-| `split` | planned | full | 3 | 3 | |
+| `split` | done | full | 3 | 3 | `-l -b -C -n` (N, K/N, l/N, l/K/N, r/N, r/K/N), suffixes `-a -d -x --numeric-suffixes --hex-suffixes --additional-suffix` with GNU's automatic widening, `-e -t --verbose`; identical to GNU on 33 cases; no `--filter`. |
 | `csplit` | planned | full | 3 | 3 | |
 | `fmt` | planned | full | 3 | 3 | |
 | `fold` | done | full | 2 | 2 | `-b` counts characters (UTF-16 code units), not UTF-8 bytes. |

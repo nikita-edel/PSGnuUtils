@@ -41,5 +41,9 @@ the full suite if they said they are busy with something performance sensitive (
 * Errors: `Write-GnuError` / `Write-GnuUsageError` / `Write-GnuWarning`; never `throw` for user errors, never `exit`.
 * `Invoke-Gnu<Name>` is reserved for util entry points: never name a helper `Invoke-Gnu<Word>` where Word could be a util
   (a helper `Invoke-GnuLink` once replaced the `link` util). Keep functions small; move shared code into `Private/Lib`. Comment the *why*, not the *what*.
+* **Nothing may hang.** Wrap every test, comparison and smoke run in `timeout` and close stdin (`< /dev/null`):
+  a pwsh started inside a bash `while read` loop otherwise reads the loop's input and blocks. Run GNU comparisons
+  as ONE pwsh script over a cases file, not one pwsh per case. Endless modes (`yes`, `shuf -r`, `tail -f`,
+  `timeout` children) are tested through mocks, `--pid`, or `Select-Object -First`, never by waiting.
 * Log every work session in `docs/DEVLOG.md` (date, what changed, what is verified / unverified, next steps) and
   keep `TODO.md` current. Commit in small logical steps with clear messages.

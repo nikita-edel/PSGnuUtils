@@ -35,6 +35,11 @@
     Runs all tests, writes out/coverage.xml (JaCoCo) and fails below 98% line coverage.
 
 .EXAMPLE
+    ./build.ps1 -Test -TestTimeoutMinutes 10
+    Stops the run if the tests take longer than 10 minutes (default 30), so a hanging test cannot block.
+    Standard input is empty during the tests: a test that reads the console gets end-of-file.
+
+.EXAMPLE
     ./build.ps1 -Install
     Builds and installs the module for the current user (open a new session, then: Import-Module PSGnuUtils).
 
@@ -63,6 +68,10 @@ param(
     [string[]]$TestPath,
 
     [switch]$CodeCoverage,
+
+    # Test/TestBuild: stop the run (and the process) if it takes longer than this, so a hanging test cannot block.
+    [ValidateRange(1, 1440)]
+    [int]$TestTimeoutMinutes = 30,
 
     [string]$NuGetApiKey = $env:PSGALLERY_API_KEY,
 
@@ -171,10 +180,26 @@ function Invoke-Test([string]$ModuleManifest) {
         $configuration.CodeCoverage.CoveragePercentTarget = $CoverageMinimum
     }
 
+    # No test may wait for console input: an accidental read gets end-of-file instead of blocking.
+    $originalInput = [Console]::In
+    [Console]::SetIn((New-Object System.IO.StringReader -ArgumentList ''))
+    # Watchdog in a second runspace: ends the process if the tests hang (the last test shown is the culprit).
+    $watchdog = [powershell]::Create()
+    $null = $watchdog.AddScript({
+            param($Minutes)
+            Start-Sleep -Seconds ($Minutes * 60)
+            [Console]::Error.WriteLine("build.ps1: the tests did not finish within $Minutes minutes; the last test shown above hangs. Stopping.")
+            [System.Diagnostics.Process]::GetCurrentProcess().Kill()
+        }).AddArgument($TestTimeoutMinutes)
+    $watch = $watchdog.BeginInvoke()
     try {
         $result = Invoke-Pester -Configuration $configuration
     }
     finally {
+        $watchdog.Stop()
+        $watchdog.Dispose()
+        $null = $watch
+        [Console]::SetIn($originalInput)
         Remove-Item Env:\PSGNUUTILS_TEST_MANIFEST -ErrorAction SilentlyContinue
     }
     if ($result.FailedCount -gt 0 -or $result.Result -ne 'Passed') {

@@ -73,6 +73,7 @@
         'Invoke-GnuShuf',
         'Invoke-GnuSleep',
         'Invoke-GnuSort',
+        'Invoke-GnuSplit',
         'Invoke-GnuSum',
         'Invoke-GnuTac',
         'Invoke-GnuTail',
