@@ -1,4 +1,4 @@
-# Date strings for touch -d (and date -d later).
+# Date strings for touch -d and date -d.
 #
 # Supported subset of GNU's date grammar:
 #   @SECONDS                 seconds since the Unix epoch (fractions allowed)
@@ -15,19 +15,28 @@ function ConvertFrom-GnuDateString {
     Parses a GNU style date string into a local [datetime], or returns nothing if it is not understood.
     .PARAMETER Now
     The reference time for 'now' and relative items (default: the current time).
+    .PARAMETER Utc
+    Interpret times without a zone as UTC and return a UTC [datetime] (date -u).
     #>
     param(
         [Parameter(Mandatory)][AllowEmptyString()][string]$Text,
-        [Nullable[datetime]]$Now
+        [Nullable[datetime]]$Now,
+        [switch]$Utc
     )
 
-    if ($null -eq $Now) { $Now = [datetime]::Now }
+    if ($null -eq $Now) {
+        $Now = [datetime]::Now
+        if ($Utc) { $Now = [datetime]::UtcNow }
+    }
     $invariant = [System.Globalization.CultureInfo]::InvariantCulture
     $rest = $Text.Trim()
 
     if ($rest -match '^@(?<seconds>[+-]?\d+(\.\d+)?)$') {
-        $milliseconds = [long][Math]::Round([double]::Parse($Matches['seconds'], $invariant) * 1000)
-        return [System.DateTimeOffset]::FromUnixTimeMilliseconds($milliseconds).LocalDateTime
+        # Ticks (100 ns) from a decimal, so fractions are not rounded through a double.
+        $ticks = [long][Math]::Truncate([decimal]::Parse($Matches['seconds'], $invariant) * 10000000)
+        $instant = [System.DateTimeOffset]::FromUnixTimeSeconds(0).AddTicks($ticks)
+        if ($Utc) { return $instant.UtcDateTime }
+        return $instant.LocalDateTime
     }
 
     $offsets = New-Object 'System.Collections.Generic.List[object]'
@@ -46,9 +55,11 @@ function ConvertFrom-GnuDateString {
         '^(?i)tomorrow$' { $base = $Now.AddDays(1) }
         default {
             $styles = [System.Globalization.DateTimeStyles]::AssumeLocal -bor [System.Globalization.DateTimeStyles]::AllowWhiteSpaces
+            if ($Utc) { $styles = [System.Globalization.DateTimeStyles]::AssumeUniversal -bor [System.Globalization.DateTimeStyles]::AllowWhiteSpaces }
             $parsed = [System.DateTimeOffset]::MinValue
             if (-not [System.DateTimeOffset]::TryParse($rest, $invariant, $styles, [ref]$parsed)) { return }
             $base = $parsed.LocalDateTime
+            if ($Utc) { $base = $parsed.UtcDateTime }
         }
     }
 

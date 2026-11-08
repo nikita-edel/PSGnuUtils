@@ -3,6 +3,21 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-09 - Batch B: tr printf test expr date
+
+- tr: sets with ranges, C-locale classes, [c*n], [=c=], octal escapes (GNU's two-digit rule above \377),
+  -c/-C -d -s -t and every GNU operand / set error; output compared with GNU tr (identical).
+- printf: conversions d i o u x X f F e E g G c s b q, flags, `*` widths, escapes incl. Unicode, strtoimax-style
+  number parsing with GNU's messages (not completely converted, out of range, expected a numeric value).
+- test: port of GNU's posixtest (1-4 argument rules, then ! ( ) -a -o grammar) with GNU's messages and quirks
+  (`-l` with string operators); file tests use .NET, Unix file types via PowerShell 7's UnixMode (mockable).
+- expr: GNU's grammar with BigInteger, short-circuit evaluation of | and &, anchored BRE matches.
+- date: strftime engine with flags/widths, -d -f -r -u -I -R --rfc-3339; ConvertFrom-GnuDateString got -Utc and
+  100 ns fractions. Every sequence compared with GNU date -u (identical except %N below 100 ns).
+- Traps found (in ARCHITECTURE.md): [int] rounds half to even (+05:30 became +06:30), [char] -eq is
+  case-insensitive, hashtable literals reject keys differing only in case, heredocs/tools mangle backslash escapes.
+- Results: 1659 tests green on 7.6, 1664 on 5.1, 99.84% coverage before the last gap fixes, analyzer clean.
+
 ## 2026-11-08 (night) - Batch A: readlink realpath basenc unexpand tsort shuf sha224sum cksum sum factor
 
 - New libs: Private/Lib/Canonical.ps1 (Get-GnuCanonicalPath for readlink -f/-e/-m and realpath), Sha224.ps1

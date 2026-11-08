@@ -81,7 +81,7 @@ implemented util is listed here).
 | `paste` | done | full | 2 | 2 | |
 | `join` | planned | full | 3 | 3 | |
 | `comm` | done | full | 2 | 2 | Ordinal comparison (like `LC_ALL=C`), not locale collation. |
-| `tr` | planned | full | 3 | 2 | Character classes and ranges. |
+| `tr` | done | full | 3 | 2 | Ranges, classes (C locale), `[c*n]`, `[=c=]`, escapes, `-c -d -s -t`; reads only the pipeline/console. |
 | `expand` | done | full | 2 | 2 | |
 | `unexpand` | done | full | 2 | 2 | Exact port of GNU's pending-blank algorithm (verified against GNU). |
 | `wc` | done | full | 1 | 1 | Word and width rules approximate GNU's locale handling (whitespace = `\s`, tabs to multiples of 8). |
@@ -118,12 +118,12 @@ implemented util is listed here).
 | Util | Status | Scope | Difficulty | Batch | Notes |
 |---|---|---|---|---|---|
 | `echo` | done | full | 1 | 1 | |
-| `printf` | planned | full | 3 | 2 | Reuses Escape.ps1 and NumberFormat.ps1. |
+| `printf` | done | full | 3 | 2 | All conversions except `%a`; `%b`, `%q`, `*` widths, Unicode escapes; errors and exit codes as GNU. |
 | `yes` | done | full | 1 | 1 | `yes \| head` never ends (see ARCHITECTURE.md); use `Select-Object -First`. |
 | `true` | done | full | 1 | 1 | Sets `$LASTEXITCODE`; functions cannot set `$?`. |
 | `false` | done | full | 1 | 1 | |
-| `test` | planned | full | 3 | 2 | Only as `test`; `[` cannot be called from PowerShell. |
-| `expr` | planned | full | 3 | 2 | |
+| `test` | done | full | 3 | 2 | GNU's posixtest grammar and messages; result in `$LASTEXITCODE`; Windows approximations for -x -O -G. |
+| `expr` | done | full | 3 | 2 | BigInteger arithmetic, BRE `:` matches, short-circuit `|`/`&`; string comparisons are ordinal. |
 | `seq` | done | full | 2 | 1 | `inf` and hexadecimal operands are not supported yet. |
 | `factor` | done | full | 3 | 2 | BigInteger, Miller-Rabin, Pollard rho; `-h`; slow when two prime factors both have more than ~12 digits. |
 | `sleep` | done | full | 1 | 1 | |
@@ -155,7 +155,7 @@ implemented util is listed here).
 | `hostname` | done | subset | 1 | 1 | Setting the host name is not supported. |
 | `nproc` | done | full | 1 | 1 | `--all` equals the runtime's processor count. |
 | `uptime` | planned | subset | 2 | 2 | Load averages only on Unix. |
-| `date` | planned | subset | 3 | 2 | `+FORMAT`, `-u`, `-d` (ISO 8601, @epoch, relative "N units ago"), `-r`, `-I`, `-R`; no full GNU free-form date grammar. |
+| `date` | done | subset | 3 | 2 | All `+FORMAT` sequences/flags, `-d -f -r -u -I -R --rfc-3339`; no date setting, no TZ variable, `-d` subset grammar, 100 ns resolution. |
 | `users`, `who`, `pinky` | skip | - | - | - | Read the Unix utmp login records, which Windows does not have. |
 | `logname` | skip | - | - | - | No login-terminal concept on Windows; it would just duplicate `whoami`. |
 | `tty`, `stty` | skip | - | - | - | Windows consoles have no tty devices or terminal line settings. |

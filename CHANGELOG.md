@@ -19,4 +19,5 @@ All notable changes to this project are documented here. The format follows
 - `rm` (pulled forward from batch 3): `-f -i -I --interactive -r -R -d -v --preserve-root --no-preserve-root --one-file-system`.
 - Daily-use utils: `touch which ln mv cp sort ls grep`.
 - Batch A: `readlink realpath basenc unexpand tsort shuf sha224sum cksum sum factor`.
+- Batch B: `tr printf test expr date`.
 - Build script (Bootstrap, Manifest, Analyze, Test, Build, TestBuild, Install, Uninstall, Publish, Clean).

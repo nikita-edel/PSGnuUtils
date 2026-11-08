@@ -184,6 +184,12 @@ Ideas for later: a tiny C# cmdlet compiled with `Add-Type` that head pipes into 
 * A `[string]` parameter turns `$null` into `''`, even with `[AllowNull()]`. Test such parameters with
   `[string]::IsNullOrEmpty()`, never `$null -ne $x` (sort once treated "no -t" as an empty separator).
 * Commas bind tighter than arithmetic: `@($a * $b, $c)` multiplies `$a` with the array `($b, $c)`; write `@(($a * $b), $c)`.
+* `[int]` rounds half to even: `[int]5.5` is 6 and `[int]2.5` is 2. Use `[Math]::Truncate` / `[Math]::Floor` when
+  converting hours, divisions and similar (date printed +06:30 for a +05:30 zone).
+* `-eq` on `[char]` is case-insensitive (`[char]'a' -eq [char]'A'` is `$true`), like on strings: use `-ceq`.
+  Hashtable literals are case-insensitive too, so `@{ x = 1; X = 2 }` is a duplicate-key parse error.
+* Tests that need non-ASCII text use `[char]` codes or escapes the util itself interprets (printf's Unicode escape);
+  editing tools may turn a written Unicode escape into the character itself, which the ASCII meta test then rejects.
 * In comment-based help, a line that starts with a dot and a word (`.NET has ...`) is read as a help keyword and
   silently breaks the whole help block (no synopsis, no examples). Never start a help line with `.`.
 * Code that could run for hours must be avoided in tests: run new tests with `timeout`, and keep endless modes
