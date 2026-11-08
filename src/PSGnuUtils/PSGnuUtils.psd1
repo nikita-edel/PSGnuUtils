@@ -21,6 +21,7 @@
         'Invoke-GnuBasenc',
         'Invoke-GnuCat',
         'Invoke-GnuCksum',
+        'Invoke-GnuCmp',
         'Invoke-GnuComm',
         'Invoke-GnuCp',
         'Invoke-GnuCut',

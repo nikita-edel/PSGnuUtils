@@ -170,7 +170,7 @@ implemented util is listed here).
 | `find` | planned | subset | 4 | 4 | Expression parser (`! -o -a ( )`), `-name -iname -path -type -size -mtime -mmin -newer -maxdepth -mindepth -empty -print -print0 -exec -delete`; no `-printf -perm -user -group -newerXY`. |
 | `xargs` | planned | full | 4 | 4 | Windows command-line quoting rules make it tricky but it is essential for pipelines. |
 | `diff` | planned | subset | 4 | 4 | Myers algorithm, normal / unified / context output, `-r -u -q -i -w -b -N`. |
-| `cmp` | planned | full | 2 | 3 | |
+| `cmp` | done | full | 2 | 3 | `-b -i -l -n -s`, SKIP operands; messages and exit codes of GNU diffutils 3.12. |
 | `gzip`, `gunzip`, `zcat` | planned | subset | 3 | 4 | `System.IO.Compression.GZipStream`; `-c -d -k -f -l -t -1..-9`. |
 | `which` | done | full | 2 | 3 | PATH programs only (not aliases/functions); PATHEXT on Windows. |
 | `less` | skip | - | - | - | Full-screen interactive pager (raw console input, resize, search). Use `less.exe` from Git for Windows or `Out-Host -Paging`. |
