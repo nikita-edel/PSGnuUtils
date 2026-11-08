@@ -24,7 +24,7 @@ Concrete next steps, most important first. Keep this list short and current; his
 - [ ] `diff --color[=WHEN]` and `--palette`.
 - [ ] Audit every util against GNU: make sure all its flags are implemented, and verify that each flag really exists in GNU.
 
-- [ ] Release 0.1.0: set ProjectUri in the manifest, `./build.ps1 -Publish -NuGetApiKey <key>`, tag `v0.1.0`.
+- [ ] Release 0.1.0: set ProjectUri in the manifest, `./build.ps1 -Publish <key>`, tag `v0.1.0`.
 - [x] Batch D: `cmp od split csplit fmt join numfmt stat df du dd`.
 
 ## Ideas

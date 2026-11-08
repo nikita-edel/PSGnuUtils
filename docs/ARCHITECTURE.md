@@ -212,7 +212,7 @@ Ideas for later: a tiny C# cmdlet compiled with `Add-Type` that head pipes into 
 
 ## Build
 
-`./build.ps1 -Build` writes `out/PSGnuUtils/` with the manifest, a merged `PSGnuUtils.psm1` and `Utils/<name>.ps1` for
+`./build.ps1 -Build` writes `out/PSGnuUtils/<version>/` with the manifest, a merged `PSGnuUtils.psm1` and `Utils/<name>.ps1` for
 every util. The time to import goes to reading and parsing, so the psm1 holds only what every session needs: the
 core, each util's `Invoke-Gnu<Name>` function and an index (`$script:GnuLazyUtils`: file, utils it calls, category,
 synopsis). The rest of a util is in its own file and is loaded on first use: `Invoke-Gnu<Name>` starts with

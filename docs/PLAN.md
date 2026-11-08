@@ -61,7 +61,7 @@ grep design:
 
 * 0.1.0: tests green on Windows PowerShell 5.1 and PowerShell 7 (Windows, ideally Linux/macOS too).
 * Before the first publish: set `ProjectUri` in the manifest (needs the public repository URL),
-  then `./build.ps1 -Publish -NuGetApiKey <key>` and tag `v0.1.0`.
+  then `./build.ps1 -Publish <key>` and tag `v0.1.0`.
 * Versioning: semantic versioning; every batch is a minor release.
 
 ## Open questions

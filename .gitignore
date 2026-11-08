@@ -1,10 +1,12 @@
-# Build output (./build.ps1 -Task Build / Test)
+# Build output (./build.ps1 -Build, -Test)
+build/
 out/
 
 # Editors / OS
 .vscode/*
 !.vscode/settings.json
 .idea/
+.cache/
 *.swp
 .DS_Store
 Thumbs.db

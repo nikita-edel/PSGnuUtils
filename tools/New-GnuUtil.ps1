@@ -5,7 +5,7 @@
 .DESCRIPTION
     Creates both files from templates that follow the repository conventions (see CONTRIBUTING.md)
     and regenerates FunctionsToExport. Afterwards: implement the util, fill in the tests, update
-    docs/UTILS.md (status), CHANGELOG.md and docs/DEVLOG.md.
+    docs/UTILS.md (status), CHANGELOG.txt and docs/DEVLOG.md.
 
 .EXAMPLE
     ./tools/New-GnuUtil.ps1 -Name cut -Category 'Text processing' -Synopsis 'Remove sections from each line of files.'
@@ -104,4 +104,4 @@ $utf8 = New-Object System.Text.UTF8Encoding($false)
 
 Write-Host "Created $utilPath"
 Write-Host "Created $testPath"
-Write-Host 'Next: implement the util, write the tests, update docs/UTILS.md, CHANGELOG.md and docs/DEVLOG.md.'
+Write-Host 'Next: implement the util, write the tests, update docs/UTILS.md, CHANGELOG.txt and docs/DEVLOG.md.'

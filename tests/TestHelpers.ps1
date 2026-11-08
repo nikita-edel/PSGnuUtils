@@ -3,7 +3,7 @@
 #   BeforeAll { . (Join-Path -Path (Split-Path -Parent $PSScriptRoot) -ChildPath 'TestHelpers.ps1') }
 #
 # The module under test is src/PSGnuUtils/PSGnuUtils.psd1, or the manifest in
-# $env:PSGNUUTILS_TEST_MANIFEST (./build.ps1 -Task TestBuild uses the built module).
+# $env:PSGNUUTILS_TEST_MANIFEST (./build.ps1 -TestBuild uses the built module).
 # Test files must stay ASCII-only (Windows PowerShell 5.1 reads BOM-less files as ANSI);
 # build non-ASCII strings with [char] codes.
 

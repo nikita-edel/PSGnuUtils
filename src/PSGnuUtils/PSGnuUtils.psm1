@@ -6,7 +6,7 @@
       2. Utils    - one file per GNU util; each registers its spec and defines Invoke-Gnu<Name>
       3. Public   - management commands (Get-GnuUtil, Enable-GnuAlias, Disable-GnuAlias, Import-GnuUtil, Disable-GnuLazyLoading)
 
-    The build (./build.ps1 -Task Build) replaces the "Loader" region below with the
+    The build (./build.ps1 -Build) replaces the "Loader" region below with the
     concatenated core and each util's small entry function; everything else of a util
     stays in Utils/<name>.ps1 and is loaded on the util's first call.
 #>

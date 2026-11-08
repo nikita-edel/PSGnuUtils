@@ -3,6 +3,21 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-08 (night, later) - Build tooling aligned with PSModuleTemplate
+
+- build.ps1 is now a thin front over tools/ (bootstrap, manifest, analyze, build, test, package, install), like the
+  template. Kept beyond the template: analyzer, manifest, coverage, the test watchdog, -Build / -TestBuild with the
+  lazy-loading split, -Uninstall, -Clean. The template's update-subtree.ps1 was left out on request.
+- Changed for callers: without arguments build.ps1 prints help (use `-Analyze -Test`); `-Test head tests/Core` replaces
+  `-TestPath` and `-Task`; `-Publish <key>` replaces `-Publish -NuGetApiKey <key>`; the staged module is
+  out/PSGnuUtils/<version>; CHANGELOG.md is now CHANGELOG.txt.
+- Publishing uses Publish-PSResource: Publish-Module parses nuget's English output, so it fails on other locales.
+- release.yml is the template's: notes come from the previous GitHub release, the gallery is the last step, so a failed
+  run can simply be repeated. Still not run (no GitHub remote yet).
+- Verified on Windows: 2833 tests on 7.6 (100% coverage, analyzer clean, now also over tools/), built module 2833,
+  5.1 2828. Zip + offline install, -Install / -Uninstall and -Publish to a temporary local feed all worked.
+- Not verified: the Linux suite was not run for this change (stopped on request); last Linux run was at the xargs commit.
+
 ## 2026-11-08 (night) - xargs
 
 - xargs: port of GNU's read_line, all grouping options, `-P` for programs. Not done: `-o` and `--show-limits` (TODO).

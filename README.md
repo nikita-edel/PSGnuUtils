@@ -116,8 +116,8 @@ Use `-NoClobber` to enable only names that do not exist yet, or `-Exclude` to ke
 
 ```powershell
 ./build.ps1 -Bootstrap   # Pester >= 5.5, PSScriptAnalyzer
-./build.ps1                   # analyze + test
-./build.ps1 -Build       # out/PSGnuUtils (single-file module)
+./build.ps1 -Analyze -Test    # analyze + test
+./build.ps1 -Build       # out/PSGnuUtils/<version>
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [docs/AGENTS.md](docs/AGENTS.md), [docs/PLAN.md](docs/PLAN.md) and
