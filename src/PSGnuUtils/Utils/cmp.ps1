@@ -11,6 +11,7 @@ Register-GnuUtil @{
     )
     FileOperands  = $true
     UsageExitCode = 2
+    UsageHintHasName = $true
     Options       = @(
         @{ Short = 'b'; Long = 'print-bytes'; Help = 'print differing bytes' }
         @{ Short = 'i'; Long = 'ignore-initial'; Arg = 'SKIP'; Help = 'skip first SKIP bytes of both inputs; or SKIP1:SKIP2 for each input' }

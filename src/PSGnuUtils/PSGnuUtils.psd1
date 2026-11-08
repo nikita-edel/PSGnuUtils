@@ -29,6 +29,7 @@
         'Invoke-GnuDate',
         'Invoke-GnuDd',
         'Invoke-GnuDf',
+        'Invoke-GnuDiff',
         'Invoke-GnuDircolors',
         'Invoke-GnuDirname',
         'Invoke-GnuDu',

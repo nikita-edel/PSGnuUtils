@@ -169,7 +169,7 @@ implemented util is listed here).
 | `sed` | done | subset | 4 | 4 | All addresses and commands including hold space and branching; `-n -e -f -E -r -i -s -z -l -b --sandbox`; `.NET` regular expressions; input is read before the script starts; no `e` command. |
 | `find` | planned | subset | 4 | 4 | Expression parser (`! -o -a ( )`), `-name -iname -path -type -size -mtime -mmin -newer -maxdepth -mindepth -empty -print -print0 -exec -delete`; no `-printf -perm -user -group -newerXY`. |
 | `xargs` | planned | full | 4 | 4 | Windows command-line quoting rules make it tricky but it is essential for pipelines. |
-| `diff` | planned | subset | 4 | 4 | Myers algorithm, normal / unified / context output, `-r -u -q -i -w -b -N`. |
+| `diff` | done | subset | 4 | 4 | Port of GNU's algorithm, so hunks match; normal, unified, context and ed output; `-r -N -q -s -i -w -b -Z -E -B -a -x -X -L -p -F -t -T`; no `-y`, `-I`, `-S`, `--from-file`. |
 | `cmp` | done | full | 2 | 3 | `-b -i -l -n -s`, SKIP operands; messages and exit codes of GNU diffutils 3.12. |
 | `gzip`, `gunzip`, `zcat` | planned | subset | 3 | 4 | `System.IO.Compression.GZipStream`; `-c -d -k -f -l -t -1..-9`. |
 | `which` | done | full | 2 | 3 | PATH programs only (not aliases/functions); PATHEXT on Windows. |

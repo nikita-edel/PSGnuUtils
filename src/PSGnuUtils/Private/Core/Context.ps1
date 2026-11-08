@@ -198,6 +198,7 @@ function Write-GnuUsageError {
     )
 
     $hint = "Try '$($Context.Name) --help' for more information."
+    if ($Context.Spec.UsageHintHasName) { $hint = "$($Context.Name): $hint" }
     $text = $hint
     if ($Message) { $text = "$Message`n$hint" }
     Write-GnuError -Context $Context -Message $text -ExitCode $Context.Spec.UsageExitCode

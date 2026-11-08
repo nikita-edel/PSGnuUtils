@@ -19,6 +19,7 @@ $script:GnuSpecDefaults = @{
     NumericOption          = $null    # short option letter that "-NUM" maps to (head -5 == head -n 5)
     NegativeNumberOperands = $false   # treat "-5" / "-.5" as operands instead of options (seq)
     UsageExitCode          = 1        # exit code for usage errors
+    UsageHintHasName       = $false   # diffutils style: the "Try ..." hint starts with the util's name too
     OpenErrorFormat        = '{0}: {1}'   # message when an input file cannot be opened ({0}=name, {1}=reason)
     ReadErrorFormat        = '{0}: {1}'   # message when an input cannot be read (directories)
 }
