@@ -66,7 +66,8 @@ Describe 'Util <Name>' -ForEach $utilCases {
 
     It 'is defined by its own Utils file (no helper function with the same name)' {
         $file = (Get-Command -Name $Command -Module PSGnuUtils).ScriptBlock.File
-        if ($file) { [System.IO.Path]::GetFileName($file) | Should -Be "$Name.ps1" }
+        # The built module merges every file into one psm1, so only the definition can tell there.
+        if ($file -and [System.IO.Path]::GetFileName($file) -ne 'PSGnuUtils.psm1') { [System.IO.Path]::GetFileName($file) | Should -Be "$Name.ps1" }
         else { (Get-Command -Name $Command -Module PSGnuUtils).Definition | Should -Match "Initialize-GnuUtil -Name '$Name'" }
     }
 

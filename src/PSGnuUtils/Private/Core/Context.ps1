@@ -116,7 +116,7 @@ function Get-GnuModuleVersion {
     .PARAMETER Module
     The module info to read (default: this module).
     .PARAMETER ManifestPath
-    Manifest used when the module has no version yet (default: the manifest of the source tree).
+    Manifest used when the module has no version yet (default: this module's own manifest).
     #>
     param(
         [AllowNull()][object]$Module,
@@ -124,7 +124,11 @@ function Get-GnuModuleVersion {
     )
 
     if (-not $PSBoundParameters.ContainsKey('Module')) { $Module = $ExecutionContext.SessionState.Module }
-    if (-not $ManifestPath) { $ManifestPath = Join-Path -Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) -ChildPath 'PSGnuUtils.psd1' }
+    if (-not $ManifestPath) {
+        # The built module keeps its manifest next to the merged psm1; in the source tree it is two levels up.
+        $ManifestPath = Join-Path -Path $PSScriptRoot -ChildPath 'PSGnuUtils.psd1'
+        if (-not (Test-Path -LiteralPath $ManifestPath)) { $ManifestPath = Join-Path -Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) -ChildPath 'PSGnuUtils.psd1' }
+    }
     if ($null -ne $Module -and $null -ne $Module.Version -and $Module.Version -ne [version]'0.0') { return $Module.Version.ToString() }
     if (Test-Path -LiteralPath $ManifestPath) { return [string](Import-PowerShellDataFile -Path $ManifestPath).ModuleVersion }
     '0.0.0'
