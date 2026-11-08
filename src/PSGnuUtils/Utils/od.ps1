@@ -175,16 +175,49 @@ function Format-GnuOdFloat {
     $smallest = 2.2250738585072014E-308
     if ($Size -eq 4) { $digits = 6; $smallest = 1.17549435E-38 }
     if ([Math]::Abs($Value) -lt $smallest) { $digits = 1 }
-    # 17 significant digits always read back exactly.
+    # 'G<p>' gives up to 17 significant digits on every runtime (.NET Framework's 'F' and 'E' stop at 15);
+    # 17 digits always read back exactly.
+    $invariant = [System.Globalization.CultureInfo]::InvariantCulture
     for ($precision = $digits; $precision -lt 17; $precision++) {
-        $text = Format-GnuFloat -Value $Value -Conversion 'g' -Precision $precision
-        $back = [double]::Parse($text, [System.Globalization.CultureInfo]::InvariantCulture)
+        $text = $Value.ToString('G' + $precision, $invariant)
+        $back = [double]::Parse($text, $invariant)
         if ($Size -eq 4) {
-            if ([float]$back -eq [float]$Value) { return $text }
+            if ([float]$back -eq [float]$Value) { return ConvertTo-GnuCStyleG -Text $text -Precision $precision }
         }
-        elseif ($back -eq $Value) { return $text }
+        elseif ($back -eq $Value) { return ConvertTo-GnuCStyleG -Text $text -Precision $precision }
     }
-    Format-GnuFloat -Value $Value -Conversion 'g' -Precision 17
+    ConvertTo-GnuCStyleG -Text $Value.ToString('G17', $invariant) -Precision 17
+}
+
+function ConvertTo-GnuCStyleG {
+    <#
+    .SYNOPSIS
+    Re-lays a .NET 'G<p>' number text out like C's %.<p>g (exponent form when exp < -4 or exp >= p).
+    #>
+    param([Parameter(Mandatory)][string]$Text, [Parameter(Mandatory)][int]$Precision)
+
+    $sign = ''
+    if ($Text.StartsWith('-', [System.StringComparison]::Ordinal)) { $sign = '-'; $Text = $Text.Substring(1) }
+    $exponent = 0
+    $mantissa = $Text
+    $at = $Text.IndexOf('E')
+    if ($at -ge 0) { $mantissa = $Text.Substring(0, $at); $exponent = [int]$Text.Substring($at + 1) }
+    $point = $mantissa.IndexOf('.')
+    if ($point -lt 0) { $point = $mantissa.Length }
+    $digits = $mantissa.Replace('.', '')
+    $zeros = $digits.Length - $digits.TrimStart('0').Length
+    $digits = $digits.Substring($zeros).TrimEnd('0')
+    $scientific = $exponent + $point - 1 - $zeros
+    if ($scientific -lt -4 -or $scientific -ge $Precision) {
+        $text = $digits.Substring(0, 1)
+        if ($digits.Length -gt 1) { $text += '.' + $digits.Substring(1) }
+        $mark = '+'
+        if ($scientific -lt 0) { $mark = '-' }
+        return "$sign$($text)e$mark$([Math]::Abs($scientific).ToString('00'))"
+    }
+    if ($scientific -lt 0) { return "$($sign)0." + ('0' * (-$scientific - 1)) + $digits }
+    if ($digits.Length -le $scientific + 1) { return $sign + $digits.PadRight($scientific + 1, '0') }
+    $sign + $digits.Substring(0, $scientific + 1) + '.' + $digits.Substring($scientific + 1)
 }
 
 function Format-GnuOdValue {

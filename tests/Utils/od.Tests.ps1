@@ -92,6 +92,11 @@ this system doesn't provide a 3-byte integral type"
             Format-GnuOdFloat -Value 0 -Size 8 | Should -Be '0'
             Format-GnuOdFloat -Value 5e-324 -Size 8 | Should -Be '5e-324'
             Format-GnuOdFloat -Value (0.1 + 0.2) -Size 8 | Should -Be '0.30000000000000004'
+            Format-GnuOdFloat -Value 123456 -Size 8 | Should -Be '123456'
+            Format-GnuOdFloat -Value 100 -Size 8 | Should -Be '100'
+            Format-GnuOdFloat -Value -12.5 -Size 8 | Should -Be '-12.5'
+            Format-GnuOdFloat -Value 1e-5 -Size 8 | Should -Be '1e-05'
+            Format-GnuOdFloat -Value 0.0001234 -Size 8 | Should -Be '0.0001234'
         }
     }
 }

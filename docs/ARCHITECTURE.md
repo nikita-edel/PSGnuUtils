@@ -198,6 +198,8 @@ Ideas for later: a tiny C# cmdlet compiled with `Add-Type` that head pipes into 
 * .NET event handlers have no runspace in PowerShell; poll `StreamReader.ReadLineAsync()` instead (timeout).
 * In "$name:" PowerShell reads a scope-qualified variable; write "${name}:".
 * In argument mode `cmd '-0', [string]$x` does not cast; use `([string]$x)`.
+* .NET Framework (Windows PowerShell 5.1) formats doubles with 'F' and 'E' to at most 15 significant digits
+  (the rest are zeros); 'G17' and 'R' still give 17. od takes its digits from 'G<p>' for that reason.
 * In comment-based help, a line that starts with a dot and a word (`.NET has ...`) is read as a help keyword and
   silently breaks the whole help block (no synopsis, no examples). Never start a help line with `.`.
 * Code that could run for hours must be avoided in tests: run new tests with `timeout`, and keep endless modes

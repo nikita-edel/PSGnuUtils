@@ -46,7 +46,7 @@ implemented util is listed here).
 
 | Util | Status | Scope | Difficulty | Batch | Notes |
 |---|---|---|---|---|---|
-| `stat` | planned | subset | 3 | 3 | Default output plus `--format` fields that exist on Windows; inode/mode/uid fields only on Unix. |
+| `stat` | done | subset | 3 | 3 | Default, `-c`, `--printf`, `-t`, `-f`, `-L`; all format sequences; .NET has no inode/device/link counts or ctime (0, 0, 1, mtime); Windows modes from attributes, ids like Cygwin. |
 | `df` | planned | subset | 2 | 3 | `-h -H -T -t -x --output`. |
 | `du` | planned | subset | 2 | 3 | `-s -h -a -c -d --max-depth -x --apparent-size`. |
 | `readlink` | done | full | 2 | 2 | Junctions count as links; a dangling link is canonicalized as a missing file. |
