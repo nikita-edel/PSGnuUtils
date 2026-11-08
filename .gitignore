@@ -8,3 +8,6 @@ out/
 *.swp
 .DS_Store
 Thumbs.db
+
+# Pester default coverage output (always use out/)
+/coverage.xml
