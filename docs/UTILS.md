@@ -67,7 +67,7 @@ implemented util is listed here).
 | `tail` | done | full | 2 | 1 | `-f/-F/--follow=name/--pid/--retry/-s` poll the files; an unfinished last line is printed when the file stops growing. |
 | `split` | done | full | 3 | 3 | `-l -b -C -n` (N, K/N, l/N, l/K/N, r/N, r/K/N), suffixes `-a -d -x --numeric-suffixes --hex-suffixes --additional-suffix` with GNU's automatic widening, `-e -t --verbose`; identical to GNU on 33 cases; no `--filter`. |
 | `csplit` | done | full | 3 | 3 | Line numbers, `/RE/[OFFSET]`, `%RE%[OFFSET]`, `{N}`/`{*}`, `-b -f -k -n -s -z --suppress-matched`; GNU's algorithm and cleanup on errors; identical to GNU on 51 cases. |
-| `fmt` | planned | full | 3 | 3 | |
+| `fmt` | done | full | 3 | 3 | Port of GNU's fmt.c (optimal line breaking with its cost model, sentence ends, `-c -p -s -t -u -w -g -WIDTH`); identical to GNU on 80 cases; CRLF read as LF; huge paragraphs are not flushed in parts. |
 | `fold` | done | full | 2 | 2 | `-b` counts characters (UTF-16 code units), not UTF-8 bytes. |
 | `pr` | skip | - | - | - | Dozens of pagination options for line printers; nobody prints with it anymore. |
 

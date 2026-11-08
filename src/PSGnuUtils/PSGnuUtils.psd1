@@ -35,6 +35,7 @@
         'Invoke-GnuExpr',
         'Invoke-GnuFactor',
         'Invoke-GnuFalse',
+        'Invoke-GnuFmt',
         'Invoke-GnuFold',
         'Invoke-GnuGrep',
         'Invoke-GnuGroups',
