@@ -5,7 +5,7 @@
 # (alias > function > cmdlet > native executable), so the GNU name wins over built-in aliases
 # such as cat -> Get-Content, functions such as mkdir, and native tools such as sort.exe.
 #
-# Built-in aliases that get replaced are remembered and restored on Disable-GnuUtil or when the
+# Built-in aliases that get replaced are remembered and restored on Disable-GnuAlias or when the
 # module is removed. Our aliases are always created with AllScope: Windows PowerShell's built-in
 # aliases are AllScope (an AllScope flag cannot be removed again), and Remove-Item Alias:\x run
 # from inside the module reliably removes AllScope aliases from the global scope.

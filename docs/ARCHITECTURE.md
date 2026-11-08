@@ -30,7 +30,7 @@ src/PSGnuUtils/
     Aliases.ps1            Enable/Disable of GNU name aliases, restoring replaced aliases
     Configuration.ps1      Import-Module -ArgumentList handling
   Private/Lib/             code shared by several utils (checksums, base encodings, sizes, escapes, number formatting, head/tail)
-  Public/                  Get-GnuUtil, Enable-GnuAlias, Disable-GnuUtil, Import-GnuUtil, Disable-GnuLazyLoading
+  Public/                  Get-GnuUtil, Enable-GnuAlias, Disable-GnuAlias, Import-GnuUtil, Disable-GnuLazyLoading
   Utils/<name>.ps1         one file per util: Register-GnuUtil spec + Invoke-Gnu<Name> function (+ private helpers)
 tests/
   TestHelpers.ps1          Invoke-TestGnu, New-TestFile, platform helpers
@@ -51,7 +51,7 @@ tests/
 
 * `Enable-GnuAlias` creates `Set-Alias -Scope Global -Option AllScope -Description PSGnuUtils <name> Invoke-Gnu<Name>`.
 * If a global alias with that name exists (e.g. `cat`), its definition, options and description are saved in
-  `$script:GnuEnabledUtils[name]` and restored by `Disable-GnuUtil` or `Remove-Module` (`OnRemove` handler).
+  `$script:GnuEnabledUtils[name]` and restored by `Disable-GnuAlias` or `Remove-Module` (`OnRemove` handler).
 * Our aliases are always `AllScope` because Windows PowerShell's built-in aliases are `AllScope` and that flag
   cannot be removed from an existing alias. `Remove-Item Alias:\x` from inside the module reliably removes an
   `AllScope` alias from the global scope (verified on 5.1 and 7.6), after which the original is re-created with its

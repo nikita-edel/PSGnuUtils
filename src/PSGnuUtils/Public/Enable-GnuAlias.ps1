@@ -10,7 +10,7 @@ function Enable-GnuAlias {
 
     Aliases take precedence over functions, cmdlets and native executables, so an enabled GNU
     name always wins. Existing aliases with the same name (for example cat -> Get-Content or
-    ls -> Get-ChildItem on Windows) are overridden and remembered; Disable-GnuUtil or
+    ls -> Get-ChildItem on Windows) are overridden and remembered; Disable-GnuAlias or
     Remove-Module PSGnuUtils restores them. Use -NoClobber to skip names that already resolve
     to another command instead.
 

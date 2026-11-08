@@ -136,7 +136,7 @@ function Invoke-Bootstrap {
 
 function Invoke-Manifest {
     Write-Step 'Manifest: FunctionsToExport'
-    $functions = @('Disable-GnuLazyLoading', 'Disable-GnuUtil', 'Enable-GnuAlias', 'Get-GnuUtil', 'Import-GnuUtil') + @(Get-UtilFunctionName) | Sort-Object
+    $functions = @('Disable-GnuLazyLoading', 'Disable-GnuAlias', 'Enable-GnuAlias', 'Get-GnuUtil', 'Import-GnuUtil') + @(Get-UtilFunctionName) | Sort-Object
     $list = ($functions | ForEach-Object { "        '$_'" }) -join ",`n"
     $replacement = "FunctionsToExport    = @(`n$list`n    )"
     $content = [System.IO.File]::ReadAllText($ManifestPath)

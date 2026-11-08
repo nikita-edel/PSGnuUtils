@@ -183,7 +183,7 @@ Describe 'Framework error paths' {
             (Get-Alias -Name seq -Scope Global).Definition | Should -Be 'Get-Date'
         }
         finally {
-            Disable-GnuUtil -All
+            Disable-GnuAlias -All
             Remove-Item -LiteralPath 'Alias:\seq' -Force -ErrorAction SilentlyContinue
         }
     }
@@ -204,7 +204,7 @@ Describe 'Framework error paths' {
         try {
             InModuleScope PSGnuUtils {
                 Mock Set-Alias { throw 'restore refused' }
-                Disable-GnuUtil -Name seq -ErrorVariable failures -ErrorAction SilentlyContinue
+                Disable-GnuAlias -Name seq -ErrorVariable failures -ErrorAction SilentlyContinue
                 "$failures" | Should -Match "cannot restore 'seq': restore refused"
                 $script:GnuEnabledUtils.ContainsKey('seq') | Should -BeFalse
             }

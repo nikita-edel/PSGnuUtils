@@ -28,7 +28,7 @@ function Get-GnuUtil {
     Lists the checksum utils.
 
     .EXAMPLE
-    Get-GnuUtil -Enabled | Disable-GnuUtil
+    Get-GnuUtil -Enabled | Disable-GnuAlias
 
     Disables every enabled util.
     #>

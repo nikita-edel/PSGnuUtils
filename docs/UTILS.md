@@ -182,7 +182,7 @@ implemented util is listed here).
 
 ## Command name conflicts
 
-Enabling a util with `Enable-GnuAlias` overrides these existing commands (restored on `Disable-GnuUtil`):
+Enabling a util with `Enable-GnuAlias` overrides these existing commands (restored on `Disable-GnuAlias`):
 
 | GNU name | Windows PowerShell 5.1 | PowerShell 7 on Windows | Linux/macOS |
 |---|---|---|---|

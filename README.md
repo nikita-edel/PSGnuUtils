@@ -46,8 +46,8 @@ Get-ChildItem | wc -l
 seq -w 1 10 | head -3
 
 Get-GnuUtil                              # list utils, Enabled state and what each name shadows
-Disable-GnuUtil cat                      # cat is Get-Content again
-Disable-GnuUtil -All
+Disable-GnuAlias cat                      # cat is Get-Content again
+Disable-GnuAlias -All
 ```
 
 Enable them in every session with your profile (`notepad $PROFILE`):
@@ -86,7 +86,7 @@ Get-Content notes.txt                                   # the cmdlet behind the 
 sort.exe data.txt                                       # Windows: a name with .exe bypasses the alias
 /usr/bin/cat notes.txt                                  # Linux/macOS: the full path bypasses the alias
 & (Get-Command cat -CommandType Application) notes.txt  # any OS: the native program found in PATH
-Disable-GnuUtil cat                                     # or give the name back
+Disable-GnuAlias cat                                     # or give the name back
 ```
 
 Use `-NoClobber` to enable only names that do not exist yet, or `-Exclude` to keep specific names

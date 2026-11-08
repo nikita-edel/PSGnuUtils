@@ -1,4 +1,4 @@
-function Disable-GnuUtil {
+function Disable-GnuAlias {
     <#
     .SYNOPSIS
     Removes GNU name aliases created by Enable-GnuAlias and restores the aliases they replaced.
@@ -21,12 +21,12 @@ function Disable-GnuUtil {
     Return the util info objects (see Get-GnuUtil).
 
     .EXAMPLE
-    Disable-GnuUtil -Name cat
+    Disable-GnuAlias -Name cat
 
     'cat' is Get-Content again (on Windows).
 
     .EXAMPLE
-    Disable-GnuUtil -All
+    Disable-GnuAlias -All
     #>
     [CmdletBinding(DefaultParameterSetName = 'Name')]
     [OutputType('PSGnuUtils.UtilInfo')]

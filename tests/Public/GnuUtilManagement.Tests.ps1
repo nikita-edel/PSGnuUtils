@@ -26,9 +26,9 @@ Describe 'Get-GnuUtil' {
     }
 }
 
-Describe 'Enable-GnuAlias / Disable-GnuUtil' {
+Describe 'Enable-GnuAlias / Disable-GnuAlias' {
     AfterEach {
-        Disable-GnuUtil -All
+        Disable-GnuAlias -All
         Remove-Item -LiteralPath 'Alias:\tac' -Force -ErrorAction SilentlyContinue
         Remove-Item -LiteralPath 'Alias:\seq' -Force -ErrorAction SilentlyContinue
     }
@@ -46,9 +46,9 @@ Describe 'Enable-GnuAlias / Disable-GnuUtil' {
         $result | Should -Be @('b', 'a')
     }
 
-    It 'removes the alias again on Disable-GnuUtil' {
+    It 'removes the alias again on Disable-GnuAlias' {
         Enable-GnuAlias -Name tac
-        Disable-GnuUtil -Name tac
+        Disable-GnuAlias -Name tac
         Get-Alias -Name tac -Scope Global -ErrorAction SilentlyContinue | Should -BeNullOrEmpty
         (Get-GnuUtil -Name tac).Enabled | Should -BeFalse
     }
@@ -61,7 +61,7 @@ Describe 'Enable-GnuAlias / Disable-GnuUtil' {
         (Get-Alias -Name seq -Scope Global).Definition | Should -Be 'Invoke-GnuSeq'
         (Get-GnuUtil -Name seq).Shadows | Should -Be 'Alias -> Get-Date'
 
-        Disable-GnuUtil -Name seq
+        Disable-GnuAlias -Name seq
         $restored = Get-Alias -Name seq -Scope Global
         $restored.Definition | Should -Be 'Get-Date'
         $restored.Description | Should -Be 'user alias'
@@ -71,7 +71,7 @@ Describe 'Enable-GnuAlias / Disable-GnuUtil' {
     It 'restores non-AllScope aliases' {
         Set-Alias -Name seq -Value Get-Date -Scope Global -Force
         Enable-GnuAlias -Name seq
-        Disable-GnuUtil -Name seq
+        Disable-GnuAlias -Name seq
         (Get-Alias -Name seq -Scope Global).Definition | Should -Be 'Get-Date'
     }
 
@@ -94,19 +94,19 @@ Describe 'Enable-GnuAlias / Disable-GnuUtil' {
     It 'is idempotent' {
         Enable-GnuAlias -Name tac
         Enable-GnuAlias -Name tac
-        Disable-GnuUtil -Name tac
+        Disable-GnuAlias -Name tac
         Get-Alias -Name tac -Scope Global -ErrorAction SilentlyContinue | Should -BeNullOrEmpty
     }
 
     It 'returns util info with -PassThru' {
         (Enable-GnuAlias -Name tac -PassThru).Enabled | Should -BeTrue
-        (Disable-GnuUtil -Name tac -PassThru).Enabled | Should -BeFalse
+        (Disable-GnuAlias -Name tac -PassThru).Enabled | Should -BeFalse
     }
 
     It 'accepts Get-GnuUtil output from the pipeline' {
         Get-GnuUtil -Name tac | Enable-GnuAlias
         (Get-GnuUtil -Name tac).Enabled | Should -BeTrue
-        Get-GnuUtil -Enabled | Disable-GnuUtil
+        Get-GnuUtil -Enabled | Disable-GnuAlias
         (Get-GnuUtil -Name tac).Enabled | Should -BeFalse
     }
 
@@ -118,7 +118,7 @@ Describe 'Enable-GnuAlias / Disable-GnuUtil' {
 
 Describe 'Import-time configuration' {
     AfterEach {
-        Disable-GnuUtil -All
+        Disable-GnuAlias -All
         Remove-Item -LiteralPath 'Alias:\tac' -Force -ErrorAction SilentlyContinue
     }
 

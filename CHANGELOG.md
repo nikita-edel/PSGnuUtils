@@ -11,7 +11,7 @@ All notable changes to this project are documented here. The format follows
   and exit codes (`$LASTEXITCODE`), pipeline input as stdin, shell-like wildcard expansion.
 - Utils load on first use, so importing the module is fast; `Import-GnuUtil` (names, `-MostUsed`, `-All`) and
   `Disable-GnuLazyLoading` load them up front.
-- `Get-GnuUtil`, `Enable-GnuAlias`, `Disable-GnuUtil` and import-time configuration
+- `Get-GnuUtil`, `Enable-GnuAlias`, `Disable-GnuAlias` and import-time configuration
   (`Import-Module PSGnuUtils -ArgumentList @{ All = $true; Exclude = 'ls' }`); replaced aliases are restored on
   disable and on module removal.
 - Batch 1 utils: `arch base32 base64 basename cat dirname echo false head hostname link md5sum mkdir mktemp nproc
