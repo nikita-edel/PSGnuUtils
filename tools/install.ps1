@@ -59,7 +59,8 @@ foreach ($root in $roots) {
     $null = New-Item -ItemType Directory -Force -Path $target
     Copy-Item -Path (Join-Path $source[0].FullName '*') -Destination $target -Recurse -Force
     # Files from a downloaded zip are marked as coming from the internet, which blocks them under RemoteSigned.
-    if (Get-Command -Name Unblock-File -ErrorAction SilentlyContinue) { Get-ChildItem -LiteralPath $target -Recurse -File | Unblock-File }
+    # Unblock-File exists in PowerShell on Linux and macOS too, but fails there.
+    if ($PSVersionTable.PSEdition -eq 'Desktop' -or $IsWindows) { Get-ChildItem -LiteralPath $target -Recurse -File | Unblock-File }
     Write-Host "Installed PSGnuUtils $version to $target"
 }
 if (-not $Uninstall) { Write-Host 'In a new session: Import-Module PSGnuUtils' }
