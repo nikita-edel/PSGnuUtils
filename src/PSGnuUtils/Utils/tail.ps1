@@ -54,7 +54,7 @@ function Invoke-GnuTail {
     .DESCRIPTION
     Prints the last 10 lines (or -n NUM lines, or -c NUM bytes) of each FILE. -n +NUM starts
     at line NUM instead. tail -5 is short for tail -n 5.
-    Enable the GNU name with: Enable-GnuUtil tail
+    Enable the GNU name with: Enable-GnuAlias tail
 
     .EXAMPLE
     Invoke-GnuTail -n 20 app.log

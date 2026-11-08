@@ -22,7 +22,7 @@ function Invoke-GnuPwd {
     .DESCRIPTION
     Prints the current PowerShell file system location. -L prints it as is, -P (the GNU
     coreutils default) resolves symbolic links and junctions.
-    Enable the GNU name with: Enable-GnuUtil pwd (replaces the pwd -> Get-Location alias).
+    Enable the GNU name with: Enable-GnuAlias pwd (replaces the pwd -> Get-Location alias).
 
     .EXAMPLE
     Invoke-GnuPwd -L

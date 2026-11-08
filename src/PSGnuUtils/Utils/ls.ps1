@@ -56,7 +56,7 @@ function Invoke-GnuLs {
     when writing to the console, one per line in a pipeline (-1 / -C force either), or in the
     long format (-l, with -h for human sizes). -a / -A show hidden entries, -R recurses, -t / -S
     / -U / -r change the order, -F / -p append type indicators, --color colors names.
-    Enable the GNU name with: Enable-GnuUtil ls (replaces the ls -> Get-ChildItem alias on Windows).
+    Enable the GNU name with: Enable-GnuAlias ls (replaces the ls -> Get-ChildItem alias on Windows).
 
     .EXAMPLE
     Invoke-GnuLs -lah

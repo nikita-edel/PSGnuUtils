@@ -51,7 +51,7 @@ function Invoke-GnuJoin {
     Prints a line for each pair of lines whose join fields (first field, or -1 / -2 / -j)
     are equal. -a and -v print unpairable lines, -o selects output fields, -e fills
     missing ones, -t sets the separator. Inputs must be sorted on the join field.
-    Enable the GNU name with: Enable-GnuUtil join
+    Enable the GNU name with: Enable-GnuAlias join
 
     .EXAMPLE
     Invoke-GnuJoin -t ',' -a 1 users.csv orders.csv

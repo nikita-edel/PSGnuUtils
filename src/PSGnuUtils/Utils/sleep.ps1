@@ -19,7 +19,7 @@ function Invoke-GnuSleep {
     .DESCRIPTION
     Sleeps for the sum of all NUMBER[SUFFIX] operands (s, m, h, d; fractions allowed).
     The sleep can be interrupted with Ctrl+C.
-    Enable the GNU name with: Enable-GnuUtil sleep (replaces the sleep -> Start-Sleep alias).
+    Enable the GNU name with: Enable-GnuAlias sleep (replaces the sleep -> Start-Sleep alias).
 
     .EXAMPLE
     Invoke-GnuSleep 1.5

@@ -36,7 +36,7 @@ function Invoke-GnuFmt {
     (-g GOAL), with the line-breaking cost model of GNU fmt (sentence ends, short and ragged
     lines). -s only splits, -u normalizes spacing, -c / -t keep first-line indents, -p STRING
     formats only lines with that prefix.
-    Enable the GNU name with: Enable-GnuUtil fmt
+    Enable the GNU name with: Enable-GnuAlias fmt
 
     .EXAMPLE
     Get-Content README.txt | Invoke-GnuFmt -w 60

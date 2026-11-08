@@ -16,7 +16,7 @@ function Invoke-GnuFalse {
     .DESCRIPTION
     All arguments are ignored, except a single --help or --version. Like GNU false, the exit
     code is 1 even for --help and --version.
-    Enable the GNU name with: Enable-GnuUtil false
+    Enable the GNU name with: Enable-GnuAlias false
 
     .EXAMPLE
     Invoke-GnuFalse; $LASTEXITCODE

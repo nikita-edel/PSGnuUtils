@@ -27,7 +27,7 @@ function Invoke-GnuPaste {
     Joins line N of every FILE into one output line, separated by TAB or by the characters of
     -d LIST (used in turn). With -s, the lines of each file are joined into one line. Each '-'
     operand reads the next line of the pipeline input.
-    Enable the GNU name with: Enable-GnuUtil paste
+    Enable the GNU name with: Enable-GnuAlias paste
 
     .EXAMPLE
     Invoke-GnuPaste -d ',' names.txt ages.txt

@@ -40,7 +40,7 @@ function Invoke-GnuTouch {
     Sets the access and modification time of every FILE to now, to -d DATE, -t STAMP or the
     times of -r FILE. Missing files are created empty unless -c (or -h) is given. -a / -m (or
     --time) change only one of the two times.
-    Enable the GNU name with: Enable-GnuUtil touch
+    Enable the GNU name with: Enable-GnuAlias touch
 
     .EXAMPLE
     Invoke-GnuTouch new.txt

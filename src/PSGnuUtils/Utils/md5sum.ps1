@@ -10,7 +10,7 @@ function Invoke-GnuMd5sum {
     format with --tag. With -c, reads such lines from the FILEs and verifies them
     (--quiet, --status, --warn, --strict and --ignore-missing control the report).
     Pipeline input is hashed as UTF-8 text with a LF after every line.
-    Enable the GNU name with: Enable-GnuUtil md5sum
+    Enable the GNU name with: Enable-GnuAlias md5sum
 
     .EXAMPLE
     Invoke-GnuMd5sum setup.exe

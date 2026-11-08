@@ -29,7 +29,7 @@ function Invoke-GnuReadlink {
     .DESCRIPTION
     Without options prints the stored target of each symbolic link or junction (exit code 1 for
     anything that is not a link). -f, -e and -m print the absolute path with every link resolved.
-    Enable the GNU name with: Enable-GnuUtil readlink
+    Enable the GNU name with: Enable-GnuAlias readlink
 
     .EXAMPLE
     Invoke-GnuReadlink -f ./build/../out

@@ -48,7 +48,7 @@ function Invoke-GnuCp {
     Copies SOURCE to DEST or every SOURCE into DIRECTORY. -r copies directory trees (links are
     copied as links unless -L), -p / --preserve keeps timestamps and attributes, -n / -i / -u
     control overwriting, -l / -s create links instead of copies, -v reports every copy.
-    Enable the GNU name with: Enable-GnuUtil cp (replaces the cp -> Copy-Item alias).
+    Enable the GNU name with: Enable-GnuAlias cp (replaces the cp -> Copy-Item alias).
 
     .EXAMPLE
     Invoke-GnuCp -rv src backup

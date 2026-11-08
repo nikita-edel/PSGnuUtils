@@ -55,7 +55,7 @@ function $functionName {
 
     .DESCRIPTION
     TODO: describe behaviour and PowerShell specific notes.
-    Enable the GNU name with: Enable-GnuUtil $Name
+    Enable the GNU name with: Enable-GnuAlias $Name
 
     .EXAMPLE
     $functionName file.txt

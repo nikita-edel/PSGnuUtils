@@ -10,7 +10,7 @@ function Invoke-GnuSha384sum {
     format with --tag. With -c, reads such lines from the FILEs and verifies them
     (--quiet, --status, --warn, --strict and --ignore-missing control the report).
     Pipeline input is hashed as UTF-8 text with a LF after every line.
-    Enable the GNU name with: Enable-GnuUtil sha384sum
+    Enable the GNU name with: Enable-GnuAlias sha384sum
 
     .EXAMPLE
     Invoke-GnuSha384sum setup.exe

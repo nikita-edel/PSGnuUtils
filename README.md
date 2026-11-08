@@ -37,9 +37,9 @@ Enable the GNU names you want. Built-in aliases such as `cat -> Get-Content` are
 disable the util or remove the module:
 
 ```powershell
-Enable-GnuUtil cat, head, tail, wc        # just these
-Enable-GnuUtil -All -Exclude ls, rm       # everything except ls and rm
-Enable-GnuUtil -All -NoClobber            # only names that do not exist yet
+Enable-GnuAlias cat, head, tail, wc        # just these
+Enable-GnuAlias -All -Exclude ls, rm       # everything except ls and rm
+Enable-GnuAlias -All -NoClobber            # only names that do not exist yet
 
 cat -n notes.txt
 Get-ChildItem | wc -l
@@ -60,9 +60,21 @@ Import-Module PSGnuUtils -ArgumentList @{ All = $true; Exclude = 'ls', 'rm' }
 
 Every util supports `--help` and `--version`; `Get-Help Invoke-GnuHead -Full` shows the PowerShell help.
 
+### Load times
+
+Importing the module is cheap: a util is only loaded the first time it runs, which costs about 10 ms once. If a
+command must answer without that delay in a new shell, load it up front in your profile:
+
+```powershell
+Import-GnuUtil -MostUsed                 # ls, cat, grep, head, tail, sort, cp, mv, rm, ...
+Import-GnuUtil ls, grep, sha*sum         # just these
+Import-GnuUtil -All                      # everything
+Disable-GnuLazyLoading                   # the same as -All: nothing is loaded on first use any more
+```
+
 ### What an enabled name shadows
 
-`Enable-GnuUtil cat` creates a global alias `cat -> Invoke-GnuCat`. Aliases win over everything else
+`Enable-GnuAlias cat` creates a global alias `cat -> Invoke-GnuCat`. Aliases win over everything else
 (alias > function > cmdlet > native program), so while it is enabled `cat` no longer reaches `Get-Content`, and on
 Linux/macOS `cat` no longer runs `/usr/bin/cat`. This applies to the whole session, including scripts and other
 modules that call the name. `Get-GnuUtil` shows in its `Shadows` column what each name would run otherwise.

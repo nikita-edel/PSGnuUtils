@@ -9,7 +9,7 @@ function Invoke-GnuBase32 {
     Encodes FILE (or pipeline input) as base32, wrapped at 76 columns (-w COLS, 0 = no wrapping).
     With -d, decodes base32 input; -i ignores characters outside the base32 alphabet.
     Pipeline input is encoded as UTF-8 text with a LF after every line.
-    Enable the GNU name with: Enable-GnuUtil base32
+    Enable the GNU name with: Enable-GnuAlias base32
 
     .EXAMPLE
     'hello' | Invoke-GnuBase32

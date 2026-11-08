@@ -191,7 +191,7 @@ Describe 'Framework error paths' {
     It 'reports alias failures when enabling' {
         InModuleScope PSGnuUtils {
             Mock Set-Alias { throw 'alias refused' }
-            Enable-GnuUtil -Name tac -ErrorVariable failures -ErrorAction SilentlyContinue
+            Enable-GnuAlias -Name tac -ErrorVariable failures -ErrorAction SilentlyContinue
             "$failures" | Should -Match "cannot enable 'tac': alias refused"
             $script:GnuEnabledUtils.ContainsKey('tac') | Should -BeFalse
         }
@@ -200,7 +200,7 @@ Describe 'Framework error paths' {
     # Separate test: a Pester mock stays active for the whole It block.
     It 'reports alias failures when restoring on disable' {
         Set-Alias -Name seq -Value Get-Date -Scope Global -Force
-        Enable-GnuUtil -Name seq
+        Enable-GnuAlias -Name seq
         try {
             InModuleScope PSGnuUtils {
                 Mock Set-Alias { throw 'restore refused' }

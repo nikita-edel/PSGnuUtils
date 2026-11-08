@@ -35,7 +35,7 @@ function Invoke-GnuComm {
     Prints lines only in FILE1 (column 1), only in FILE2 (column 2, indented by one TAB) and in
     both (column 3, two TABs). -1 -2 -3 hide columns, --total adds counts. Input must be sorted
     ordinally; unsorted input is reported (exit code 1) unless --nocheck-order is given.
-    Enable the GNU name with: Enable-GnuUtil comm
+    Enable the GNU name with: Enable-GnuAlias comm
 
     .EXAMPLE
     Invoke-GnuComm -12 old.txt new.txt

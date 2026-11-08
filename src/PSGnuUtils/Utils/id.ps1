@@ -35,7 +35,7 @@ function Invoke-GnuId {
     Prints "uid=ID(NAME) gid=ID(NAME) groups=ID(NAME),..." for the current user or each USER;
     -u, -g or -G print only the user, group or all group IDs (-n names, -r real IDs, -z NUL).
     On Windows the IDs are SIDs.
-    Enable the GNU name with: Enable-GnuUtil id
+    Enable the GNU name with: Enable-GnuAlias id
 
     .EXAMPLE
     Invoke-GnuId -un

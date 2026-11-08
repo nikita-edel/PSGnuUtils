@@ -42,7 +42,7 @@ function Invoke-GnuUniq {
     Collapses runs of identical adjacent lines. -c counts, -d/-D show duplicates, -u unique lines,
     --group separates groups; -f/-s/-w/-i control what is compared. An OUTPUT operand writes to a
     file instead of the pipeline.
-    Enable the GNU name with: Enable-GnuUtil uniq
+    Enable the GNU name with: Enable-GnuAlias uniq
 
     .EXAMPLE
     Get-Content words.txt | Sort-Object | Invoke-GnuUniq -c

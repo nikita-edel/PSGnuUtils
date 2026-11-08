@@ -24,7 +24,7 @@ function Enable-GnuUtilAlias {
     )
 
     if ($script:GnuEnabledUtils.ContainsKey($Name)) { return }
-    $spec = Get-GnuUtilSpec -Name $Name
+    $functionName = Get-GnuFunctionName -Name $Name
 
     if ($NoClobber) {
         $other = Get-Command -Name $Name -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -45,7 +45,7 @@ function Enable-GnuUtilAlias {
     }
 
     try {
-        Set-Alias -Name $Name -Value $spec.FunctionName -Scope Global -Force -ErrorAction Stop `
+        Set-Alias -Name $Name -Value $functionName -Scope Global -Force -ErrorAction Stop `
             -Option ([System.Management.Automation.ScopedItemOptions]::AllScope) -Description $script:GnuAliasDescription
         $script:GnuEnabledUtils[$Name] = $saved
     }

@@ -39,7 +39,7 @@ function Invoke-GnuCmp {
     Reports the first differing byte and line ("a b differ: char 15, line 2"), every
     difference with -l, the differing bytes with -b, or nothing with -s. The exit code is 0
     for identical inputs, 1 if they differ, 2 on trouble.
-    Enable the GNU name with: Enable-GnuUtil cmp
+    Enable the GNU name with: Enable-GnuAlias cmp
 
     .EXAMPLE
     Invoke-GnuCmp -s old.bin new.bin; if ($LASTEXITCODE -eq 0) { 'same' }

@@ -97,7 +97,7 @@ function Invoke-GnuDate {
     Prints the current time, the time of -d STRING, of every line of -f FILE, or the
     modification time of -r FILE, as +FORMAT (strftime sequences such as %Y-%m-%d), ISO 8601
     (-I), RFC 5322 (-R) or RFC 3339 (--rfc-3339). -u uses UTC.
-    Enable the GNU name with: Enable-GnuUtil date
+    Enable the GNU name with: Enable-GnuAlias date
 
     .EXAMPLE
     Invoke-GnuDate +%F

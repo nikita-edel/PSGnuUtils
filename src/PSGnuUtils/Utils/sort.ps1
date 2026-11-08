@@ -53,7 +53,7 @@ function Invoke-GnuSort {
     numbers (-g), human sizes (-h), versions (-V) or month names (-M), optionally by keys (-k)
     split at a separator (-t). -r reverses, -u keeps the first of equal lines, -s keeps input
     order for equal keys, -c / -C check instead of sorting, -o writes to a file.
-    Enable the GNU name with: Enable-GnuUtil sort (replaces the sort -> Sort-Object alias).
+    Enable the GNU name with: Enable-GnuAlias sort (replaces the sort -> Sort-Object alias).
 
     .EXAMPLE
     Get-Content sizes.txt | Invoke-GnuSort -h -r

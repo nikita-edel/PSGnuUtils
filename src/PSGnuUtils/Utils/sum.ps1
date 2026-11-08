@@ -20,7 +20,7 @@ function Invoke-GnuSum {
     Prints the 16-bit BSD checksum and the number of 1K blocks of every FILE (default, -r), or
     the System V checksum and 512-byte blocks (-s). File names are shown for several files
     (BSD) or whenever files are given (System V).
-    Enable the GNU name with: Enable-GnuUtil sum
+    Enable the GNU name with: Enable-GnuAlias sum
 
     .EXAMPLE
     Invoke-GnuSum -s data.bin

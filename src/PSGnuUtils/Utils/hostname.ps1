@@ -14,7 +14,7 @@ function Invoke-GnuHostname {
 
     .DESCRIPTION
     Prints [System.Net.Dns]::GetHostName(). Setting the host name is not supported.
-    Enable the GNU name with: Enable-GnuUtil hostname
+    Enable the GNU name with: Enable-GnuAlias hostname
 
     .EXAMPLE
     Invoke-GnuHostname

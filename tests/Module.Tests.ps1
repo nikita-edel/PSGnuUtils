@@ -40,7 +40,7 @@ Describe 'Module manifest' {
 
     It 'exports the public commands and one function per util, nothing else' {
         $data = Import-PowerShellDataFile -Path (Join-Path $repoRoot 'src/PSGnuUtils/PSGnuUtils.psd1')
-        $expected = @('Disable-GnuUtil', 'Enable-GnuUtil', 'Get-GnuUtil') + @(Get-GnuUtil | ForEach-Object { $_.Command }) | Sort-Object
+        $expected = @('Disable-GnuLazyLoading', 'Disable-GnuUtil', 'Enable-GnuAlias', 'Get-GnuUtil', 'Import-GnuUtil') + @(Get-GnuUtil | ForEach-Object { $_.Command }) | Sort-Object
         @($data.FunctionsToExport | Sort-Object) | Should -Be $expected
         @((Get-Module PSGnuUtils).ExportedFunctions.Keys | Sort-Object) | Should -Be $expected
         @((Get-Module PSGnuUtils).ExportedAliases.Keys).Count | Should -Be 0

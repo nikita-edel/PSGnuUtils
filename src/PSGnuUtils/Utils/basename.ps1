@@ -20,7 +20,7 @@ function Invoke-GnuBasename {
     .DESCRIPTION
     Prints NAME without its leading directory components and, if given, without SUFFIX.
     On Windows both / and \ are directory separators.
-    Enable the GNU name with: Enable-GnuUtil basename
+    Enable the GNU name with: Enable-GnuAlias basename
 
     .EXAMPLE
     Invoke-GnuBasename /usr/bin/sort

@@ -75,7 +75,7 @@ function Invoke-GnuGrep {
     -n, -c, -l, -L, -o, -q, -m, context (-A/-B/-C/-NUM), file name control (-H/-h/-Z/--label),
     --include/--exclude/--exclude-dir, binary file handling and --color.
     Exit code 0 if something matched, 1 if not, 2 on errors.
-    Enable the GNU name with: Enable-GnuUtil grep
+    Enable the GNU name with: Enable-GnuAlias grep
 
     .EXAMPLE
     Invoke-GnuGrep -rn 'TODO' src

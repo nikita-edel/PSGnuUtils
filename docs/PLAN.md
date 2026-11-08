@@ -8,7 +8,7 @@ every util is tracked in [UTILS.md](UTILS.md); this file explains the order and 
 - [x] Repository structure, build script (no CI by decision of the user, 2026-11-07)
 - [x] Framework: getopt_long parser, util registry, contexts, help/version, errors and exit codes
 - [x] Input model (pipeline = stdin, files, wildcards) and output model (lines, NUL records)
-- [x] `Get-GnuUtil`, `Enable-GnuUtil`, `Disable-GnuUtil`, import-time configuration, alias restore on module removal
+- [x] `Get-GnuUtil`, `Enable-GnuAlias`, `Disable-GnuUtil`, import-time configuration, alias restore on module removal
 - [x] Meta tests: exports, help, docs, option coverage, ASCII-only sources
 - [x] Agent handoff docs (docs/AGENTS.md, agents/CLAUDE.md, DEVLOG.md, TODO.md)
 

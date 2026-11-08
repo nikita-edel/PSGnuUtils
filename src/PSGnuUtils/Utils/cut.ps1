@@ -40,7 +40,7 @@ function Invoke-GnuCut {
     Prints the selected bytes (-b), characters (-c) or delimiter separated fields (-f, delimiter
     -d, default TAB) of every line. --complement inverts the selection, -s skips lines without
     a delimiter, --output-delimiter changes the joiner.
-    Enable the GNU name with: Enable-GnuUtil cut
+    Enable the GNU name with: Enable-GnuAlias cut
 
     .EXAMPLE
     Get-Content data.csv | Invoke-GnuCut -d ',' -f 1,3

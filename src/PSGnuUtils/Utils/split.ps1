@@ -54,7 +54,7 @@ function Invoke-GnuSplit {
     Writes FILE (or the pipeline) to PREFIXaa, PREFIXab, ... with 1000 lines each, or -l lines,
     -b bytes, -C bytes of whole lines, or -n chunks (N, K/N, l/N, l/K/N, r/N, r/K/N). Suffixes
     are alphabetic, numeric (-d) or hex (-x), and grow automatically when needed.
-    Enable the GNU name with: Enable-GnuUtil split
+    Enable the GNU name with: Enable-GnuAlias split
 
     .EXAMPLE
     Invoke-GnuSplit -b 100M -d backup.tar backup.tar.part

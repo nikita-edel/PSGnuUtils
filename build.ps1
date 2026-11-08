@@ -133,7 +133,7 @@ function Invoke-Bootstrap {
 
 function Invoke-Manifest {
     Write-Step 'Manifest: FunctionsToExport'
-    $functions = @('Disable-GnuUtil', 'Enable-GnuUtil', 'Get-GnuUtil') + @(Get-UtilFunctionName) | Sort-Object
+    $functions = @('Disable-GnuLazyLoading', 'Disable-GnuUtil', 'Enable-GnuAlias', 'Get-GnuUtil', 'Import-GnuUtil') + @(Get-UtilFunctionName) | Sort-Object
     $list = ($functions | ForEach-Object { "        '$_'" }) -join ",`n"
     $replacement = "FunctionsToExport    = @(`n$list`n    )"
     $content = [System.IO.File]::ReadAllText($ManifestPath)
@@ -238,14 +238,85 @@ function Invoke-Test([string]$ModuleManifest, [string]$TaskName) {
     }
 }
 
+function Get-UtilSummary {
+    # Category and synopsis of every util, from the source module in a runspace of its own: some specs are built by code.
+    $shell = [powershell]::Create()
+    try {
+        $null = $shell.AddScript({ param($Manifest) Import-Module -Name $Manifest -ErrorAction Stop; Get-GnuUtil }).AddArgument($ManifestPath)
+        $summaries = @{}
+        foreach ($util in $shell.Invoke()) { $summaries[$util.Name] = $util }
+        $summaries
+    }
+    finally { $shell.Dispose() }
+}
+
+function Get-LazyUtilText($Ast, [string]$Text, $Entry) {
+    # The file without its entry function. Helpers become script: functions: the file is dot-sourced from inside a
+    # function of the module, where a plain definition would vanish when that function returns.
+    $edited = New-Object System.Text.StringBuilder -ArgumentList $Text
+    $functions = @($Ast.FindAll({ param($a) $a -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $false) | Sort-Object -Property { $_.Extent.StartOffset } -Descending)
+    foreach ($function in $functions) {
+        if ([object]::ReferenceEquals($function, $Entry)) {
+            [void]$edited.Remove($function.Extent.StartOffset, $function.Extent.EndOffset - $function.Extent.StartOffset)
+            continue
+        }
+        $start = $function.Extent.StartOffset + $function.Extent.Text.IndexOf($function.Name, [System.StringComparison]::Ordinal)
+        [void]$edited.Insert($start, 'script:')
+    }
+    $edited.ToString()
+}
+
+function Split-UtilForLazyLoading([System.Text.Encoding]$Encoding) {
+    # Writes each util without its entry function to out/.../Utils and returns the psm1 text: the entry functions
+    # plus the index the module needs to list utils and to load them on first use.
+    $utilsOut = Join-Path $OutputDir 'Utils'
+    $null = New-Item -ItemType Directory -Force -Path $utilsOut
+    $parsed = @{}
+    $owners = @{}
+    foreach ($file in @(Get-ChildItem -LiteralPath (Join-Path $SourceDir 'Utils') -Filter '*.ps1' | Sort-Object -Property Name)) {
+        $tokens = $null
+        $errors = $null
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$tokens, [ref]$errors)
+        $parsed[$file.BaseName] = @{ Ast = $ast; Text = [System.IO.File]::ReadAllText($file.FullName) }
+        foreach ($function in $ast.FindAll({ param($a) $a -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $false)) { $owners[$function.Name] = $file.BaseName }
+    }
+
+    $summaries = Get-UtilSummary
+    $entries = New-Object System.Text.StringBuilder
+    $index = New-Object System.Text.StringBuilder
+    [void]$index.AppendLine('$script:GnuLazyRoot = [System.IO.Path]::Combine($PSScriptRoot, ''Utils'')')
+    [void]$index.AppendLine('$script:GnuLazyUtils = @{')
+    foreach ($name in @($parsed.Keys | Sort-Object)) {
+        $ast = $parsed[$name].Ast
+        $text = $parsed[$name].Text
+        $entryName = 'Invoke-Gnu' + $name.Substring(0, 1).ToUpperInvariant() + $name.Substring(1)
+        $entry = @($ast.FindAll({ param($a) $a -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $a.Name -eq $entryName }, $false))[0]
+        if ($null -eq $entry -or $entry.Extent.Text -notmatch 'Initialize-GnuUtil -Name') { throw "$($name).ps1: $entryName must exist and start with Initialize-GnuUtil." }
+        [void]$entries.AppendLine($entry.Extent.Text).AppendLine()
+        $remainder = Get-LazyUtilText -Ast $ast -Text $text -Entry $entry
+        [System.IO.File]::WriteAllText((Join-Path $utilsOut "$name.ps1"), $remainder, $Encoding)
+
+        $depends = @($ast.FindAll({ param($a) $a -is [System.Management.Automation.Language.CommandAst] }, $true) | ForEach-Object { $_.GetCommandName() } |
+            Where-Object { $_ -and $owners.ContainsKey($_) -and $owners[$_] -cne $name -and $_ -cnotlike 'Invoke-Gnu*' } | ForEach-Object { $owners[$_] } | Sort-Object -Unique)
+        $dependsText = @($depends | ForEach-Object { "'$_'" }) -join ', '
+        $category = $summaries[$name].Category.Replace("'", "''")
+        $synopsis = $summaries[$name].Synopsis.Replace("'", "''")
+        [void]$index.AppendLine("    '$name' = @{ File = '$name.ps1'; Depends = @($dependsText); Category = '$category'; Synopsis = '$synopsis'; Loaded = `$false }")
+    }
+    [void]$index.AppendLine('}')
+    $index.ToString() + [Environment]::NewLine + $entries.ToString()
+}
+
 function Invoke-Build {
     Invoke-Manifest
     Write-Step "Build -> $OutputDir"
     if (Test-Path -LiteralPath $OutputDir) { Remove-Item -LiteralPath $OutputDir -Recurse -Force }
     $null = New-Item -ItemType Directory -Force -Path $OutputDir
 
+    # UTF-8 with BOM so Windows PowerShell 5.1 never misreads the files.
+    $utf8Bom = New-Object System.Text.UTF8Encoding($true)
     $builder = New-Object System.Text.StringBuilder
-    foreach ($folder in @('Private', 'Utils', 'Public')) {
+    foreach ($folder in @('Private', 'Public')) {
         foreach ($file in @(Get-ChildItem -LiteralPath (Join-Path $SourceDir $folder) -Filter '*.ps1' -Recurse | Sort-Object -Property FullName)) {
             $relative = $file.FullName.Substring($SourceDir.Length + 1).Replace('\', '/')
             [void]$builder.AppendLine("#region $relative")
@@ -254,12 +325,11 @@ function Invoke-Build {
             [void]$builder.AppendLine()
         }
     }
+    [void]$builder.AppendLine((Split-UtilForLazyLoading -Encoding $utf8Bom))
     $merged = $builder.ToString()
     $rootModule = [System.IO.File]::ReadAllText((Join-Path $SourceDir 'PSGnuUtils.psm1'))
     $rootModule = [regex]::Replace($rootModule, '(?s)#region Loader.*?#endregion Loader', [System.Text.RegularExpressions.MatchEvaluator] { $merged.TrimEnd() })
 
-    # UTF-8 with BOM so Windows PowerShell 5.1 never misreads the file.
-    $utf8Bom = New-Object System.Text.UTF8Encoding($true)
     [System.IO.File]::WriteAllText((Join-Path $OutputDir 'PSGnuUtils.psm1'), $rootModule, $utf8Bom)
     Copy-Item -LiteralPath $ManifestPath -Destination $OutputDir
     foreach ($extra in @('LICENSE', 'README.md', 'CHANGELOG.md')) {

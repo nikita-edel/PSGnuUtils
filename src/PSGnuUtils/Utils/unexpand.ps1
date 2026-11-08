@@ -23,7 +23,7 @@ function Invoke-GnuUnexpand {
     Replaces runs of blanks that reach a tab stop with tabs (every 8 columns by default, -t N or
     a list of positions). Only leading blanks are converted unless -a (or -t) is given;
     --first-only restores the leading-only behaviour.
-    Enable the GNU name with: Enable-GnuUtil unexpand
+    Enable the GNU name with: Enable-GnuAlias unexpand
 
     .EXAMPLE
     Get-Content source.txt | Invoke-GnuUnexpand -t 4

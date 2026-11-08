@@ -29,7 +29,7 @@ function Invoke-GnuRealpath {
     Prints each FILE as an absolute path without '.', '..' and links (unless -s). By default all
     but the last component must exist; -e requires all, -m none. --relative-to prints the path
     relative to a directory; --relative-base does so only for paths below that directory.
-    Enable the GNU name with: Enable-GnuUtil realpath
+    Enable the GNU name with: Enable-GnuAlias realpath
 
     .EXAMPLE
     Invoke-GnuRealpath --relative-to=. ./src/../build

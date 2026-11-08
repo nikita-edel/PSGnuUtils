@@ -57,7 +57,7 @@ function Invoke-GnuExpr {
     Evaluates integer arithmetic (any size), comparisons, '|' / '&', regular expression matches
     (STRING : REGEXP) and the string functions match, substr, index and length. Prints the
     result; the exit code is 1 when it is null or 0, 2 for syntax errors and 3 for other errors.
-    Enable the GNU name with: Enable-GnuUtil expr
+    Enable the GNU name with: Enable-GnuAlias expr
 
     .EXAMPLE
     Invoke-GnuExpr 6 '*' 7

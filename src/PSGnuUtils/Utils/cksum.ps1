@@ -43,7 +43,7 @@ function Invoke-GnuCksum {
     Prints "CRC SIZE NAME" (the POSIX cksum CRC-32) for every FILE. -a selects sysv, bsd,
     md5, sha1, sha224, sha256, sha384 or sha512; digests are printed in BSD tag format unless
     --untagged, and can be verified with -c.
-    Enable the GNU name with: Enable-GnuUtil cksum
+    Enable the GNU name with: Enable-GnuAlias cksum
 
     .EXAMPLE
     Invoke-GnuCksum -a sha256 setup.exe

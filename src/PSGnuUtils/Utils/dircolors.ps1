@@ -45,7 +45,7 @@ function Invoke-GnuDircolors {
     Converts the built-in database (or FILE) into an LS_COLORS value for the current TERM and
     prints it as Bourne shell (-b), C shell (-c) or, without a SHELL variable, PowerShell code.
     -p prints the database.
-    Enable the GNU name with: Enable-GnuUtil dircolors
+    Enable the GNU name with: Enable-GnuAlias dircolors
 
     .EXAMPLE
     Invoke-GnuDircolors | Invoke-Expression

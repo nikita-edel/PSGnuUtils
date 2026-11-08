@@ -26,7 +26,7 @@ function Invoke-GnuWhich {
     Searches every directory of PATH for an executable named COMMAND (on Windows also COMMAND plus
     each PATHEXT extension) and prints the first match, or every match with -a. Names that contain a
     directory separator are checked directly. Exit code 1 if any COMMAND was not found.
-    Enable the GNU name with: Enable-GnuUtil which
+    Enable the GNU name with: Enable-GnuAlias which
 
     .EXAMPLE
     Invoke-GnuWhich git

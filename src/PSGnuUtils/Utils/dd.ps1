@@ -65,7 +65,7 @@ function Invoke-GnuDd {
     obs bytes, skipping skip= input blocks and seek= output blocks, copying count= blocks,
     and applying conv= conversions (ucase, lcase, swab, sync, notrunc, ...). The statistics
     ("N+M records in") are written to the information stream.
-    Enable the GNU name with: Enable-GnuUtil dd
+    Enable the GNU name with: Enable-GnuAlias dd
 
     .EXAMPLE
     Invoke-GnuDd if=image.iso of=part.bin bs=1M skip=10 count=5

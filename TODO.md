@@ -19,7 +19,9 @@ Concrete next steps, most important first. Keep this list short and current; his
       API key), package the zip and upload it to the release of the latest tag; the release text is the diff of
       CHANGELOG.md against the latest release (the user writes the changelog).
 
-- [ ] Daily-use utils still missing: `find sed xargs diff` (then the rest of batch 2/3).
+- [ ] Daily-use utils still missing: `find xargs` (then the rest of batch 2/3).
+- [ ] `diff --color[=WHEN]` and `--palette`.
+- [ ] Audit every util against GNU: make sure all its flags are implemented, and verify that each flag really exists in GNU.
 
 - [ ] Release 0.1.0: set ProjectUri in the manifest, `./build.ps1 -Publish -NuGetApiKey <key>`, tag `v0.1.0`.
 - [x] Batch D: `cmp od split csplit fmt join numfmt stat df du dd`.

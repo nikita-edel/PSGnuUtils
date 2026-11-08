@@ -26,7 +26,7 @@ Describe 'Get-GnuUtil' {
     }
 }
 
-Describe 'Enable-GnuUtil / Disable-GnuUtil' {
+Describe 'Enable-GnuAlias / Disable-GnuUtil' {
     AfterEach {
         Disable-GnuUtil -All
         Remove-Item -LiteralPath 'Alias:\tac' -Force -ErrorAction SilentlyContinue
@@ -34,20 +34,20 @@ Describe 'Enable-GnuUtil / Disable-GnuUtil' {
     }
 
     It 'creates a global alias for the GNU name' {
-        Enable-GnuUtil -Name tac
+        Enable-GnuAlias -Name tac
         (Get-Alias -Name tac -Scope Global).Definition | Should -Be 'Invoke-GnuTac'
         (Get-GnuUtil -Name tac).Enabled | Should -BeTrue
         @(Get-GnuUtil -Enabled).Name | Should -Be @('tac')
     }
 
     It 'makes the GNU name run the implementation' {
-        Enable-GnuUtil -Name tac
+        Enable-GnuAlias -Name tac
         $result = & ([scriptblock]::Create("'a', 'b' | tac"))
         $result | Should -Be @('b', 'a')
     }
 
     It 'removes the alias again on Disable-GnuUtil' {
-        Enable-GnuUtil -Name tac
+        Enable-GnuAlias -Name tac
         Disable-GnuUtil -Name tac
         Get-Alias -Name tac -Scope Global -ErrorAction SilentlyContinue | Should -BeNullOrEmpty
         (Get-GnuUtil -Name tac).Enabled | Should -BeFalse
@@ -57,7 +57,7 @@ Describe 'Enable-GnuUtil / Disable-GnuUtil' {
         Set-Alias -Name seq -Value Get-Date -Scope Global -Option AllScope -Description 'user alias' -Force
         (Get-GnuUtil -Name seq).Shadows | Should -Be 'Alias -> Get-Date'
 
-        Enable-GnuUtil -Name seq
+        Enable-GnuAlias -Name seq
         (Get-Alias -Name seq -Scope Global).Definition | Should -Be 'Invoke-GnuSeq'
         (Get-GnuUtil -Name seq).Shadows | Should -Be 'Alias -> Get-Date'
 
@@ -70,20 +70,20 @@ Describe 'Enable-GnuUtil / Disable-GnuUtil' {
 
     It 'restores non-AllScope aliases' {
         Set-Alias -Name seq -Value Get-Date -Scope Global -Force
-        Enable-GnuUtil -Name seq
+        Enable-GnuAlias -Name seq
         Disable-GnuUtil -Name seq
         (Get-Alias -Name seq -Scope Global).Definition | Should -Be 'Get-Date'
     }
 
     It 'skips existing commands with -NoClobber' {
         Set-Alias -Name seq -Value Get-Date -Scope Global -Force
-        Enable-GnuUtil -Name seq -NoClobber
+        Enable-GnuAlias -Name seq -NoClobber
         (Get-Alias -Name seq -Scope Global).Definition | Should -Be 'Get-Date'
         (Get-GnuUtil -Name seq).Enabled | Should -BeFalse
     }
 
     It 'enables everything with -All and honors -Exclude' {
-        Enable-GnuUtil -All -Exclude 'sha*', 'echo', 'pwd', 'sleep', 'tee', 'cat', 'mkdir', 'rmdir'
+        Enable-GnuAlias -All -Exclude 'sha*', 'echo', 'pwd', 'sleep', 'tee', 'cat', 'mkdir', 'rmdir'
         $enabled = @(Get-GnuUtil -Enabled).Name
         $enabled | Should -Contain 'tac'
         $enabled | Should -Contain 'md5sum'
@@ -92,26 +92,26 @@ Describe 'Enable-GnuUtil / Disable-GnuUtil' {
     }
 
     It 'is idempotent' {
-        Enable-GnuUtil -Name tac
-        Enable-GnuUtil -Name tac
+        Enable-GnuAlias -Name tac
+        Enable-GnuAlias -Name tac
         Disable-GnuUtil -Name tac
         Get-Alias -Name tac -Scope Global -ErrorAction SilentlyContinue | Should -BeNullOrEmpty
     }
 
     It 'returns util info with -PassThru' {
-        (Enable-GnuUtil -Name tac -PassThru).Enabled | Should -BeTrue
+        (Enable-GnuAlias -Name tac -PassThru).Enabled | Should -BeTrue
         (Disable-GnuUtil -Name tac -PassThru).Enabled | Should -BeFalse
     }
 
     It 'accepts Get-GnuUtil output from the pipeline' {
-        Get-GnuUtil -Name tac | Enable-GnuUtil
+        Get-GnuUtil -Name tac | Enable-GnuAlias
         (Get-GnuUtil -Name tac).Enabled | Should -BeTrue
         Get-GnuUtil -Enabled | Disable-GnuUtil
         (Get-GnuUtil -Name tac).Enabled | Should -BeFalse
     }
 
     It 'writes an error for unknown names' {
-        Enable-GnuUtil -Name 'not-a-util' -ErrorVariable failures -ErrorAction SilentlyContinue
+        Enable-GnuAlias -Name 'not-a-util' -ErrorVariable failures -ErrorAction SilentlyContinue
         "$failures" | Should -Match "no util named 'not-a-util'"
     }
 }

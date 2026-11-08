@@ -14,7 +14,7 @@ function Invoke-GnuLink {
 
     .DESCRIPTION
     Exactly two operands. FILE1 must be an existing file and FILE2 must not exist.
-    Enable the GNU name with: Enable-GnuUtil link
+    Enable the GNU name with: Enable-GnuAlias link
 
     .EXAMPLE
     Invoke-GnuLink original.txt copy.txt

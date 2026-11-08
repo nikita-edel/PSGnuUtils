@@ -15,7 +15,7 @@ function Invoke-GnuUnlink {
     .DESCRIPTION
     Removes a single file (or symbolic link). Takes no options, never recurses and refuses
     directories, which makes it a predictable minimal delete.
-    Enable the GNU name with: Enable-GnuUtil unlink
+    Enable the GNU name with: Enable-GnuAlias unlink
 
     .EXAMPLE
     Invoke-GnuUnlink old.log

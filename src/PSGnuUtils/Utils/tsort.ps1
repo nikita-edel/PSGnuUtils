@@ -20,7 +20,7 @@ function Invoke-GnuTsort {
     .DESCRIPTION
     Reads pairs of items and prints every item once, each before the items it must precede.
     Cycles are reported ("input contains a loop") and the remaining items are still printed.
-    Enable the GNU name with: Enable-GnuUtil tsort
+    Enable the GNU name with: Enable-GnuAlias tsort
 
     .EXAMPLE
     'build test', 'test deploy', 'lint test' | Invoke-GnuTsort

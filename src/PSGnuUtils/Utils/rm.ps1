@@ -47,7 +47,7 @@ function Invoke-GnuRm {
     removals. Links and junctions are removed themselves, never followed. '/' and drive roots
     are refused unless --no-preserve-root is given, and '.' / '..' are always refused.
     File system objects piped in (Get-ChildItem *.tmp | Invoke-GnuRm) are removed too.
-    Enable the GNU name with: Enable-GnuUtil rm (replaces the rm -> Remove-Item alias).
+    Enable the GNU name with: Enable-GnuAlias rm (replaces the rm -> Remove-Item alias).
 
     .EXAMPLE
     Invoke-GnuRm -rf build

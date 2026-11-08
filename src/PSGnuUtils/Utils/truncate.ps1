@@ -40,7 +40,7 @@ function Invoke-GnuTruncate {
     .DESCRIPTION
     Sets the size of every FILE to SIZE (-s) or to the size of RFILE (-r). Missing files are
     created unless -c is given. SIZE may be relative: +N, -N, <N, >N, /N, %N.
-    Enable the GNU name with: Enable-GnuUtil truncate
+    Enable the GNU name with: Enable-GnuAlias truncate
 
     .EXAMPLE
     Invoke-GnuTruncate -s 0 app.log

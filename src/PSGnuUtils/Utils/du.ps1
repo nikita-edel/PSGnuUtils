@@ -47,7 +47,7 @@ function Invoke-GnuDu {
     Prints the space used by every directory below each FILE (default .), in 1K blocks,
     -B units or human readable (-h, --si). -a includes files, -s and -d limit the depth,
     -c adds a total, --apparent-size / -b count bytes, --exclude skips names.
-    Enable the GNU name with: Enable-GnuUtil du
+    Enable the GNU name with: Enable-GnuAlias du
 
     .EXAMPLE
     Invoke-GnuDu -sh *

@@ -46,7 +46,7 @@ function Invoke-GnuLn {
     Creates a hard link (default) or symbolic link (-s) for every TARGET: named LINK_NAME, placed
     in DIRECTORY, or in the current directory. Existing destinations are an error unless -f
     replaces them or -i asks. -r stores a symbolic link target relative to the link.
-    Enable the GNU name with: Enable-GnuUtil ln
+    Enable the GNU name with: Enable-GnuAlias ln
 
     .EXAMPLE
     Invoke-GnuLn -s ../shared/config.json config.json

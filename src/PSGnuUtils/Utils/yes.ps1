@@ -19,7 +19,7 @@ function Invoke-GnuYes {
     .DESCRIPTION
     Outputs 'y', or all operands joined with spaces, forever. Stop it with Ctrl+C or with a
     cmdlet that stops its input, such as Select-Object -First.
-    Enable the GNU name with: Enable-GnuUtil yes
+    Enable the GNU name with: Enable-GnuAlias yes
 
     .EXAMPLE
     Invoke-GnuYes | Select-Object -First 2

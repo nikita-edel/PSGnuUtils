@@ -17,7 +17,7 @@ function Invoke-GnuGroups {
 
     .DESCRIPTION
     Prints the group names of the current user, or "USER : GROUP..." for each USERNAME.
-    Enable the GNU name with: Enable-GnuUtil groups
+    Enable the GNU name with: Enable-GnuAlias groups
 
     .EXAMPLE
     Invoke-GnuGroups

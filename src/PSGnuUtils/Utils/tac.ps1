@@ -24,7 +24,7 @@ function Invoke-GnuTac {
     Reverses the records of each FILE. Records end with a newline by default, or with any
     STRING (-s) or regular expression (-r -s). With -b the separator starts a record.
     Like GNU tac, a final line without a newline is joined to the next one.
-    Enable the GNU name with: Enable-GnuUtil tac
+    Enable the GNU name with: Enable-GnuAlias tac
 
     .EXAMPLE
     Invoke-GnuTac app.log

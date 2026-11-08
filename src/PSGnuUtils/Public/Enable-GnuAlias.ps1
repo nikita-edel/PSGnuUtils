@@ -1,11 +1,11 @@
-function Enable-GnuUtil {
+function Enable-GnuAlias {
     <#
     .SYNOPSIS
     Makes GNU names (cat, head, sha256sum, ...) call the PSGnuUtils implementations.
 
     .DESCRIPTION
     Every util is always available under its PowerShell name (Invoke-GnuCat, Invoke-GnuHead, ...).
-    Enable-GnuUtil additionally creates a global alias with the GNU name that points to that
+    Enable-GnuAlias additionally creates a global alias with the GNU name that points to that
     function.
 
     Aliases take precedence over functions, cmdlets and native executables, so an enabled GNU
@@ -33,17 +33,17 @@ function Enable-GnuUtil {
     Return the util info objects (see Get-GnuUtil).
 
     .EXAMPLE
-    Enable-GnuUtil -Name cat, head, tail
+    Enable-GnuAlias -Name cat, head, tail
 
     cat, head and tail now run the GNU implementations.
 
     .EXAMPLE
-    Enable-GnuUtil -All -Exclude ls, rm
+    Enable-GnuAlias -All -Exclude ls, rm
 
     Enables everything except ls and rm.
 
     .EXAMPLE
-    Enable-GnuUtil -All -NoClobber
+    Enable-GnuAlias -All -NoClobber
 
     Enables only names that do not exist yet.
     #>

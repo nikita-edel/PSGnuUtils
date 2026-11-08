@@ -9,7 +9,7 @@ function Invoke-GnuBase64 {
     Encodes FILE (or pipeline input) as base64, wrapped at 76 columns (-w COLS, 0 = no wrapping).
     With -d, decodes base64 input; -i ignores characters outside the base64 alphabet.
     Pipeline input is encoded as UTF-8 text with a LF after every line.
-    Enable the GNU name with: Enable-GnuUtil base64
+    Enable the GNU name with: Enable-GnuAlias base64
 
     .EXAMPLE
     'hello' | Invoke-GnuBase64

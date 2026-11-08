@@ -15,7 +15,7 @@ function Invoke-GnuTrue {
 
     .DESCRIPTION
     All arguments are ignored, except a single --help or --version.
-    Enable the GNU name with: Enable-GnuUtil true
+    Enable the GNU name with: Enable-GnuAlias true
 
     .EXAMPLE
     Invoke-GnuTrue; $LASTEXITCODE

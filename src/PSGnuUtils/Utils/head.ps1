@@ -41,7 +41,7 @@ function Invoke-GnuHead {
     Prints the first 10 lines (or -n NUM lines, or -c NUM bytes) of each FILE. A leading '-'
     (-n -5) prints everything except the last NUM lines/bytes. head -5 is short for head -n 5.
     Pipeline input is processed as it arrives.
-    Enable the GNU name with: Enable-GnuUtil head
+    Enable the GNU name with: Enable-GnuAlias head
 
     .EXAMPLE
     Invoke-GnuHead -n 3 notes.txt

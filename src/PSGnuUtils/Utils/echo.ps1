@@ -39,7 +39,7 @@ function Invoke-GnuEcho {
     .DESCRIPTION
     Joins the operands with spaces. Leading arguments made only of -n, -e and -E are options:
     -n suppresses the trailing newline, -e interprets backslash escapes (\n, \t, \x41, \0101, \c ...).
-    Enable the GNU name with: Enable-GnuUtil echo (replaces the echo -> Write-Output alias).
+    Enable the GNU name with: Enable-GnuAlias echo (replaces the echo -> Write-Output alias).
 
     .EXAMPLE
     Invoke-GnuEcho -e 'a\tb\nc'

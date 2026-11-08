@@ -26,7 +26,7 @@ function Invoke-GnuUname {
     .DESCRIPTION
     Prints the selected fields in GNU order: kernel name, node name, kernel release, kernel
     version, machine, processor, hardware platform, operating system.
-    Enable the GNU name with: Enable-GnuUtil uname
+    Enable the GNU name with: Enable-GnuAlias uname
 
     .EXAMPLE
     Invoke-GnuUname -sm

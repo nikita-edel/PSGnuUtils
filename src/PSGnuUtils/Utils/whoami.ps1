@@ -14,7 +14,7 @@ function Invoke-GnuWhoami {
 
     .DESCRIPTION
     Prints [Environment]::UserName. Unlike Windows whoami.exe there is no DOMAIN\ prefix.
-    Enable the GNU name with: Enable-GnuUtil whoami
+    Enable the GNU name with: Enable-GnuAlias whoami
 
     .EXAMPLE
     Invoke-GnuWhoami

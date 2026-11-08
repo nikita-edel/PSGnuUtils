@@ -25,7 +25,7 @@ function Invoke-GnuNproc {
     .DESCRIPTION
     Prints [Environment]::ProcessorCount, adjusted by OMP_NUM_THREADS / OMP_THREAD_LIMIT and
     --ignore=N. The result is never less than 1.
-    Enable the GNU name with: Enable-GnuUtil nproc
+    Enable the GNU name with: Enable-GnuAlias nproc
 
     .EXAMPLE
     Invoke-GnuNproc --ignore=2

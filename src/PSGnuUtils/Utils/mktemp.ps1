@@ -30,7 +30,7 @@ function Invoke-GnuMktemp {
     .DESCRIPTION
     Replaces the trailing X's of TEMPLATE (default tmp.XXXXXXXXXX in the temp directory) with
     random letters and digits, creates the file (or directory with -d) and prints its path.
-    Enable the GNU name with: Enable-GnuUtil mktemp
+    Enable the GNU name with: Enable-GnuAlias mktemp
 
     .EXAMPLE
     $file = Invoke-GnuMktemp

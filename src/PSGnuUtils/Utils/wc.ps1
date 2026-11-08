@@ -34,7 +34,7 @@ function Invoke-GnuWc {
     .DESCRIPTION
     Counts lines (newline characters), words, characters, bytes and the maximum line width of
     each FILE ('-' or no FILE = pipeline input) and prints a total line for several files.
-    Enable the GNU name with: Enable-GnuUtil wc
+    Enable the GNU name with: Enable-GnuAlias wc
 
     .EXAMPLE
     Invoke-GnuWc -l *.ps1

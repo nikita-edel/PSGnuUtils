@@ -80,7 +80,7 @@ function Invoke-GnuNumfmt {
     Converts the NUMBERs, or field 1 (or --field) of every input line: --from parses
     suffixes (si, iec, iec-i, auto), --to scales the output, --round, --format, --padding,
     --suffix and the unit options control the result.
-    Enable the GNU name with: Enable-GnuUtil numfmt
+    Enable the GNU name with: Enable-GnuAlias numfmt
 
     .EXAMPLE
     Invoke-GnuNumfmt --to=iec 1048576

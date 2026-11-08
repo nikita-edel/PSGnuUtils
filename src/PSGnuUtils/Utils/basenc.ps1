@@ -46,7 +46,7 @@ function Invoke-GnuBasenc {
     .DESCRIPTION
     Encodes FILE (or pipeline input) with the selected encoding, wrapped at 76 columns
     (-w COLS, 0 = no wrapping). With -d, decodes; -i ignores characters outside the alphabet.
-    Enable the GNU name with: Enable-GnuUtil basenc
+    Enable the GNU name with: Enable-GnuAlias basenc
 
     .EXAMPLE
     'hello' | Invoke-GnuBasenc --base16

@@ -82,7 +82,7 @@ function Invoke-GnuStat {
     Prints the size, blocks, type, permissions, owner and times of each FILE, or the
     file system status with -f. -c / --printf print custom FORMATs (%n %s %y ...), -t the
     terse form, -L follows links.
-    Enable the GNU name with: Enable-GnuUtil stat
+    Enable the GNU name with: Enable-GnuAlias stat
 
     .EXAMPLE
     Invoke-GnuStat -c '%n %s %y' *.log

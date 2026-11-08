@@ -76,7 +76,7 @@ function Invoke-GnuTest {
     .DESCRIPTION
     Evaluates EXPRESSION with the POSIX rules for 0 to 4 arguments and GNU's grammar beyond
     that (! ( ) -a -o). Sets $LASTEXITCODE to 0 (true), 1 (false) or 2 (error).
-    Enable the GNU name with: Enable-GnuUtil test
+    Enable the GNU name with: Enable-GnuAlias test
 
     .EXAMPLE
     Invoke-GnuTest -d build; if ($LASTEXITCODE -eq 0) { 'build exists' }

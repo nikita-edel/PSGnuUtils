@@ -32,7 +32,7 @@ function Invoke-GnuShuf {
     Prints the input lines (FILE, pipeline input, -e arguments or the numbers of -i LO-HI) in
     random order. -n limits the count, -r draws with repetition (endless without -n), -o writes
     to a file, --random-source makes the order reproducible.
-    Enable the GNU name with: Enable-GnuUtil shuf
+    Enable the GNU name with: Enable-GnuAlias shuf
 
     .EXAMPLE
     Invoke-GnuShuf -i 1-6 -n 1

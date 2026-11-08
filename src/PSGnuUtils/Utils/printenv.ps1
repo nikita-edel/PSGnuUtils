@@ -24,7 +24,7 @@ function Invoke-GnuPrintenv {
     .DESCRIPTION
     Prints the value of each named environment variable (exit code 1 if one is missing), or
     every NAME=value pair sorted by name.
-    Enable the GNU name with: Enable-GnuUtil printenv
+    Enable the GNU name with: Enable-GnuAlias printenv
 
     .EXAMPLE
     Invoke-GnuPrintenv HOME PATH

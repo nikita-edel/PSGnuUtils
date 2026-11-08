@@ -21,7 +21,7 @@ function Invoke-GnuDirname {
     .DESCRIPTION
     Prints each NAME without its last component. Names without a directory part give '.'.
     On Windows both / and \ are directory separators.
-    Enable the GNU name with: Enable-GnuUtil dirname
+    Enable the GNU name with: Enable-GnuAlias dirname
 
     .EXAMPLE
     Invoke-GnuDirname /usr/bin/

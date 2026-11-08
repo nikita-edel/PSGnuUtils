@@ -29,7 +29,7 @@ function Invoke-GnuKill {
     .DESCRIPTION
     Sends TERM (or -s SIGNAL / -SIGNAL) to every PID. -l lists the signal names or converts
     between names and numbers, -t prints a table. On Windows the process is terminated.
-    Enable the GNU name with: Enable-GnuUtil kill
+    Enable the GNU name with: Enable-GnuAlias kill
 
     .EXAMPLE
     Invoke-GnuKill -9 1234

@@ -21,7 +21,7 @@ function Invoke-GnuPathchk {
     Reports names whose components are too long, and with -p names that are not portable to
     every POSIX system (14 byte components, 256 byte names, only A-Z a-z 0-9 . _ -).
     -P additionally rejects empty names and components starting with '-'.
-    Enable the GNU name with: Enable-GnuUtil pathchk
+    Enable the GNU name with: Enable-GnuAlias pathchk
 
     .EXAMPLE
     Invoke-GnuPathchk --portability 'my file.txt'

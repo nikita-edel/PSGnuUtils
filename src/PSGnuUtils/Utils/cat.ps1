@@ -29,7 +29,7 @@ function Invoke-GnuCat {
     Prints every FILE ('-' or no FILE = pipeline input) as text lines. Supports numbering
     (-n, -b), squeezing blank lines (-s) and making invisible characters visible (-A, -v, -E, -T).
     Pipeline input is processed line by line as it arrives.
-    Enable the GNU name with: Enable-GnuUtil cat (replaces the cat -> Get-Content alias).
+    Enable the GNU name with: Enable-GnuAlias cat (replaces the cat -> Get-Content alias).
 
     .EXAMPLE
     Invoke-GnuCat -n notes.txt

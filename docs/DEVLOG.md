@@ -3,7 +3,17 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
-## 2026-11-08 (latest) - First Linux run (WSL), tests isolated from the user's session
+## 2026-11-08 (latest) - Lazy loading, sed, diff
+
+- Lazy loading (user decision): the built psm1 has the core, entry functions and an index; the rest of each util
+  loads on first use. Import on 7 / 5.1: 93 / 265 ms instead of 270 / 415 ms. First use of a util: about 10 ms.
+- `Enable-GnuUtil` removed in favour of `Enable-GnuAlias`; new `Import-GnuUtil` (`-MostUsed`, `-All`) and
+  `Disable-GnuLazyLoading`. `Preload-` is not an approved verb, hence `Import-`. The user's profile config must switch to
+  `Enable-GnuAlias` at the next install.
+- sed: all commands and addresses, 267 of 270 cases identical to GNU sed on Linux (2 usage text, 1 harness).
+- diff: port of GNU's search, so hunks match: 171 of 171 on Linux, 170 of 171 on Windows (msys getopt wording).
+
+## 2026-11-08 (earlier) - First Linux run (WSL), tests isolated from the user's session
 
 - First full run on Linux: Ubuntu 26.04 in WSL, PowerShell 7.6.9 (snap). 9 failures found, all fixed.
 - Real bugs: du counted a link to a directory as 4 KiB and read a link's own size with -L; du -L had no protection

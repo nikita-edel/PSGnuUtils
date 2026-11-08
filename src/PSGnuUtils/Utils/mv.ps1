@@ -34,7 +34,7 @@ function Invoke-GnuMv {
     Renames SOURCE to DEST, or moves every SOURCE into DIRECTORY. Existing destinations are
     replaced (-f, default), kept (-n), replaced after asking (-i) or only when older (-u). A
     directory replaces an existing empty directory only.
-    Enable the GNU name with: Enable-GnuUtil mv (replaces the mv -> Move-Item alias).
+    Enable the GNU name with: Enable-GnuAlias mv (replaces the mv -> Move-Item alias).
 
     .EXAMPLE
     Invoke-GnuMv -v draft.txt final.txt

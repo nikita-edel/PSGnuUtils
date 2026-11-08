@@ -60,7 +60,7 @@ function Invoke-GnuDiff {
     Compares two files, a file and a directory, or two directories (-r for subdirectories), and
     prints normal, unified (-u, -U), context (-c, -C) or ed (-e) output. A port of GNU's algorithm,
     so hunks come out the same. Exit code 0: same, 1: different, 2: trouble.
-    Enable the GNU name with: Enable-GnuUtil diff
+    Enable the GNU name with: Enable-GnuAlias diff
 
     .EXAMPLE
     Invoke-GnuDiff -u old.txt new.txt

@@ -5,7 +5,7 @@ function Get-GnuUtil {
 
     .DESCRIPTION
     Returns one object per util with its GNU name, category, PowerShell function name, whether
-    the GNU name is currently enabled (see Enable-GnuUtil) and what the GNU name resolves to
+    the GNU name is currently enabled (see Enable-GnuAlias) and what the GNU name resolves to
     without PSGnuUtils (for example 'Alias -> Get-Content' for cat on Windows).
 
     .PARAMETER Name
@@ -49,17 +49,17 @@ function Get-GnuUtil {
         $patterns = $Name
         if ($null -eq $patterns -or $patterns.Count -eq 0) { $patterns = @('*') }
         foreach ($utilName in @(Resolve-GnuUtilName -Name $patterns)) {
-            $spec = Get-GnuUtilSpec -Name $utilName
-            if ($spec.Category -notlike $Category) { continue }
+            $summary = Get-GnuUtilSummary -Name $utilName
+            if ($summary.Category -notlike $Category) { continue }
             $isEnabled = $script:GnuEnabledUtils.ContainsKey($utilName)
             if ($Enabled -and -not $isEnabled) { continue }
 
             [pscustomobject]@{
                 PSTypeName = 'PSGnuUtils.UtilInfo'
                 Name       = $utilName
-                Category   = $spec.Category
-                Synopsis   = $spec.Synopsis
-                Command    = $spec.FunctionName
+                Category   = $summary.Category
+                Synopsis   = $summary.Synopsis
+                Command    = $summary.FunctionName
                 Enabled    = $isEnabled
                 Shadows    = Get-GnuShadowedCommand -Name $utilName
             }

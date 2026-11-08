@@ -46,7 +46,7 @@ function Invoke-GnuPrintf {
     Prints the ARGUMENTs according to FORMAT (C printf conversions d i o u x X f F e E g G c s,
     plus %b for escapes and %q for shell quoting). The FORMAT is reused until all ARGUMENTs are
     consumed. Invalid numbers are reported and printed as 0 (exit code 1).
-    Enable the GNU name with: Enable-GnuUtil printf
+    Enable the GNU name with: Enable-GnuAlias printf
 
     .EXAMPLE
     Invoke-GnuPrintf '%-10s %5.1f\n' apples 1.25 pears 10

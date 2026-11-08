@@ -6,7 +6,7 @@ How PSGnuUtils is put together and why. Read this before changing anything in `s
 
 1. **GNU compatible**: same option syntax (`-rn`, `--lines=5`, `--li 5`, `--`), same output format, same messages
    (`head: cannot open 'x' for reading: No such file or directory`) and exit codes.
-2. **Opt-in**: importing the module changes nothing. GNU names are enabled per util (`Enable-GnuUtil`).
+2. **Opt-in**: importing the module changes nothing. GNU names are enabled per util (`Enable-GnuAlias`).
 3. **Portable**: Windows PowerShell 5.1 and PowerShell 7+ on Windows, Linux and macOS, with one code base and no
    compiled code.
 4. **PowerShell friendly**: utils are pipeline citizens (pipeline input = stdin, output = string lines, errors go to
@@ -30,7 +30,7 @@ src/PSGnuUtils/
     Aliases.ps1            Enable/Disable of GNU name aliases, restoring replaced aliases
     Configuration.ps1      Import-Module -ArgumentList handling
   Private/Lib/             code shared by several utils (checksums, base encodings, sizes, escapes, number formatting, head/tail)
-  Public/                  Get-GnuUtil, Enable-GnuUtil, Disable-GnuUtil
+  Public/                  Get-GnuUtil, Enable-GnuAlias, Disable-GnuUtil, Import-GnuUtil, Disable-GnuLazyLoading
   Utils/<name>.ps1         one file per util: Register-GnuUtil spec + Invoke-Gnu<Name> function (+ private helpers)
 tests/
   TestHelpers.ps1          Invoke-TestGnu, New-TestFile, platform helpers
@@ -42,14 +42,14 @@ tests/
 
 * Every util is a normal PowerShell function `Invoke-Gnu<Name>` (`Invoke-GnuHead`, `Invoke-GnuSha256sum`). The
   function is always exported and can always be called by that name.
-* The GNU name (`head`) is an **alias** created by `Enable-GnuUtil`. Aliases have the highest command precedence
+* The GNU name (`head`) is an **alias** created by `Enable-GnuAlias`. Aliases have the highest command precedence
   (alias > function > cmdlet > native executable), so an enabled GNU name wins over `cat -> Get-Content`, the
   `mkdir` function, `sort.exe` and `/usr/bin/head` alike.
 * The manifest exports no aliases. Aliases are created at runtime only for the utils the user asked for.
 
 ## Enabling utils (Aliases.ps1)
 
-* `Enable-GnuUtil` creates `Set-Alias -Scope Global -Option AllScope -Description PSGnuUtils <name> Invoke-Gnu<Name>`.
+* `Enable-GnuAlias` creates `Set-Alias -Scope Global -Option AllScope -Description PSGnuUtils <name> Invoke-Gnu<Name>`.
 * If a global alias with that name exists (e.g. `cat`), its definition, options and description are saved in
   `$script:GnuEnabledUtils[name]` and restored by `Disable-GnuUtil` or `Remove-Module` (`OnRemove` handler).
 * Our aliases are always `AllScope` because Windows PowerShell's built-in aliases are `AllScope` and that flag
@@ -57,7 +57,7 @@ tests/
   `AllScope` alias from the global scope (verified on 5.1 and 7.6), after which the original is re-created with its
   original options.
 * `-NoClobber` skips names that already resolve to any command.
-* Configuration: `Enable-GnuUtil` in the profile, or `Import-Module PSGnuUtils -ArgumentList @{ All = $true; Exclude = 'ls' }`
+* Configuration: `Enable-GnuAlias` in the profile, or `Import-Module PSGnuUtils -ArgumentList @{ All = $true; Exclude = 'ls' }`
   (keys `All`, `Name`, `Exclude`, `NoClobber`).
 
 ## Why utils are simple functions reading `$args`
@@ -212,7 +212,16 @@ Ideas for later: a tiny C# cmdlet compiled with `Add-Type` that head pipes into 
 
 ## Build
 
-`./build.ps1 -Build` writes `out/PSGnuUtils/` with the manifest and a single merged `PSGnuUtils.psm1` (the
-`#region Loader` block is replaced by all source files in load order), which loads much faster than dot-sourcing
-dozens of files. `-TestBuild` runs the full test suite against that output. There is no CI: run `-Test` and `-Build -TestBuild` on
+`./build.ps1 -Build` writes `out/PSGnuUtils/` with the manifest, a merged `PSGnuUtils.psm1` and `Utils/<name>.ps1` for
+every util. The time to import goes to reading and parsing, so the psm1 holds only what every session needs: the
+core, each util's `Invoke-Gnu<Name>` function and an index (`$script:GnuLazyUtils`: file, utils it calls, category,
+synopsis). The rest of a util is in its own file and is loaded on first use: `Invoke-Gnu<Name>` starts with
+`Initialize-GnuUtil`, whose `Get-GnuUtilSpec` calls `Import-GnuUtilBody`. Because the entry function stays real, the
+pipeline, error streams and `$MyInvocation` behave exactly as without lazy loading; there is no forwarding.
+
+Rules that follow: a util's public function must stay a thin shell that calls `Initialize-GnuUtil -Name` first (the
+build enforces it), and calls to helpers of another util are found by the build and loaded with it. The build writes
+helpers as `function script:Name`, because the file is dot-sourced inside a function. From the source tree everything
+is loaded at import. Import time on PowerShell 7 / 5.1: 93 / 265 ms, against 270 / 415 ms for everything in one psm1
+and 720 / 1000 ms for the source tree. `-TestBuild` runs the full test suite against that output. There is no CI: run `-Test` and `-Build -TestBuild` on
 Windows PowerShell 5.1 and PowerShell 7 before committing.

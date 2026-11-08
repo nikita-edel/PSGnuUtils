@@ -26,9 +26,9 @@ function Invoke-GnuImportConfiguration {
     if ($Configuration.ContainsKey('NoClobber') -and $Configuration['NoClobber']) { $parameters['NoClobber'] = $true }
 
     if ($Configuration.ContainsKey('All') -and $Configuration['All']) {
-        Enable-GnuUtil -All @parameters
+        Enable-GnuAlias -All @parameters
     }
     elseif ($Configuration.ContainsKey('Name')) {
-        Enable-GnuUtil -Name ([string[]]@($Configuration['Name'])) @parameters
+        Enable-GnuAlias -Name ([string[]]@($Configuration['Name'])) @parameters
     }
 }

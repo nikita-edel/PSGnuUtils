@@ -51,7 +51,7 @@ function Invoke-GnuNl {
     Numbers the non-empty body lines (-b t, default) of every FILE. Supports numbering styles
     (a, t, n, pREGEX) for header, body and footer sections, number formats (ln, rn, rz), width,
     separator, start value and increment.
-    Enable the GNU name with: Enable-GnuUtil nl
+    Enable the GNU name with: Enable-GnuAlias nl
 
     .EXAMPLE
     Get-Content script.ps1 | Invoke-GnuNl -ba -w3

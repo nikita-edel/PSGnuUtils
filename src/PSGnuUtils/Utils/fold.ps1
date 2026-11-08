@@ -23,7 +23,7 @@ function Invoke-GnuFold {
     Breaks lines longer than WIDTH (default 80) columns. Tabs advance to the next multiple of 8,
     backspace moves one column back, carriage return goes to column 0 (unless -b). With -s
     lines are broken after the last blank that fits. fold -20 is short for fold -w 20.
-    Enable the GNU name with: Enable-GnuUtil fold
+    Enable the GNU name with: Enable-GnuAlias fold
 
     .EXAMPLE
     Get-Content README.md | Invoke-GnuFold -s -w 60

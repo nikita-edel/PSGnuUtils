@@ -24,7 +24,7 @@ function Invoke-GnuMkdir {
     .DESCRIPTION
     Creates each DIRECTORY. With -p, missing parents are created and existing directories are
     not an error. -v reports every directory created.
-    Enable the GNU name with: Enable-GnuUtil mkdir (replaces the built-in mkdir function).
+    Enable the GNU name with: Enable-GnuAlias mkdir (replaces the built-in mkdir function).
 
     .EXAMPLE
     Invoke-GnuMkdir -pv build/output/logs

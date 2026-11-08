@@ -26,7 +26,7 @@ function Invoke-GnuFactor {
     .DESCRIPTION
     Prints "N: p1 p2 ..." for every NUMBER (or every whitespace separated number of the pipeline
     input). -h prints repeated factors as p^e.
-    Enable the GNU name with: Enable-GnuUtil factor
+    Enable the GNU name with: Enable-GnuAlias factor
 
     .EXAMPLE
     Invoke-GnuFactor 84 1000000007

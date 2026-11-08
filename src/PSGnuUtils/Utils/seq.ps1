@@ -36,7 +36,7 @@ function Invoke-GnuSeq {
     Prints FIRST (default 1) to LAST in steps of INCREMENT (default 1). Decimal arithmetic is
     used, so 'seq 0 0.1 1' has no rounding drift. -w pads with zeros, -s joins with a
     separator, -f formats with a printf floating point directive (%f %e %g).
-    Enable the GNU name with: Enable-GnuUtil seq
+    Enable the GNU name with: Enable-GnuAlias seq
 
     .EXAMPLE
     Invoke-GnuSeq 3

@@ -46,7 +46,7 @@ function Invoke-GnuInstall {
     Copies SOURCE to DEST (or into DIRECTORY / -t DIRECTORY), creating leading directories with
     -D; -d creates directories. -m sets the mode (Unix), -p keeps timestamps, -C skips
     identical files, -v reports every action.
-    Enable the GNU name with: Enable-GnuUtil install
+    Enable the GNU name with: Enable-GnuAlias install
 
     .EXAMPLE
     Invoke-GnuInstall -D -m 755 build/tool ~/.local/bin/tool

@@ -41,7 +41,7 @@ function Invoke-GnuTimeout {
     Runs COMMAND and terminates it after DURATION (5, 1.5m, 2h, 1d). The exit code is 124
     after a timeout (137 with -s KILL), otherwise the program's own exit code. Output is
     passed through line by line; pipeline input is written to the program's input.
-    Enable the GNU name with: Enable-GnuUtil timeout
+    Enable the GNU name with: Enable-GnuAlias timeout
 
     .EXAMPLE
     Invoke-GnuTimeout 30s ping example.com

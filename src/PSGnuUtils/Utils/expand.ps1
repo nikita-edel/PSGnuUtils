@@ -21,7 +21,7 @@ function Invoke-GnuExpand {
     .DESCRIPTION
     Replaces every tab with spaces up to the next tab stop (every 8 columns by default, -t N or a
     list of positions). -i only converts tabs before the first non-blank character.
-    Enable the GNU name with: Enable-GnuUtil expand
+    Enable the GNU name with: Enable-GnuAlias expand
 
     .EXAMPLE
     Get-Content Makefile | Invoke-GnuExpand -t 4

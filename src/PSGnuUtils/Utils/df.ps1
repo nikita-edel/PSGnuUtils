@@ -57,7 +57,7 @@ function Invoke-GnuDf {
     Lists the size, used and available space of every file system (or the ones holding
     FILE), in 1K blocks, -B units, or human readable with -h / -H. -T adds the type, -i
     shows inodes, --output selects columns, --total adds a sum, -t / -x / -l filter.
-    Enable the GNU name with: Enable-GnuUtil df
+    Enable the GNU name with: Enable-GnuAlias df
 
     .EXAMPLE
     Invoke-GnuDf -h

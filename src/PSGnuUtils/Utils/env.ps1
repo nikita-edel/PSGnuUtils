@@ -35,7 +35,7 @@ function Invoke-GnuEnv {
     Without COMMAND prints NAME=VALUE for every environment variable. Otherwise sets each
     NAME=VALUE (after -i clears everything and -u removes names), runs COMMAND (in DIR with -C)
     and restores the environment. -S splits a string into arguments like GNU env.
-    Enable the GNU name with: Enable-GnuUtil env
+    Enable the GNU name with: Enable-GnuAlias env
 
     .EXAMPLE
     Invoke-GnuEnv DEBUG=1 node app.js

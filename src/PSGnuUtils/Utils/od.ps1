@@ -82,7 +82,7 @@ function Invoke-GnuOd {
     in the formats of -t TYPE (a c d o u x f with sizes and the z suffix) and the traditional
     options -a -b -c -d -f -i -l -o -s -x. -A sets the address radix, -j and -N select a
     range, -w the bytes per line; repeated lines are shown as * unless -v.
-    Enable the GNU name with: Enable-GnuUtil od
+    Enable the GNU name with: Enable-GnuAlias od
 
     .EXAMPLE
     Invoke-GnuOd -A x -t x1z setup.bin

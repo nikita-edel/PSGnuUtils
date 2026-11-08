@@ -42,7 +42,7 @@ function Invoke-GnuSed {
     Runs a sed script over files or the pipeline. Supports addresses (N, $, /re/, first~step,
     addr,+N, addr,~N, 0,/re/, !), all editing commands including hold space and branching
     (s y d D p P n N g G h H x a i c = l q Q r R w W b t T : { } F z), and -n -e -f -E -r -i -s -z -l.
-    Enable the GNU name with: Enable-GnuUtil sed
+    Enable the GNU name with: Enable-GnuAlias sed
 
     .EXAMPLE
     Invoke-GnuSed -i.bak 's/foo/bar/g' notes.txt

@@ -24,7 +24,7 @@ function Invoke-GnuTee {
     .DESCRIPTION
     Every input line is written to each FILE (UTF-8, LF line endings) and passed on to the
     pipeline. -a appends instead of overwriting. Lines are written as they arrive.
-    Enable the GNU name with: Enable-GnuUtil tee (replaces the tee -> Tee-Object alias).
+    Enable the GNU name with: Enable-GnuAlias tee (replaces the tee -> Tee-Object alias).
 
     .EXAMPLE
     Get-Process | Invoke-GnuTee processes.txt | Select-Object -First 5

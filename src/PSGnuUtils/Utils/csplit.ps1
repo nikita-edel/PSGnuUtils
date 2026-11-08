@@ -45,7 +45,7 @@ function Invoke-GnuCsplit {
     their sizes. PATTERNs are line numbers, /REGEXP/[OFFSET] (split before the match),
     %REGEXP%[OFFSET] (skip to the match) and {N} / {*} repetitions. On errors the files are
     removed unless -k.
-    Enable the GNU name with: Enable-GnuUtil csplit
+    Enable the GNU name with: Enable-GnuAlias csplit
 
     .EXAMPLE
     Invoke-GnuCsplit -f chapter book.txt '/^Chapter/' '{*}'

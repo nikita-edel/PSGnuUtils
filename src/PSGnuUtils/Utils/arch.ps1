@@ -13,7 +13,7 @@ function Invoke-GnuArch {
 
     .DESCRIPTION
     Prints x86_64, aarch64 (arm64 on macOS), i686 or armv7l.
-    Enable the GNU name with: Enable-GnuUtil arch
+    Enable the GNU name with: Enable-GnuAlias arch
 
     .EXAMPLE
     Invoke-GnuArch

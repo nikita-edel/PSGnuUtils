@@ -1,10 +1,10 @@
 function Disable-GnuUtil {
     <#
     .SYNOPSIS
-    Removes GNU name aliases created by Enable-GnuUtil and restores the aliases they replaced.
+    Removes GNU name aliases created by Enable-GnuAlias and restores the aliases they replaced.
 
     .DESCRIPTION
-    The PowerShell functions (Invoke-GnuCat, ...) stay available. Aliases that Enable-GnuUtil
+    The PowerShell functions (Invoke-GnuCat, ...) stay available. Aliases that Enable-GnuAlias
     replaced (for example cat -> Get-Content) are restored with their original options.
     Removing the module (Remove-Module PSGnuUtils) disables all utils automatically.
 

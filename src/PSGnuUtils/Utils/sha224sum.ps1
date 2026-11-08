@@ -10,7 +10,7 @@ function Invoke-GnuSha224sum {
     format with --tag. With -c, reads such lines from the FILEs and verifies them
     (--quiet, --status, --warn, --strict and --ignore-missing control the report).
     The digest is computed in PowerShell, as there is no SHA-224 in .NET (slower for large files).
-    Enable the GNU name with: Enable-GnuUtil sha224sum
+    Enable the GNU name with: Enable-GnuAlias sha224sum
 
     .EXAMPLE
     Invoke-GnuSha224sum setup.exe

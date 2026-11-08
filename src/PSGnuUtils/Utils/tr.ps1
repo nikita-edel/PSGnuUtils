@@ -63,7 +63,7 @@ function Invoke-GnuTr {
     Reads the pipeline (or the console) and translates the characters of STRING1 to those of
     STRING2, deletes them (-d), squeezes repeats (-s) or works on the complement (-c).
     Sets support ranges (a-z), classes ([:upper:]), repeats ([x*4]) and escapes (\n, \033).
-    Enable the GNU name with: Enable-GnuUtil tr
+    Enable the GNU name with: Enable-GnuAlias tr
 
     .EXAMPLE
     'Hello' | Invoke-GnuTr a-z A-Z

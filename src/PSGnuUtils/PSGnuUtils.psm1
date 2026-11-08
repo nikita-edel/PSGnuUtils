@@ -4,10 +4,11 @@
     Load order:
       1. Private  - core framework (argument parser, input/output, registry) and shared libraries
       2. Utils    - one file per GNU util; each registers its spec and defines Invoke-Gnu<Name>
-      3. Public   - management commands (Get-GnuUtil, Enable-GnuUtil, Disable-GnuUtil)
+      3. Public   - management commands (Get-GnuUtil, Enable-GnuAlias, Disable-GnuUtil, Import-GnuUtil, Disable-GnuLazyLoading)
 
     The build (./build.ps1 -Task Build) replaces the "Loader" region below with the
-    concatenated source files, so the released module is a single fast-loading psm1.
+    concatenated core and each util's small entry function; everything else of a util
+    stays in Utils/<name>.ps1 and is loaded on the util's first call.
 #>
 param(
     # Optional import-time configuration, for example:
@@ -28,8 +29,8 @@ foreach ($folder in @('Private', 'Utils', 'Public')) {
 }
 #endregion Loader
 
-$publicFunctions = @('Get-GnuUtil', 'Enable-GnuUtil', 'Disable-GnuUtil')
-$utilFunctions = @($script:GnuUtilRegistry.Values | ForEach-Object { $_.FunctionName })
+$publicFunctions = @('Get-GnuUtil', 'Enable-GnuAlias', 'Disable-GnuUtil', 'Import-GnuUtil', 'Disable-GnuLazyLoading')
+$utilFunctions = @(Get-GnuUtilNameList | ForEach-Object { Get-GnuFunctionName -Name $_ })
 Export-ModuleMember -Function ($publicFunctions + $utilFunctions)
 
 # Restore every alias we replaced when the module is removed (Remove-Module / Import-Module -Force).

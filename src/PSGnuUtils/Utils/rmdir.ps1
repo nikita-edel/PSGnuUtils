@@ -20,7 +20,7 @@ function Invoke-GnuRmdir {
     .DESCRIPTION
     Removes each DIRECTORY if it is empty. With -p, the ancestors given in the path are
     removed as well. Never removes files or non-empty directories.
-    Enable the GNU name with: Enable-GnuUtil rmdir (replaces the rmdir -> Remove-Item alias).
+    Enable the GNU name with: Enable-GnuAlias rmdir (replaces the rmdir -> Remove-Item alias).
 
     .EXAMPLE
     Invoke-GnuRmdir -p a/b/c

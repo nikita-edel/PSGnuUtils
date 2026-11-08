@@ -26,7 +26,7 @@ function Invoke-GnuUptime {
     .DESCRIPTION
     Prints " HH:MM:SS  up D days HH:MM,  N users,  load average: A, B, C". -p prints
     "up 2 days, 3 hours, 4 minutes"; -s prints when the system booted.
-    Enable the GNU name with: Enable-GnuUtil uptime
+    Enable the GNU name with: Enable-GnuAlias uptime
 
     .EXAMPLE
     Invoke-GnuUptime -p

@@ -194,4 +194,10 @@ Describe 'Unquoted comma lists' {
     It 'works end to end' {
         (Invoke-TestGnu cut '-d', ' ', '-f', @(1, 3) -InputObject 'a b c').Output | Should -Be @('a c')
     }
+
+    It 'turns an unquoted {} back into text' {
+        InModuleScope PSGnuUtils {
+            @(ConvertTo-GnuArgumentList -Arguments @('-exec', {}, ';')) | Should -Be @('-exec', '{}', ';')
+        }
+    }
 }

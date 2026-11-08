@@ -46,7 +46,7 @@ function Invoke-GnuShred {
     Overwrites each FILE 3 times (-n N) with random data, rounded up to 4 KiB blocks unless
     -x, plus a final pass of zeros with -z. -u renames the file to names of zeros and removes
     it. Not reliable on SSDs and copy-on-write file systems.
-    Enable the GNU name with: Enable-GnuUtil shred
+    Enable the GNU name with: Enable-GnuAlias shred
 
     .EXAMPLE
     Invoke-GnuShred -u -z secrets.txt
