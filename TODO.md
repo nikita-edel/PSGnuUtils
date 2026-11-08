@@ -6,8 +6,9 @@ Concrete next steps, most important first. Keep this list short and current; his
 
 - [x] Bootstrap, Analyze, Test on 5.1 and 7, Build + TestBuild (all green, 2026-11-07; see docs/DEVLOG.md).
 - [x] Coverage: 100% on Windows / PowerShell 7 (build fails below 98% with -CodeCoverage).
-- [ ] Run the suite once on Linux/macOS (no CI): symlinks, `/` vs `\`, Unix modes. WSL here has no pwsh yet (needs
-      `sudo` to install); its `dd` etc. are uutils, so GNU comparisons still need Git for Windows or real GNU.
+- [x] Run the suite once on Linux (Ubuntu in WSL, 2026-11-08). In WSL the GNU tools are `gnudd`, `gnudu`, ...;
+      plain `dd` etc. are uutils.
+- [ ] Run the suite once on macOS (no CI): symlinks, `/` vs `\`, Unix modes.
 - [ ] Run the symlink tests once with developer mode enabled (they are skipped otherwise on Windows).
 
 ## Next

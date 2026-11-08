@@ -44,7 +44,7 @@ Describe 'du' {
     }
 
     It 'counts bytes with -b / --bytes and --apparent-size' {
-        (Invoke-TestGnu du '-b', 'a' -WorkingDirectory $dir).Output | Should -Be @("$(10 + $d)`ta/b", "$(5010 + 2 * $d)`ta")
+        (Invoke-TestGnu du '-b', 'a' -WorkingDirectory $dir).Output | Should -Be @("10`ta/b", "5010`ta")
         (Invoke-TestGnu du '--bytes', 'a/f1' -WorkingDirectory $dir).Output | Should -Be @("5000`ta/f1")
         (Invoke-TestGnu du '--apparent-size', 'a/f1', 'a/b/f2' -WorkingDirectory $dir).Output | Should -Be @("5`ta/f1", "1`ta/b/f2")
     }
@@ -93,8 +93,8 @@ Describe 'du' {
     }
 
     It 'filters with -t / --threshold, --exclude and -X / --exclude-from' {
-        (Invoke-TestGnu du '-t', '5K', 'a' -WorkingDirectory $dir).Output | Should -Be @("$(12 + 2 * $k)`ta")
-        (Invoke-TestGnu du '-a', '-b', '--threshold=-100', 'a' -WorkingDirectory $dir).Output | Should -Be @("10`ta/b/f2", "$(10 + $d)`ta/b", "0`ta/e") -Because 'negative thresholds hide larger entries'
+        (Invoke-TestGnu du '-t', '9K', 'a' -WorkingDirectory $dir).Output | Should -Be @("$(12 + 2 * $k)`ta")
+        (Invoke-TestGnu du '-a', '-b', '--threshold=-100', 'a' -WorkingDirectory $dir).Output | Should -Be @("10`ta/b/f2", "10`ta/b", "0`ta/e") -Because 'negative thresholds hide larger entries'
         (Invoke-TestGnu du '-t', 'x', 'a' -WorkingDirectory $dir).ErrorText | Should -Match "invalid -t argument 'x'"
         (Invoke-TestGnu du '--threshold=x', 'a' -WorkingDirectory $dir).ErrorText | Should -Match "invalid --threshold argument 'x'"
         (Invoke-TestGnu du '--threshold=-0', 'a' -WorkingDirectory $dir).ErrorText | Should -Match "invalid --threshold argument '-0'"
@@ -117,8 +117,8 @@ Describe 'du' {
             (Invoke-TestGnu du '-s', 'link' -WorkingDirectory $dir).Output | Should -Be @("0`tlink")
             (Invoke-TestGnu du '-P', '-s', 'link' -WorkingDirectory $dir).Output | Should -Be @("0`tlink")
             (Invoke-TestGnu du '--no-dereference', '-s', 'link' -WorkingDirectory $dir).Output | Should -Be @("0`tlink")
-            (Invoke-TestGnu du '-L', '-s', 'link' -WorkingDirectory $dir).Output | Should -Be @("$(12 + $k)`tlink")
-            (Invoke-TestGnu du '--dereference', '-s', 'link' -WorkingDirectory $dir).Output | Should -Be @("$(12 + $k)`tlink")
+            (Invoke-TestGnu du '-L', '-s', 'link' -WorkingDirectory $dir).Output | Should -Be @("$(12 + 2 * $k)`tlink")
+            (Invoke-TestGnu du '--dereference', '-s', 'link' -WorkingDirectory $dir).Output | Should -Be @("$(12 + 2 * $k)`tlink")
             (Invoke-TestGnu du '-x', '-a', '.' -WorkingDirectory $dir).Output | Should -Not -Contain "0`t./link"
             (Invoke-TestGnu du '--one-file-system', '-a', '.' -WorkingDirectory $dir).Output | Should -Contain "8`t./a/f1"
         }
@@ -143,8 +143,27 @@ Describe 'du' {
         InModuleScope PSGnuUtils -Parameters @{ Dir = $dir } {
             param($Dir)
             Mock Get-GnuLinkTarget { 'target' }
-            Get-GnuDuSize -Item (Get-Item -LiteralPath (Join-Path $Dir 'a/f1')) -Apparent $true | Should -Be 0
+            Get-GnuDuSize -Item (Get-Item -LiteralPath (Join-Path $Dir 'a/f1')) -Apparent $true | Should -Be 6 -Because 'the apparent size of a link is the length of its target'
+            Get-GnuDuSize -Item (Get-Item -LiteralPath (Join-Path $Dir 'a/f1')) -Apparent $false | Should -Be 0
         }
+    }
+
+    It 'ends on a link loop with -L and does not count it' {
+        $loop = Join-Path $dir 'a/loop'
+        if (-not (New-TestDirectoryLink -Path $loop -Target (Join-Path $dir 'a'))) { Set-ItResult -Skipped -Because 'links cannot be created here'; return }
+        try {
+            $r = Invoke-TestGnu du '-L', '-s', 'a' -WorkingDirectory $dir
+            $r.Output | Should -Be @("$(12 + 2 * $k)`ta")
+            $r.ExitCode | Should -Be 0
+        }
+        finally { [System.IO.Directory]::Delete($loop) }
+    }
+
+    It 'reports a link it cannot follow with -L' {
+        Mock -ModuleName PSGnuUtils Get-GnuCanonicalPath { @{ Error = 'No such file or directory' } }
+        $r = Invoke-TestGnu du '-L', 'a/f1' -WorkingDirectory $dir
+        $r.ErrorText | Should -Be "du: cannot access 'a/f1': No such file or directory"
+        $r.ExitCode | Should -Be 1
     }
 
     It 'reports directories it cannot read' {

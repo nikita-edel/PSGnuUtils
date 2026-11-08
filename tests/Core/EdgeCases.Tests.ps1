@@ -71,9 +71,14 @@ Describe 'Unreadable files' {
     }
 
     It 'reports when unlink cannot delete a file' {
-        $r = Invoke-TestGnu unlink $lockedPath
-        $r.ExitCode | Should -Be 1
-        $r.ErrorText | Should -Match "cannot unlink '.*locked.txt'"
+        $protected = New-TestFile -Path (Join-Path (New-Item -ItemType Directory -Path (Join-Path $TestDrive 'unlink-guard')).FullName 'locked.txt') -Content 'x'
+        $guard = Block-TestFileRemoval -Path $protected
+        try {
+            $r = Invoke-TestGnu unlink $protected
+            $r.ExitCode | Should -Be 1
+            $r.ErrorText | Should -Match "cannot unlink '.*locked.txt'"
+        }
+        finally { $guard.Dispose() }
     }
 }
 

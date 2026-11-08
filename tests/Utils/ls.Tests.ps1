@@ -236,9 +236,11 @@ Describe 'ls helpers' {
             $fake = [pscustomobject]@{ FullName = 'x'; User = 'alice'; Group = 'staff' }
             $owner = Get-GnuLsOwner -Item ([System.IO.FileInfo]::new([System.IO.Path]::GetTempFileName()))
             $owner.Owner | Should -Not -BeNullOrEmpty
-            Mock Get-Acl { }
-            $none = Get-GnuLsOwner -Item ([System.IO.FileInfo]::new([System.IO.Path]::GetTempFileName()))
-            if (-not ((Get-Item -LiteralPath $PSHOME).PSObject.Properties['User'])) { $none.Owner | Should -Be '-' }
+            # Unix has no Get-Acl: owners come from the User property there.
+            if (Test-GnuWindows) {
+                Mock Get-Acl { }
+                (Get-GnuLsOwner -Item ([System.IO.FileInfo]::new([System.IO.Path]::GetTempFileName()))).Owner | Should -Be '-'
+            }
             $null = $fake
         }
     }
@@ -271,9 +273,12 @@ Describe 'ls edge cases' {
             $item = Get-Item -LiteralPath $F
             Add-Member -InputObject $item -NotePropertyName User -NotePropertyValue 'alice' -Force
             Add-Member -InputObject $item -NotePropertyName Group -NotePropertyValue 'staff' -Force
+            # On Unix the real User and Group properties win over the ones added here.
+            $expected = @('alice', 'staff')
+            if (-not (Test-GnuWindows)) { $expected = @([string]$item.User, [string]$item.Group) }
             $owner = Get-GnuLsOwner -Item $item
-            $owner.Owner | Should -Be 'alice'
-            $owner.Group | Should -Be 'staff'
+            $owner.Owner | Should -Be $expected[0]
+            $owner.Group | Should -Be $expected[1]
         }
     }
 

@@ -3,6 +3,20 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-08 (latest) - First Linux run (WSL), tests isolated from the user's session
+
+- First full run on Linux: Ubuntu 26.04 in WSL, PowerShell 7.6.9 (snap). 9 failures found, all fixed.
+- Real bugs: du counted a link to a directory as 4 KiB and read a link's own size with -L; du -L had no protection
+  against link loops (GNU skips them silently); du --apparent-size counted directories (GNU 9 counts 0).
+- Windows assumptions in tests: file locks do not stop deletion on Unix, so Block-TestFileRemoval uses a read-only
+  parent directory there and those error paths now run on both systems instead of being skipped.
+- Red failures in a normal console: a profile that loads the installed module put a second PSGnuUtils beside the
+  one under test (443 failures). build.ps1 now runs the tests in a child process without a profile and with a
+  clean module path for 5.1; TestHelpers removes a foreign copy for direct Invoke-Pester runs.
+- Compared with real GNU 9.7 on ext4 (`gnudd gnudu gnudf`, C locale, du order ignored): 169 of 172. The other 3:
+  df -i twice (.NET has no inode counts, documented) and the -0 harness artifact. WSL's plain `dd` is uutils.
+- Not verified: macOS, and df on systems with unusual mounts.
+
 ## 2026-11-08 (later) - dd streams files, TestBuild green
 
 - dd reads and writes files block by block (read 2 MB past the 3 GB mark of a 3 GB file); pipeline data stays in
@@ -12,8 +26,6 @@ next. Keep entries short and factual so the next person (or LLM) can continue wi
 - TestBuild: Get-GnuModuleVersion finds the manifest next to the merged psm1; the per-util origin meta test checks
   the definition there. Was 87 failures, now 0.
 - Compared with GNU 8.32 (172 cases, 5.1 and 7.6): 169 identical; the other 3 are the ones explained below.
-- Not done: WSL. It has no pwsh, installing needs sudo, and downloading a portable pwsh was denied by the session's
-  permission rules. Linux/macOS remain unverified.
 
 ## 2026-11-08 (end of Batch D) - dd df du, unquoted comma lists
 

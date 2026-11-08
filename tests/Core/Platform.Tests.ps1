@@ -111,9 +111,8 @@ Describe 'Platform-specific code paths' {
     }
 
     It 'stops renaming a shredded file that cannot be renamed' {
-        $file = New-TestFile -Path (Join-Path $TestDrive 'locked-shred') -Content 'x'
-        $stream = Lock-TestFile -Path $file
-        if ($null -eq $stream) { Set-ItResult -Skipped -Because 'the OS does not enforce file locks'; return }
+        $file = New-TestFile -Path (Join-Path (New-Item -ItemType Directory -Path (Join-Path $TestDrive 'shred-guard')).FullName 'locked-shred') -Content 'x'
+        $stream = Block-TestFileRemoval -Path $file
         try {
             $messages = InModuleScope PSGnuUtils -Parameters @{ File = $file } {
                 param($File)

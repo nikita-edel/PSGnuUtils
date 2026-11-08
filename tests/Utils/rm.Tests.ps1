@@ -232,8 +232,7 @@ Describe 'rm' {
     It 'reports files that cannot be removed' {
         $dir = New-RmSandbox
         $file = New-TestFile -Path (Join-Path $dir 'locked.txt') -Content 'x'
-        $lock = Lock-TestFile -Path $file
-        if ($null -eq $lock) { Set-ItResult -Skipped -Because 'this OS does not enforce exclusive file locks' }
+        $lock = Block-TestFileRemoval -Path $file
         try {
             $r = Invoke-TestGnu rm $file
             $r.ExitCode | Should -Be 1
@@ -245,8 +244,7 @@ Describe 'rm' {
     It 'keeps a directory whose children could not be removed' {
         $dir = New-RmSandbox
         $file = New-TestFile -Path (Join-Path $dir 'tree/locked.txt') -Content 'x'
-        $lock = Lock-TestFile -Path $file
-        if ($null -eq $lock) { Set-ItResult -Skipped -Because 'this OS does not enforce exclusive file locks' }
+        $lock = Block-TestFileRemoval -Path $file
         try {
             $r = Invoke-TestGnu rm '-r', 'tree' -WorkingDirectory $dir
             $r.ExitCode | Should -Be 1

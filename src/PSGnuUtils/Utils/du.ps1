@@ -31,7 +31,7 @@ Register-GnuUtil @{
         'and the DU_BLOCK_SIZE, BLOCK_SIZE and BLOCKSIZE environment variables.',
         'Otherwise, units default to 1024 bytes (or 512 if POSIXLY_CORRECT is set).',
         '',
-        'PowerShell note: disk usage is the size rounded up to 4 KiB clusters (.NET does not',
+        'PowerShell note: -x stops only at links and junctions, not at mount points. Disk usage is the size rounded up to 4 KiB clusters (.NET does not',
         'expose allocation sizes); directories count 0 on Windows and 4 KiB elsewhere. Entries',
         'are listed in name order, hard links are counted every time, and the environment',
         'variables are ignored; SIZE does not take the '' grouping prefix.'
@@ -63,13 +63,22 @@ function Get-GnuDuSize {
     <#
     .SYNOPSIS
     The size an entry adds: apparent bytes, or the disk usage estimate (4 KiB clusters; directories 0 on Windows).
+    .PARAMETER Resolved
+    With -L, the path the entry resolves to: that file is measured instead of the link.
     #>
-    param([Parameter(Mandatory)][System.IO.FileSystemInfo]$Item, [Parameter(Mandatory)][bool]$Apparent)
+    param([Parameter(Mandatory)][System.IO.FileSystemInfo]$Item, [Parameter(Mandatory)][bool]$Apparent, [string]$Resolved)
+    if ($Resolved) { $Item = Get-Item -LiteralPath $Resolved -Force }
+    # A link's own size: its target text when apparent, no blocks otherwise (checked first: a link to a directory is a DirectoryInfo).
+    $target = Get-GnuLinkTarget -Path $Item.FullName
+    if ($null -ne $target) {
+        if ($Apparent) { return [double]$target.Length }
+        return [double]0
+    }
     if ($Item -is [System.IO.DirectoryInfo]) {
-        if (Test-GnuWindows) { return [double]0 }
+        # GNU counts only files and links as apparent size.
+        if ($Apparent -or (Test-GnuWindows)) { return [double]0 }
         return [double]4096
     }
-    if ($null -ne (Get-GnuLinkTarget -Path $Item.FullName)) { return [double]0 }
     $length = [double]$Item.Length
     if ($Apparent) { return $length }
     [Math]::Ceiling($length / 4096) * 4096
@@ -82,11 +91,20 @@ function Measure-GnuDuEntry {
     #>
     param([Parameter(Mandatory)][hashtable]$State, [Parameter(Mandatory)][System.IO.FileSystemInfo]$Item, [Parameter(Mandatory)][string]$Display, [Parameter(Mandatory)][int]$Depth)
 
-    $size = Get-GnuDuSize -Item $Item -Apparent $State.Apparent
+    $canonical = ''
+    if ($State.Follow) {
+        $resolved = Get-GnuCanonicalPath -Path $Item.FullName -Require 'all'
+        if ($resolved.ContainsKey('Error')) { Write-GnuError -Context $State.Context -Message "cannot access '$Display': $($resolved.Error)"; return [double]0 }
+        $canonical = $resolved.Path
+        # A link back to a directory being measured: GNU skips it silently, and without this du -L would never end.
+        if ($State.Active.Contains($canonical)) { return [double]0 }
+    }
+    $size = Get-GnuDuSize -Item $Item -Apparent $State.Apparent -Resolved $canonical
     $isLink = $null -ne (Get-GnuLinkTarget -Path $Item.FullName)
     $descend = $Item -is [System.IO.DirectoryInfo] -and (-not $isLink -or $State.Follow)
     $children = [double]0
     if ($descend) {
+        if ($State.Follow) { $null = $State.Active.Add($canonical) }
         try { $entries = @(Get-ChildItem -LiteralPath $Item.FullName -Force -ErrorAction Stop | Sort-Object -Property Name) }
         catch {
             Write-GnuError -Context $State.Context -Message "cannot read directory '$Display': $(Get-GnuErrorReason -Exception $_.Exception)"
@@ -99,6 +117,7 @@ function Measure-GnuDuEntry {
             if ($State.Separate -and $entry -is [System.IO.DirectoryInfo]) { continue }
             $children += $childSize
         }
+        if ($State.Follow) { $null = $State.Active.Remove($canonical) }
     }
     $total = $size + $children
     $print = $Depth -eq 0 -or ($Depth -le $State.MaxDepth -and ($descend -or $State.All))
@@ -181,6 +200,7 @@ function Invoke-GnuDuReport {
         MaxDepth = $maxDepth; All = Test-GnuOption -Context $Context -Key 'all'; Separate = Test-GnuOption -Context $Context -Key 'separate-dirs'
         Follow = (Get-GnuOptionValue -Context $Context -Key 'links' -Default 'none') -eq 'follow'; OneFileSystem = Test-GnuOption -Context $Context -Key 'one-file-system'
         Threshold = $threshold; Exclude = $patterns; Records = New-Object 'System.Collections.Generic.List[string]'
+        Active = New-Object 'System.Collections.Generic.HashSet[string]'
     }
     $operands = @($Context.Operands)
     if ($operands.Count -eq 0) { $operands = @('.') }

@@ -150,8 +150,7 @@ Describe 'mv' {
 
     It 'reports destinations that cannot be removed' {
         $dir = New-MvSandbox
-        $lock = Lock-TestFile -Path (Join-Path $dir 'b.txt')
-        if ($null -eq $lock) { Set-ItResult -Skipped -Because 'this OS does not enforce exclusive file locks' }
+        $lock = Block-TestFileRemoval -Path (Join-Path $dir 'b.txt')
         try { (Invoke-TestGnu mv 'a.txt', 'b.txt' -WorkingDirectory $dir).ErrorText | Should -Match "cannot remove 'b.txt'" }
         finally { $lock.Dispose() }
     }
