@@ -59,7 +59,7 @@ implemented util is listed here).
 | `cat` | done | full | 1 | 1 | |
 | `tac` | done | full | 1 | 1 | `-r` uses .NET regular expressions. |
 | `nl` | done | full | 2 | 2 | `-b p` uses .NET regular expressions. |
-| `od` | planned | subset | 3 | 3 | `-A -t -N -j -v -c -x -o -d`; `Format-Hex` covers the rest. |
+| `od` | done | full | 3 | 3 | All `-t` types with sizes and `z`, traditional options, `-A -j -N -v -w --endian`; output identical to GNU 8.32; no `-S`. |
 | `base64` | done | full | 1 | 1 | Decoded output is written as UTF-8 text lines. |
 | `base32` | done | full | 1 | 1 | |
 | `basenc` | done | full | 2 | 2 | All encodings incl. base16, base2msbf/lsbf, z85; base16 decoding accepts lower case (coreutils 9.x). |

@@ -50,6 +50,7 @@
         'Invoke-GnuMv',
         'Invoke-GnuNl',
         'Invoke-GnuNproc',
+        'Invoke-GnuOd',
         'Invoke-GnuPaste',
         'Invoke-GnuPathchk',
         'Invoke-GnuPrintenv',

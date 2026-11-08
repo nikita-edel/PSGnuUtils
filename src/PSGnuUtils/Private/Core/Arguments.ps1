@@ -94,6 +94,11 @@ function Set-GnuOptionValue {
             $Options[$key] = $Value
         }
     }
+    elseif ($Definition.HasValue -and $Definition.Multi) {
+        # Flags that add a constant to a list, in command-line order (od -a -x share one format list).
+        if (-not $Options.ContainsKey($key)) { $Options[$key] = New-Object 'System.Collections.Generic.List[string]' }
+        $Options[$key].Add([string]$Definition.Value)
+    }
     elseif ($Definition.HasValue) {
         $Options[$key] = $Definition.Value
     }
