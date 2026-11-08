@@ -38,6 +38,7 @@
     ./build.ps1 -Test -TestTimeoutMinutes 10
     Stops the run if the tests take longer than 10 minutes (default 30), so a hanging test cannot block.
     Standard input is empty during the tests: a test that reads the console gets end-of-file.
+    The tests run in a child process without a profile, so a module or aliases loaded by the profile cannot interfere.
 
 .EXAMPLE
     ./build.ps1 -Install
@@ -159,7 +160,34 @@ function Invoke-Analyze {
     Write-Host 'No analyzer issues.'
 }
 
-function Invoke-Test([string]$ModuleManifest) {
+function Invoke-IsolatedTest([string]$TaskName) {
+    # The tests get a process of their own: a profile that loads the installed module puts a second PSGnuUtils beside
+    # the one under test (Pester refuses that), its aliases would leak in, and the watchdog would kill the user's shell.
+    $arguments = @("-Task $TaskName", "-TestTimeoutMinutes $TestTimeoutMinutes")
+    if ($TestPath) { $arguments += '-TestPath ' + (@($TestPath | ForEach-Object { "'" + ($_ -replace "'", "''") + "'" }) -join ',') }
+    if ($CodeCoverage) { $arguments += '-CodeCoverage' }
+    $command = "& '$($PSCommandPath -replace "'", "''")' $($arguments -join ' ')"
+    $originalModulePath = $env:PSModulePath
+    $env:PSGNUUTILS_TEST_ISOLATED = '1'
+    if ($PSVersionTable.PSEdition -eq 'Desktop') {
+        # Started from PowerShell 7, Windows PowerShell inherits 7's module folders and loses core cmdlets (Get-Acl, ...).
+        $folders = @($env:PSModulePath -split ';' | Where-Object { $_ -notmatch '\\PowerShell\\|microsoft\.powershell_' })
+        $system = Join-Path $PSHOME 'Modules'
+        if ($folders -notcontains $system) { $folders += $system }
+        $env:PSModulePath = $folders -join ';'
+    }
+    try {
+        & (Get-Process -Id $PID).Path -NoProfile -ExecutionPolicy Bypass -Command $command
+        if ($LASTEXITCODE -ne 0) { throw 'The tests failed; see the output above.' }
+    }
+    finally {
+        $env:PSModulePath = $originalModulePath
+        Remove-Item Env:\PSGNUUTILS_TEST_ISOLATED -ErrorAction SilentlyContinue
+    }
+}
+
+function Invoke-Test([string]$ModuleManifest, [string]$TaskName) {
+    if (-not $env:PSGNUUTILS_TEST_ISOLATED) { Invoke-IsolatedTest -TaskName $TaskName; return }
     Write-Step "Test ($ModuleManifest)"
     Import-Module Pester -MinimumVersion $PesterMinimumVersion
     $env:PSGNUUTILS_TEST_MANIFEST = $ModuleManifest
@@ -307,9 +335,9 @@ foreach ($name in $selected) {
         'Bootstrap' { Invoke-Bootstrap }
         'Manifest' { Invoke-Manifest }
         'Analyze' { Invoke-Analyze }
-        'Test' { Invoke-Test -ModuleManifest $ManifestPath }
+        'Test' { Invoke-Test -ModuleManifest $ManifestPath -TaskName 'Test' }
         'Build' { Invoke-Build }
-        'TestBuild' { Invoke-Test -ModuleManifest (Join-Path $OutputDir 'PSGnuUtils.psd1') }
+        'TestBuild' { Invoke-Test -ModuleManifest (Join-Path $OutputDir 'PSGnuUtils.psd1') -TaskName 'TestBuild' }
         'Install' { Invoke-Install }
         'Uninstall' { Invoke-Uninstall }
         'Publish' { Invoke-Publish }

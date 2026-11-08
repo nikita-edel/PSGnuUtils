@@ -11,10 +11,10 @@ $script:TestRepoRoot = Split-Path -Parent $PSScriptRoot
 $script:TestManifest = Join-Path -Path $script:TestRepoRoot -ChildPath 'src/PSGnuUtils/PSGnuUtils.psd1'
 if ($env:PSGNUUTILS_TEST_MANIFEST) { $script:TestManifest = $env:PSGNUUTILS_TEST_MANIFEST }
 
-$loaded = Get-Module -Name PSGnuUtils
-if ($null -eq $loaded -or -not $loaded.Path.StartsWith((Split-Path -Parent $script:TestManifest))) {
-    Import-Module -Name $script:TestManifest -Force -ErrorAction Stop
-}
+# A copy from elsewhere (the installed module, loaded by a profile) must go: Pester refuses two modules of one name.
+$testModuleFolder = Split-Path -Parent $script:TestManifest
+Get-Module -Name PSGnuUtils | Where-Object { -not $_.Path.StartsWith($testModuleFolder) } | Remove-Module -Force
+if ($null -eq (Get-Module -Name PSGnuUtils)) { Import-Module -Name $script:TestManifest -Force -ErrorAction Stop }
 
 function Invoke-TestGnu {
     <#
@@ -145,6 +145,24 @@ function Use-TestConsoleInput {
     # Prompts (rm -i) go to the console's stderr; attach them to Invoke-TestGnu results.
     if ($result -is [pscustomobject]) { Add-Member -InputObject $result -NotePropertyName 'ConsoleError' -NotePropertyValue $errorWriter.ToString() -Force }
     $result
+}
+
+function Block-TestFileRemoval {
+    <#
+    .SYNOPSIS
+    Makes deleting Path fail until the returned object is disposed.
+    .DESCRIPTION
+    Windows: an exclusive handle. Unix lets open files be deleted, so there the parent directory becomes read-only.
+    Give Path a directory of its own: everything else in that directory is protected as well.
+    #>
+    param([Parameter(Mandatory)][string]$Path)
+
+    if (Test-IsWindowsPlatform) { return Lock-TestFile -Path $Path }
+    $parent = Split-Path -Parent $Path
+    & /bin/chmod 555 -- $parent
+    $guard = [pscustomobject]@{ Directory = $parent }
+    Add-Member -InputObject $guard -MemberType ScriptMethod -Name Dispose -Value { & /bin/chmod 755 -- $this.Directory }
+    $guard
 }
 
 function Lock-TestFile {
