@@ -87,7 +87,7 @@ implemented util is listed here).
 | `wc` | done | full | 1 | 1 | Word and width rules approximate GNU's locale handling (whitespace = `\s`, tabs to multiples of 8). |
 | `tsort` | done | full | 2 | 2 | Port of the GNU algorithm: same order and loop reports as GNU. |
 | `shuf` | done | full | 2 | 2 | `--random-source` seeds the generator (reproducible, not GNU's order); `-r -o` needs `-n`. |
-| `numfmt` | planned | subset | 3 | 3 | `--to/--from si/iec/iec-i`, `--suffix`, `--padding`, `--field`. |
+| `numfmt` | done | full | 3 | 3 | All options (`--from/--to` si/iec/iec-i/auto, units, `--round`, `--format`, `--padding`, `--field`, `-d`, `--header`, `--invalid`, `-z`); identical to GNU on 91 cases; [decimal] instead of long double. |
 | `ptx` | skip | - | - | - | Builds permuted indexes for books; essentially unused. |
 
 ## Checksums
