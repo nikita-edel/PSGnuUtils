@@ -104,6 +104,7 @@
         'Invoke-GnuWc',
         'Invoke-GnuWhich',
         'Invoke-GnuWhoami',
+        'Invoke-GnuXargs',
         'Invoke-GnuYes'
     )
     CmdletsToExport      = @()

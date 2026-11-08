@@ -3,6 +3,39 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-08 (night) - xargs
+
+- xargs: port of GNU's read_line, all grouping options, `-P` for programs. Not done: `-o` and `--show-limits` (TODO).
+- Compared with GNU findutils: 137 of 137 cases on Linux (4.10), 133 of 137 on Windows (4.11). The 4 on Windows:
+  three are msys getopt wording (`-- I` for `-- 'I'`, `unknown option`), one is Git's sh running an extensionless
+  text file as a script.
+- Bugs the comparison found: a child's own exit 126/127 must give 123 (only a command that cannot be started or
+  found gives 126/127, hence `$Context.LaunchFailed` in Invoke-GnuChildCommand); `-n -L -l -I` cancel each other in
+  command line order and `-0`/`-d` are last-wins; `-p` showed the command twice; `\N` passed as `\n` (hashtable keys
+  ignore case); arguments end at a NUL; `-s 0` is not a usage error.
+- GNU wording differs by version or platform for a missing command: `name: No such file or directory` on Linux 4.10,
+  `failed to run command 'name': ...` on Windows 4.11. Each platform prints what its reference prints.
+- Known limit: on Unix an exit code from 129 to 192 counts as killed by a signal (125), since PowerShell reports a
+  signal as 128+N. A command that really does `exit 130` gets 125 where GNU gives 123.
+- One full Linux run failed the `-P` test: a child pwsh printed PowerShell's own "not properly handled" crash. It did
+  not come back in three runs of the xargs tests alone; the cause was not found. The test now starts `sh` / `cmd.exe`.
+- Verified at this commit: 2827 tests on 7.6 (100% coverage, analyzer clean), built module 2827, 5.1 2822, Linux 2821.
+- The comparison harness is still in the session scratchpad (`...\scratchpad\cmp2\`: compare.sh, run.ps1, <util>.txt,
+  <util>_seed.sh), not in the repository; moving it to tools/ is on TODO.md.
+
+## 2026-11-08 (evening) - find, release workflow, Disable-GnuAlias
+
+- Committed: `./build.ps1 -Package` + tools/install.ps1 (offline install, checked on 5.1, 7 and Linux) and
+  .github/workflows/release.yml (manual, no tests; needs a GitHub remote, the PSGALLERY_API_KEY secret and a
+  `v<ModuleVersion>` tag). `Disable-GnuUtil` renamed to `Disable-GnuAlias`.
+- Committed: find, with -printf/-fprintf. Compared with GNU findutils: 190 of 196 cases on Windows (4.11), 176 of 196 on
+  Linux (4.10). The rest: directory order (GNU uses file-system order, we sort; on Linux NUL output and batched
+  -exec lines cannot be sorted by the harness), `\;` accepted on purpose, no change time from .NET on Linux,
+  4.10 vs 4.11 wording, harness artifacts (access times reset by the copy, pwd path style, -ok prompt).
+- Found: .NET File.Exists is true for a dangling symlink on Linux. New Test-GnuPathExists (follows links like
+  stat()) is used by Get-GnuCanonicalPath, which fixes readlink -e / realpath on dangling links there.
+- Verified at the find commit: 2769 tests on 7.6 (100% coverage), built module the same, 2764 on 5.1, Linux 2764.
+
 ## 2026-11-08 (latest) - Lazy loading, sed, diff
 
 - Lazy loading (user decision): the built psm1 has the core, entry functions and an index; the rest of each util

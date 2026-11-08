@@ -94,18 +94,34 @@ function Resolve-GnuChildCommand {
     $command
 }
 
+function Get-GnuLaunchFailureReason {
+    <#
+    .SYNOPSIS
+    The short reason why a program could not be started, without PowerShell's and .NET's wording around it.
+    #>
+    param([Parameter(Mandatory)][System.Exception]$Exception, [AllowEmptyString()][string]$Path)
+
+    $reason = $Exception.GetBaseException().Message -replace "^An error occurred trying to start process '.*' with working directory '.*'\. ", ''
+    # .NET reports a file without the execute permission as missing.
+    if (-not (Test-GnuWindows) -and $reason -ceq 'No such file or directory' -and [System.IO.File]::Exists($Path)) { $reason = 'Permission denied' }
+    $reason
+}
+
 function Invoke-GnuChildCommand {
     <#
     .SYNOPSIS
     Runs a command (native program or PowerShell command), streaming its output; sets the context's exit code.
     .PARAMETER InputObject
     Lines passed to the command's input (the util's pipeline input).
+    .PARAMETER LaunchPrefix
+    When the command cannot be started, report "PREFIX: reason" instead of PowerShell's long message.
     #>
     param(
         [Parameter(Mandatory)][hashtable]$Context,
         [Parameter(Mandatory)][System.Management.Automation.CommandInfo]$Command,
         [AllowEmptyCollection()][string[]]$Arguments = @(),
-        [AllowNull()][object[]]$InputObject
+        [AllowNull()][object[]]$InputObject,
+        [string]$LaunchPrefix = ''
     )
 
     $global:LASTEXITCODE = 0
@@ -131,7 +147,12 @@ function Invoke-GnuChildCommand {
         }
     }
     catch {
-        Write-GnuError -Context $Context -Message $_.Exception.Message -ExitCode 126
+        $message = $_.Exception.Message
+        if ($LaunchPrefix.Length -gt 0) {
+            $message = "$($LaunchPrefix): $(Get-GnuLaunchFailureReason -Exception $_.Exception -Path $Command.Source)"
+        }
+        Write-GnuError -Context $Context -Message $message -ExitCode 126
+        $Context.LaunchFailed = $true
         return
     }
     # This module's utils set $LASTEXITCODE like a native program; other PowerShell commands only report errors.

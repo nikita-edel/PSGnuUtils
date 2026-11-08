@@ -25,6 +25,7 @@ All notable changes to this project are documented here. The format follows
 - Batch C: `env timeout kill id groups uptime install shred dircolors`, and `tail -f/-F/--pid/--retry/-s`.
 - Batch D: `od cmp join numfmt split csplit fmt stat dd df du`.
 - `sed`, `diff` and `find` (including `-printf`, `-exec ... {} +` and `-delete`).
+- `xargs`: GNU quoting and all grouping options, `-P` for programs; COMMAND can be a program, a PowerShell command or a util.
 - Unquoted comma lists such as `cut -f 1,3` work: PowerShell passes them as arrays, which are rejoined when GNU reads them as one option value.
 - `./build.ps1 -Test`: empty standard input during the tests and a watchdog (`-TestTimeoutMinutes`, default 30) so a hanging test cannot block the run.
 - Build script (Bootstrap, Manifest, Analyze, Test, Build, TestBuild, Install, Uninstall, Package, Publish, Clean).
