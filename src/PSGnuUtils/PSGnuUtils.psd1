@@ -41,6 +41,7 @@
         'Invoke-GnuHostname',
         'Invoke-GnuId',
         'Invoke-GnuInstall',
+        'Invoke-GnuJoin',
         'Invoke-GnuKill',
         'Invoke-GnuLink',
         'Invoke-GnuLn',

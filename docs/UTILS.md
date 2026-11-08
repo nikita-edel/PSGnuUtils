@@ -79,7 +79,7 @@ implemented util is listed here).
 | `uniq` | done | full | 2 | 2 | |
 | `cut` | done | full | 2 | 2 | `-c` counts characters (GNU treats `-c` like `-b`); `-b` counts UTF-8 bytes. |
 | `paste` | done | full | 2 | 2 | |
-| `join` | planned | full | 3 | 3 | |
+| `join` | done | full | 3 | 3 | GNU's merge algorithm incl. order checks, `-a -v -e -o auto -i -t -1 -2 -j --header -z`; ordinal comparison; identical to GNU on 30 cases. |
 | `comm` | done | full | 2 | 2 | Ordinal comparison (like `LC_ALL=C`), not locale collation. |
 | `tr` | done | full | 3 | 2 | Ranges, classes (C locale), `[c*n]`, `[=c=]`, escapes, `-c -d -s -t`; reads only the pipeline/console. |
 | `expand` | done | full | 2 | 2 | |
