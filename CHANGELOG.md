@@ -26,4 +26,6 @@ All notable changes to this project are documented here. The format follows
 - Batch D: `od cmp join numfmt split csplit fmt stat dd df du`.
 - Unquoted comma lists such as `cut -f 1,3` work: PowerShell passes them as arrays, which are rejoined when GNU reads them as one option value.
 - `./build.ps1 -Test`: empty standard input during the tests and a watchdog (`-TestTimeoutMinutes`, default 30) so a hanging test cannot block the run.
-- Build script (Bootstrap, Manifest, Analyze, Test, Build, TestBuild, Install, Uninstall, Publish, Clean).
+- Build script (Bootstrap, Manifest, Analyze, Test, Build, TestBuild, Install, Uninstall, Package, Publish, Clean).
+- Release package: a zip with the module and `install.ps1` for offline installation, and a manual GitHub workflow
+  that publishes the latest tag to the PowerShell Gallery and as a GitHub release.

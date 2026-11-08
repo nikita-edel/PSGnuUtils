@@ -19,6 +19,8 @@
                  (Documents\WindowsPowerShell\Modules) and PowerShell 7 (Documents\PowerShell\Modules);
                  on Linux/macOS ~/.local/share/powershell/Modules. -ModulePath overrides the target.
       Uninstall  Remove the installed copy of the current version again.
+      Package    Build, then write out/PSGnuUtils-<version>.zip: the module and an install.ps1 that installs it
+                 offline (unzip, then ./install.ps1). This is what a GitHub release ships.
       Publish    Build, then publish out/PSGnuUtils to the PowerShell Gallery.
       Clean      Remove out/.
 
@@ -51,7 +53,7 @@
 [CmdletBinding()]
 param(
     # Tasks by name (for scripts). The switches below do the same: ./build.ps1 -Install
-    [ValidateSet('Bootstrap', 'Manifest', 'Analyze', 'Test', 'Build', 'TestBuild', 'Install', 'Uninstall', 'Publish', 'Clean')]
+    [ValidateSet('Bootstrap', 'Manifest', 'Analyze', 'Test', 'Build', 'TestBuild', 'Install', 'Uninstall', 'Package', 'Publish', 'Clean')]
     [string[]]$Task,
 
     [switch]$Bootstrap,
@@ -63,6 +65,7 @@ param(
     [switch]$TestBuild,
     [switch]$Install,
     [switch]$Uninstall,
+    [switch]$Package,
     [switch]$Publish,
 
 
@@ -385,6 +388,27 @@ function Invoke-Uninstall {
     }
 }
 
+function Invoke-Package {
+    Invoke-Build
+    $version = Get-ModuleVersion
+    $staging = Join-Path $OutputRoot 'package'
+    if (Test-Path -LiteralPath $staging) { Remove-Item -LiteralPath $staging -Recurse -Force }
+    $moduleTarget = Join-Path (Join-Path $staging 'PSGnuUtils') $version
+    $null = New-Item -ItemType Directory -Force -Path $moduleTarget
+    Copy-Item -Path (Join-Path $OutputDir '*') -Destination $moduleTarget -Recurse -Force
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'tools/install.ps1') -Destination $staging
+    foreach ($extra in @('LICENSE', 'README.md', 'CHANGELOG.md')) { Copy-Item -LiteralPath (Join-Path $RepoRoot $extra) -Destination $staging }
+
+    $zip = Join-Path $OutputRoot "PSGnuUtils-$version.zip"
+    Write-Step "Package -> $zip"
+    if (Test-Path -LiteralPath $zip) { Remove-Item -LiteralPath $zip -Force }
+    # ZipFile writes '/' separators; Compress-Archive of Windows PowerShell 5.1 writes '\', which breaks on Linux.
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    [System.IO.Compression.ZipFile]::CreateFromDirectory($staging, $zip)
+    Remove-Item -LiteralPath $staging -Recurse -Force
+    Write-Host "Packaged $zip"
+}
+
 function Invoke-Publish {
     if (-not $NuGetApiKey) { throw 'Publish needs -NuGetApiKey or $env:PSGALLERY_API_KEY.' }
     Invoke-Build
@@ -395,7 +419,7 @@ function Invoke-Publish {
 # Switches run in a fixed, sensible order; without any task the default is Analyze + Test.
 $selected = New-Object 'System.Collections.Generic.List[string]'
 foreach ($name in @($Task)) { if ($name -and -not $selected.Contains($name)) { $selected.Add($name) } }
-foreach ($name in @('Bootstrap', 'Clean', 'Manifest', 'Analyze', 'Test', 'Build', 'TestBuild', 'Install', 'Uninstall', 'Publish')) {
+foreach ($name in @('Bootstrap', 'Clean', 'Manifest', 'Analyze', 'Test', 'Build', 'TestBuild', 'Install', 'Uninstall', 'Package', 'Publish')) {
     if ($PSBoundParameters.ContainsKey($name) -and $PSBoundParameters[$name] -and -not $selected.Contains($name)) { $selected.Add($name) }
 }
 if ($selected.Count -eq 0) { $selected.AddRange([string[]]@('Analyze', 'Test')) }
@@ -410,6 +434,7 @@ foreach ($name in $selected) {
         'TestBuild' { Invoke-Test -ModuleManifest (Join-Path $OutputDir 'PSGnuUtils.psd1') -TaskName 'TestBuild' }
         'Install' { Invoke-Install }
         'Uninstall' { Invoke-Uninstall }
+        'Package' { Invoke-Package }
         'Publish' { Invoke-Publish }
         'Clean' {
             Write-Step 'Clean'

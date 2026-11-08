@@ -1,0 +1,73 @@
+# Publishes the latest tag: the module to the PowerShell Gallery and the offline package (zip) to a GitHub release.
+# Started by hand only (Actions > Release > Run workflow). It runs no tests: run them locally before tagging.
+#
+# Needs the repository secret PSGALLERY_API_KEY. The tag must be v<ModuleVersion of the manifest>, e.g. v0.1.0.
+# The release text is what CHANGELOG.md gained since the previous tag (all of it for the first release).
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Find the latest tag and the one before it
+        id: tags
+        shell: bash
+        run: |
+          latest=$(git tag --list 'v*' --sort=-v:refname | sed -n 1p)
+          previous=$(git tag --list 'v*' --sort=-v:refname | sed -n 2p)
+          if [ -z "$latest" ]; then echo "No v* tag found." >&2; exit 1; fi
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          echo "previous=$previous" >> "$GITHUB_OUTPUT"
+          git checkout --quiet "$latest"
+
+      - name: Check that the tag matches the manifest version
+        shell: pwsh
+        run: |
+          $version = (Import-PowerShellDataFile -Path src/PSGnuUtils/PSGnuUtils.psd1).ModuleVersion
+          if ("v$version" -ne '${{ steps.tags.outputs.latest }}') { throw "Tag ${{ steps.tags.outputs.latest }} does not match ModuleVersion $version." }
+
+      - name: Write the release notes (changelog.txt)
+        shell: bash
+        run: |
+          if [ -n "${{ steps.tags.outputs.previous }}" ]; then
+            git diff --unified=0 "${{ steps.tags.outputs.previous }}" "${{ steps.tags.outputs.latest }}" -- CHANGELOG.md \
+              | grep '^+' | grep -v '^+++' | sed 's/^+//' > changelog.txt
+          else
+            cp CHANGELOG.md changelog.txt
+          fi
+          if [ ! -s changelog.txt ]; then echo "CHANGELOG.md did not change since the previous release." > changelog.txt; fi
+          cat changelog.txt
+
+      - name: Build the package
+        shell: pwsh
+        run: ./build.ps1 -Package
+
+      - name: Publish to the PowerShell Gallery
+        shell: pwsh
+        env:
+          PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
+        run: ./build.ps1 -Publish
+
+      - name: Publish the GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ steps.tags.outputs.latest }}"
+          zip=$(ls out/PSGnuUtils-*.zip)
+          if gh release view "$tag" > /dev/null 2>&1; then
+            gh release edit "$tag" --notes-file changelog.txt
+            gh release upload "$tag" "$zip" changelog.txt --clobber
+          else
+            gh release create "$tag" "$zip" changelog.txt --title "PSGnuUtils $tag" --notes-file changelog.txt
+          fi

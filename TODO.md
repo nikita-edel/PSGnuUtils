@@ -13,11 +13,8 @@ Concrete next steps, most important first. Keep this list short and current; his
 
 ## Next
 
-- [ ] After all utils are done (100% coverage): `./build.ps1 -Package` -> zip with the module and an
-      `install.ps1` that installs it offline (user request 2026-11-09).
-- [ ] Then ONE manual GitHub workflow (workflow_dispatch, no tests): publish to PSGallery (repo secret with the
-      API key), package the zip and upload it to the release of the latest tag; the release text is the diff of
-      CHANGELOG.md against the latest release (the user writes the changelog).
+- [x] `./build.ps1 -Package` and `.github/workflows/release.yml` (manual, no tests). Before the first run: push to
+      GitHub, set ProjectUri in the manifest, add the repository secret PSGALLERY_API_KEY, tag `v<ModuleVersion>`.
 
 - [ ] Daily-use utils still missing: `find xargs` (then the rest of batch 2/3).
 - [ ] `diff --color[=WHEN]` and `--palette`.
