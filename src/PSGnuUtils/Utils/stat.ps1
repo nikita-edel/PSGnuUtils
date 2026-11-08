@@ -221,6 +221,7 @@ function Format-GnuStatText {
     .SYNOPSIS
     Expands %-sequences (with printf flags, width and precision) from a value table; unknown ones print '?'.
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Values', Justification = 'Used inside the MatchEvaluator script block.')]
     param([Parameter(Mandatory)][AllowEmptyString()][string]$Format, [Parameter(Mandatory)][System.Collections.Generic.Dictionary[string, string]]$Values)
 
     $numeric = 'abBdDfghioOstTuXYZW'
