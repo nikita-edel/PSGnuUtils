@@ -115,7 +115,7 @@
         PSData = @{
             Tags         = @('GNU', 'coreutils', 'Unix', 'Linux', 'shell', 'cat', 'head', 'tail', 'wc', 'seq', 'sha256sum', 'base64', 'CrossPlatform', 'Windows', 'MacOS', 'PSEdition_Desktop', 'PSEdition_Core')
             LicenseUri   = 'https://www.gnu.org/licenses/gpl-3.0.html'
-            # ProjectUri is set once the repository is public.
+            ProjectUri = 'https://github.com/nikita-edel/PSGnuUtils'
             ReleaseNotes = 'See CHANGELOG.txt'
         }
     }
