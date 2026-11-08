@@ -16,7 +16,9 @@ Concrete next steps, most important first. Keep this list short and current; his
 - [x] `./build.ps1 -Package` and `.github/workflows/release.yml` (manual, no tests). Before the first run: push to
       GitHub, set ProjectUri in the manifest, add the repository secret PSGALLERY_API_KEY, tag `v<ModuleVersion>`.
 
-- [ ] Daily-use utils still missing: `find xargs` (then the rest of batch 2/3).
+- [ ] Daily-use utils still missing: `xargs` (then the rest of batch 2/3).
+- [ ] `find -ls -fls -perm -user -group -uid -gid -nouser -nogroup -links -inum -samefile -newerXY -readable
+      -writable -executable -files0-from`.
 - [ ] `diff --color[=WHEN]` and `--palette`.
 - [ ] Audit every util against GNU: make sure all its flags are implemented, and verify that each flag really exists in GNU.
 

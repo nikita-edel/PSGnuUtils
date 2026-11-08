@@ -25,7 +25,7 @@ function Get-GnuCanonicalPath {
     $index = 0
     while ($index -lt $parts.Count) {
         $candidate = [System.IO.Path]::Combine($existing, $parts[$index])
-        if (-not ([System.IO.File]::Exists($candidate) -or [System.IO.Directory]::Exists($candidate))) { break }
+        if (-not (Test-GnuPathExists -Path $candidate)) { break }
         $existing = $candidate
         $index++
     }

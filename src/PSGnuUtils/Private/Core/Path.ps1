@@ -165,3 +165,22 @@ function Remove-GnuTrailingSeparator {
     if ([string]::IsNullOrEmpty($trimmed) -and $Path.Length -gt 0) { return [string]$Path[0] }
     $trimmed
 }
+
+function Test-GnuPathExists {
+    <#
+    .SYNOPSIS
+    $true if a path exists the way stat() sees it: links are followed, so a dangling link does not exist.
+    .NOTES
+    File.Exists is true for a dangling link on Unix, and Directory.Exists for one on no system.
+    #>
+    param([Parameter(Mandatory)][AllowEmptyString()][string]$Path, [int]$Hops = 0)
+
+    if ([string]::IsNullOrEmpty($Path)) { return $false }
+    if ([System.IO.Directory]::Exists($Path)) { return $true }
+    if (-not [System.IO.File]::Exists($Path)) { return $false }
+    $target = Get-GnuLinkTarget -Path $Path
+    if ($null -eq $target) { return $true }
+    if ($Hops -ge 40) { return $false }
+    if (-not [System.IO.Path]::IsPathRooted($target)) { $target = [System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($Path), $target) }
+    Test-GnuPathExists -Path $target -Hops ($Hops + 1)
+}

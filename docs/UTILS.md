@@ -167,7 +167,7 @@ implemented util is listed here).
 |---|---|---|---|---|---|
 | `grep` | done | full | 4 | 4 | BRE/ERE translated to .NET regex (POSIX classes, `\<` `\>`, backreferences); `-P` is .NET syntax; pipeline objects are matched as displayed; piped input is searched as it arrives. |
 | `sed` | done | subset | 4 | 4 | All addresses and commands including hold space and branching; `-n -e -f -E -r -i -s -z -l -b --sandbox`; `.NET` regular expressions; input is read before the script starts; no `e` command. |
-| `find` | planned | subset | 4 | 4 | Expression parser (`! -o -a ( )`), `-name -iname -path -type -size -mtime -mmin -newer -maxdepth -mindepth -empty -print -print0 -exec -delete`; no `-printf -perm -user -group -newerXY`. |
+| `find` | done | subset | 4 | 4 | Operators, `-name -path -regex -type -size -empty -[amc]time -[amc]min -newer`, `-print -print0 -printf -fprint -exec -execdir -ok -delete -prune -quit`, `-L -H -maxdepth -mindepth -depth -xdev -daystart -regextype`; names in ordinal order; `-ctime` from creation/modification time; no `-ls -perm -user -group -links -inum -newerXY`. |
 | `xargs` | planned | full | 4 | 4 | Windows command-line quoting rules make it tricky but it is essential for pipelines. |
 | `diff` | done | subset | 4 | 4 | Port of GNU's algorithm, so hunks match; normal, unified, context and ed output; `-r -N -q -s -i -w -b -Z -E -B -a -x -X -L -p -F -t -T`; no `-y`, `-I`, `-S`, `--from-file`. |
 | `cmp` | done | full | 2 | 3 | `-b -i -l -n -s`, SKIP operands; messages and exit codes of GNU diffutils 3.12. |

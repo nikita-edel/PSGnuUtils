@@ -179,3 +179,18 @@ function New-GnuProcessStartInfo {
     else { $info.Arguments = ConvertTo-GnuCommandLine -Arguments $Arguments }
     $info
 }
+
+function Resolve-GnuExecCommand {
+    <#
+    .SYNOPSIS
+    The command find -exec and xargs run for a name, or $null.
+    .DESCRIPTION
+    A util of this module answers to its GNU name, as in a shell where GNU tools are installed, even where
+    PowerShell has an alias of that name (echo -> Write-Output). Anything else resolves like in PowerShell.
+    #>
+    param([Parameter(Mandatory)][string]$Name)
+    if ($Name -notmatch '[\/]' -and @(Get-GnuUtilNameList) -ccontains $Name) {
+        return Get-Command -Name (Get-GnuFunctionName -Name $Name) -CommandType Function
+    }
+    Get-Command -Name $Name -ErrorAction SilentlyContinue | Select-Object -First 1
+}

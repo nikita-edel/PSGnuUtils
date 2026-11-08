@@ -124,3 +124,22 @@ Describe 'Platform-specific code paths' {
         finally { $stream.Dispose() }
     }
 }
+
+Describe 'Test-GnuPathExists' {
+    It 'follows links like stat()' {
+        $file = New-TestFile -Path (Join-Path $TestDrive 'exists-target.txt') -Content 'x'
+        InModuleScope PSGnuUtils -Parameters @{ F = $file } {
+            param($F)
+            Test-GnuPathExists -Path '' | Should -BeFalse
+            Test-GnuPathExists -Path (Split-Path -Parent $F) | Should -BeTrue
+            Test-GnuPathExists -Path ($F + '.missing') | Should -BeFalse
+            Test-GnuPathExists -Path $F | Should -BeTrue
+            Mock Get-GnuLinkTarget { 'nowhere.txt' } -ParameterFilter { $Path -eq $F }
+            Test-GnuPathExists -Path $F | Should -BeFalse -Because 'a dangling link does not exist'
+            Mock Get-GnuLinkTarget { 'exists-target.txt' } -ParameterFilter { $Path -eq $F }
+            Test-GnuPathExists -Path $F | Should -BeFalse -Because 'a link to itself is a loop'
+            Mock Get-GnuLinkTarget { (Split-Path -Parent $F) } -ParameterFilter { $Path -eq $F }
+            Test-GnuPathExists -Path $F | Should -BeTrue
+        }
+    }
+}
