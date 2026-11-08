@@ -3,6 +3,25 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-08 (end of Batch D) - dd df du, unquoted comma lists
+
+- New: dd, df, du. Shared in Private/Lib/Size.ps1: Format-GnuHumanSize, ConvertFrom-GnuBlockSize (GNU's SIZE rules
+  and df header labels), Get-GnuSizeScale, Format-GnuScaledSize, Write-GnuSizeArgumentError.
+- Parser: arrays are rejoined when GNU reads them as one option value (`cut -f 1,3`); Context.Spellings records how
+  an option was written, for messages like `invalid -B argument`. -h --si -k -m -B (du also -b) share the key
+  'scale' so the last one wins.
+- Compared with GNU coreutils 8.32 (145 cases, 5.1 and 7.6): 142 identical. The other 3: two du runs where GNU sees
+  real NTFS allocation and we estimate 4 KiB clusters (documented), and one harness artifact (no newline after -0).
+  The comparison found: conv=swab across odd blocks, overflow exceptions on huge numbers, unit suffixes for -BM,
+  -P header sizes, option order for size options, the mutual-exclusion errors of df --output, and several messages.
+- Results: 2353 tests on 7.6 (100% coverage, analyzer clean), 2348 on 5.1. Windows PowerShell started from a
+  PowerShell 7 shell inherits its PSModulePath and loses core cmdlets; use `env -u PSModulePath powershell`.
+- Unverified: Linux/macOS. df with the real /proc/mounts has only mocked coverage.
+- TestBuild: 2266 pass, 87 fail, all from two tests that assume the source layout (see TODO.md); neither involves
+  this batch's code. Not fixed here.
+- Also suppressed a false-positive analyzer warning in stat.ps1 (a parameter used only in a MatchEvaluator).
+- Next: find sed xargs diff (TODO.md).
+
 ## 2026-11-09 (later) - Batch C: env timeout kill id groups uptime install shred dircolors, tail -f
 
 - Skipped after review with the user: nice, nohup, sync (reasons in UTILS.md). kill stays (user request).

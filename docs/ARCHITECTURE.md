@@ -74,7 +74,8 @@ So util functions have **no `param()` block and no `[CmdletBinding()]`**. They p
 Facts about `$args` (verified on 5.1 and 7.6, see DEVLOG 2026-11-07):
 
 * `-5` arrives as `[int]`, `1.5` as `[double]`, `a,b` as an array: `ConvertTo-GnuArgumentList` flattens and converts
-  with invariant culture.
+  with invariant culture. An array is joined back into `a,b` only when GNU reads it as one option value: after an
+  option that needs a value (`cut -f 1,3`), or when its first element is itself an option (`--output=a,b`).
 * A literal `--` and quoted `'--'` both reach the function.
 * `-n:5` arrives as two arguments, `'-n:'` and `5` (PowerShell syntax); this is not supported.
 
@@ -202,6 +203,10 @@ Ideas for later: a tiny C# cmdlet compiled with `Add-Type` that head pipes into 
   (the rest are zeros); 'G17' and 'R' still give 17. od takes its digits from 'G<p>' for that reason.
 * In comment-based help, a line that starts with a dot and a word (`.NET has ...`) is read as a help keyword and
   silently breaks the whole help block (no synopsis, no examples). Never start a help line with `.`.
+* `Remove-Item -LiteralPath <directory link> -Force` throws a NullReferenceException on Windows PowerShell 5.1;
+  use `[System.IO.Directory]::Delete($link)`, which removes only the link.
+* Options that override each other (df/du `-h --si -k -m -B`, du `-b`) share one Key so the last one wins, as in
+  GNU; `$Context.Spellings[Key]` keeps how it was written, for messages like `invalid -B argument`.
 * Code that could run for hours must be avoided in tests: run new tests with `timeout`, and keep endless modes
   (`yes`, `shuf -r`) reachable only through the pipeline, where `Select-Object -First` can stop them.
 

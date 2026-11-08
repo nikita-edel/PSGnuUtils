@@ -8,6 +8,9 @@ Concrete next steps, most important first. Keep this list short and current; his
 - [x] Coverage: 100% on Windows / PowerShell 7 (build fails below 98% with -CodeCoverage).
 - [ ] Run the suite once on Linux/macOS (no CI): symlinks, `/` vs `\`, Unix modes.
 - [ ] Run the symlink tests once with developer mode enabled (they are skipped otherwise on Windows).
+- [ ] `./build.ps1 -TestBuild` fails 87 tests: Module.Tests "is defined by its own Utils file" (86 utils; the build
+      merges them into PSGnuUtils.psm1) and Injected.Tests "falls back to the manifest" (default path assumes the
+      source tree). Make both aware of the built module before releasing.
 
 ## Next
 
@@ -20,7 +23,8 @@ Concrete next steps, most important first. Keep this list short and current; his
 - [ ] Daily-use utils still missing: `find sed xargs diff` (then the rest of batch 2/3).
 
 - [ ] Release 0.1.0: set ProjectUri in the manifest, `./build.ps1 -Publish -NuGetApiKey <key>`, tag `v0.1.0`.
-- [ ] Batch D: `cmp od split csplit fmt join numfmt stat df du dd`.
+- [x] Batch D: `cmp od split csplit fmt join numfmt stat df du dd`.
+- [ ] `dd` holds the whole input in memory (2 GB limit): stream files instead if large copies matter.
 
 ## Ideas
 

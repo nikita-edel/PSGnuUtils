@@ -25,7 +25,7 @@ implemented util is listed here).
 | `touch` | done | full | 2 | 2 | `-d` supports @SECONDS, now/today/yesterday/tomorrow, ISO dates and relative items ("2 days ago"), not all of GNU's grammar. |
 | `install` | done | subset | 2 | 2 | `-c -C -d -D -m -p -t -T -v -o -g`; octal modes; modes and `-o/-g` only on Unix; no backups or `-s`. |
 | `shred` | done | full | 2 | 2 | Random passes (no fixed patterns), `-n -s -u --remove -x -z -f -v --random-source`; not effective on SSDs / copy-on-write file systems. |
-| `dd` | planned | subset | 3 | 3 | File copies with `bs count skip seek conv=notrunc`; no raw disk access (`\\.\PhysicalDrive`): needs admin and one bug wipes a disk. |
+| `dd` | done | subset | 3 | 3 | Regular files, the pipeline and the console; `bs ibs obs count skip seek conv iflag oflag status`; no `ascii ebcdic block unblock sparse` or direct I/O; statistics on the information stream (6); the whole input is held in memory (below 2 GB). No raw disk access (`\\.\PhysicalDrive`): needs admin and one bug wipes a disk. |
 | `sync` | skip | - | - | - | Without FILE it must flush whole volumes, which needs administrator rights on Windows; flushing single files is rarely useful. |
 | `truncate` | done | full | 1 | 1 | An IO block (`-o`) is 4096 bytes. |
 | `mktemp` | done | full | 1 | 1 | |
@@ -47,8 +47,8 @@ implemented util is listed here).
 | Util | Status | Scope | Difficulty | Batch | Notes |
 |---|---|---|---|---|---|
 | `stat` | done | subset | 3 | 3 | Default, `-c`, `--printf`, `-t`, `-f`, `-L`; all format sequences; .NET has no inode/device/link counts or ctime (0, 0, 1, mtime); Windows modes from attributes, ids like Cygwin. |
-| `df` | planned | subset | 2 | 3 | `-h -H -T -t -x --output`. |
-| `du` | planned | subset | 2 | 3 | `-s -h -a -c -d --max-depth -x --apparent-size`. |
+| `df` | done | subset | 2 | 3 | All options except the ignored `-v`; file systems from .NET `DriveInfo`; inode columns show `-`; `DF_BLOCK_SIZE` and friends are ignored; `--sync` has no effect; no `'` grouping prefix in SIZE. |
+| `du` | done | subset | 2 | 3 | All options except `-D`, `-H`, `-l`, `--files0-from`, `--inodes`, `--time`; disk usage is estimated with 4 KiB clusters (directories 0 on Windows); hard links counted every time; entries in name order; `DU_BLOCK_SIZE` and friends are ignored. |
 | `readlink` | done | full | 2 | 2 | Junctions count as links; a dangling link is canonicalized as a missing file. |
 | `realpath` | done | full | 2 | 2 | `..` is always resolved before links, so `-L` = `-P`. |
 
