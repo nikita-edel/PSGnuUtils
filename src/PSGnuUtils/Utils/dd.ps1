@@ -51,7 +51,7 @@ Register-GnuUtil @{
         'information stream (6). Output to the pipeline is decoded as UTF-8 text lines; use',
         'of=FILE for binary data. ascii, ebcdic, block, unblock, sparse and direct I/O flags are',
         'not supported. oflag=seek_bytes keeps the first SEEK bytes (GNU 8.32 truncates them).',
-        'The whole input is held in memory, so files of 2 GB or more cannot be read.'
+        'Files are streamed; only pipeline input and output are held in memory.'
     )
 }
 
@@ -116,9 +116,10 @@ function Write-GnuDdStatus {
     $text = "$bytes bytes"
     if ($bytes -eq 1) { $text = '1 byte' }
     if ($bytes -ge 1000) {
-        $si = (Format-GnuHumanSize -Bytes $bytes -Base 1000) -replace '([kMGTPEZY])$', ' $1B'
-        $iec = (Format-GnuHumanSize -Bytes $bytes -Base 1024) -replace '([KMGTPEZY])$', ' $1iB'
-        $text += " ($si, $iec)"
+        $si = (Format-GnuHumanSize -Bytes $bytes -Base 1000 -Nearest) -replace '([kMGTPEZY])$', ' $1B'
+        $iec = (Format-GnuHumanSize -Bytes $bytes -Base 1024 -Nearest) -replace '([KMGTPEZY])$', ' $1iB'
+        # GNU leaves out the IEC form while it has no unit (1000 to 1023 bytes).
+        if ($iec -match '\d$') { $text += " ($si)" } else { $text += " ($si, $iec)" }
     }
     # GNU prints the rate with three significant digits: 125 kB/s, 27.0 MB/s, 3.89 GB/s.
     $rate = 'Infinity B'
@@ -131,6 +132,152 @@ function Write-GnuDdStatus {
         $rate = $value.ToString($digits, $invariant) + ' ' + ('', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')[$unit] + 'B'
     }
     Write-Information -MessageData "$text copied, $($Seconds.ToString('0.######', $invariant)) s, $rate/s" -InformationAction Continue
+}
+
+function Read-GnuDdBlock {
+    <#
+    .SYNOPSIS
+    One block of up to Size bytes; shorter only at the end of the stream.
+    #>
+    param([Parameter(Mandatory)][System.IO.Stream]$Stream, [Parameter(Mandatory)][long]$Size)
+    $block = New-Object byte[] $Size
+    $got = 0
+    do {
+        $count = $Stream.Read($block, $got, $Size - $got)
+        $got += $count
+    } while ($count -gt 0 -and $got -lt $Size)
+    if ($got -lt $Size) { [array]::Resize([ref]$block, $got) }
+    , $block
+}
+
+function Write-GnuDdBlock {
+    <#
+    .SYNOPSIS
+    Writes one block (a separate function so tests can make writing fail).
+    #>
+    param([Parameter(Mandatory)][System.IO.Stream]$Stream, [byte[]]$Bytes)
+    $Stream.Write($Bytes, 0, $Bytes.Length)
+}
+
+function Convert-GnuDdSwab {
+    <#
+    .SYNOPSIS
+    Swaps byte pairs. Pairs span blocks: like GNU, the last byte of an odd block waits in Carry for the next one.
+    #>
+    param([byte[]]$Block, [Parameter(Mandatory)][AllowEmptyCollection()][System.Collections.Generic.List[byte]]$Carry)
+    $Carry.AddRange($Block)
+    $all = $Carry.ToArray()
+    $Carry.Clear()
+    $even = $all.Length - ($all.Length % 2)
+    for ($k = 0; $k -lt $even; $k += 2) { $swap = $all[$k]; $all[$k] = $all[$k + 1]; $all[$k + 1] = $swap }
+    if ($even -lt $all.Length) {
+        $Carry.Add($all[$even])
+        [array]::Resize([ref]$all, $even)
+    }
+    , $all
+}
+
+function Open-GnuDdOutput {
+    <#
+    .SYNOPSIS
+    Opens of=FILE, positioned and sized like GNU (seek extends or truncates unless notrunc), or reports the error.
+    #>
+    param([Parameter(Mandatory)][hashtable]$Context, [Parameter(Mandatory)][hashtable]$Settings)
+    $name = $Settings.of
+    if ([string]::IsNullOrEmpty($name)) { Write-GnuError -Context $Context -Message "failed to open '': No such file or directory"; return }
+    $path = Resolve-GnuPath -Path $name
+    if ([System.IO.Directory]::Exists($path)) { Write-GnuError -Context $Context -Message "failed to open '$name': Is a directory"; return }
+    $exists = [System.IO.File]::Exists($path)
+    if ($Settings.conv -contains 'excl' -and $exists) { Write-GnuError -Context $Context -Message "failed to open '$name': File exists"; return }
+    if ($Settings.conv -contains 'nocreat' -and -not $exists) { Write-GnuError -Context $Context -Message "failed to open '$name': No such file or directory"; return }
+    $seek = $Settings.seek * $Settings.obs
+    if ($Settings.oflag -contains 'seek_bytes') { $seek = $Settings.seek }
+    $stream = $null
+    try {
+        $stream = New-Object System.IO.FileStream -ArgumentList $path, 'OpenOrCreate', 'Write', 'Read'
+        if ($Settings.oflag -contains 'append') { $seek = $stream.Length }
+        elseif ($Settings.conv -notcontains 'notrunc') { $stream.SetLength($seek) }
+        $stream.Position = $seek
+        $stream
+    }
+    catch {
+        if ($null -ne $stream) { $stream.Dispose() }
+        Write-GnuError -Context $Context -Message "failed to open '$name': $(Get-GnuErrorReason -Exception $_.Exception)"
+    }
+}
+
+function Copy-GnuDdData {
+    <#
+    .SYNOPSIS
+    Reads, converts and writes the blocks, filling Stats. A read or write error ends the copy, as in GNU.
+    #>
+    param(
+        [Parameter(Mandatory)][hashtable]$Context, [Parameter(Mandatory)][hashtable]$Settings,
+        [Parameter(Mandatory)][System.IO.Stream]$Source, [Parameter(Mandatory)][System.IO.Stream]$Target,
+        [Parameter(Mandatory)][hashtable]$Stats, [Parameter(Mandatory)][string]$InputName, [Parameter(Mandatory)][string]$OutputName
+    )
+
+    $ibs = [long]$Settings.ibs
+    $countBytes = $Settings.iflag -contains 'count_bytes'
+    $offset = $Settings.skip * $ibs
+    if ($Settings.iflag -contains 'skip_bytes') { $offset = $Settings.skip }
+    if ($offset -gt $Source.Length) {
+        Write-GnuWarning -Context $Context -Message "$($InputName): cannot skip to specified offset"
+        $offset = $Source.Length
+    }
+    $Source.Position = $offset
+    $limit = [long]::MaxValue
+    if ($Settings.count -ge 0) {
+        if ($countBytes) { $limit = $Settings.count } else { $limit = $Settings.count * $ibs }
+    }
+    $swab = $Settings.conv -contains 'swab'
+    $ucase = $Settings.conv -contains 'ucase'
+    $lcase = $Settings.conv -contains 'lcase'
+    $carry = New-Object 'System.Collections.Generic.List[byte]'
+    $consumed = [long]0
+    $action = "error reading '$InputName'"
+    try {
+        while ($Source.Position -lt $Source.Length -and $consumed -lt $limit -and ($Settings.count -lt 0 -or $countBytes -or $Stats.FullIn + $Stats.PartialIn -lt $Settings.count)) {
+            $take = [Math]::Min($ibs, [long]($Source.Length - $Source.Position))
+            if ($countBytes) { $take = [Math]::Min($take, $limit - $consumed) }
+            $action = "error reading '$InputName'"
+            $block = Read-GnuDdBlock -Stream $Source -Size $take
+            $size = $block.Length
+            $consumed += $size
+            if ($size -eq $ibs) { $Stats.FullIn++ } else { $Stats.PartialIn++ }
+            if ($Settings.conv -contains 'sync' -and $size -lt $ibs) {
+                $padded = New-Object byte[] $ibs
+                [array]::Copy($block, $padded, $size)
+                $block = $padded
+            }
+            if ($ucase -or $lcase) {
+                for ($k = 0; $k -lt $block.Length; $k++) {
+                    $b = $block[$k]
+                    if ($ucase -and $b -ge 97 -and $b -le 122) { $block[$k] = $b - 32 }
+                    if ($lcase -and $b -ge 65 -and $b -le 90) { $block[$k] = $b + 32 }
+                }
+            }
+            if ($Settings.bsGiven) {
+                if ($block.Length -eq $Settings.obs) { $Stats.FullOut++ } else { $Stats.PartialOut++ }
+            }
+            if ($swab) { $block = Convert-GnuDdSwab -Block $block -Carry $carry }
+            $action = "error writing '$OutputName'"
+            Write-GnuDdBlock -Stream $Target -Bytes $block
+            $Stats.Bytes += $block.Length
+        }
+        $action = "error writing '$OutputName'"
+        if ($carry.Count -gt 0) {
+            Write-GnuDdBlock -Stream $Target -Bytes $carry.ToArray()
+            $Stats.Bytes += $carry.Count
+        }
+        $Target.Flush()
+        if ($Target -is [System.IO.FileStream] -and ($Settings.conv -contains 'fsync' -or $Settings.conv -contains 'fdatasync')) { $Target.Flush($true) }
+    }
+    catch { Write-GnuError -Context $Context -Message "$($action): $(Get-GnuErrorReason -Exception $_.Exception)" }
+    if (-not $Settings.bsGiven) {
+        $Stats.FullOut = [long][Math]::Floor($Stats.Bytes / $Settings.obs)
+        if ($Stats.Bytes % $Settings.obs -ne 0) { $Stats.PartialOut = 1 }
+    }
 }
 
 function Invoke-GnuDdCopy {
@@ -178,97 +325,35 @@ function Invoke-GnuDdCopy {
     if ($settings.conv -contains 'lcase' -and $settings.conv -contains 'ucase') { Write-GnuError -Context $Context -Message 'cannot combine lcase and ucase'; return }
     if ($settings.conv -contains 'excl' -and $settings.conv -contains 'nocreat') { Write-GnuError -Context $Context -Message 'cannot combine excl and nocreat'; return }
 
+    $settings.bsGiven = $bsGiven
     $clock = [System.Diagnostics.Stopwatch]::StartNew()
     $inputName = '-'
     if ($null -ne $settings.if) { $inputName = $settings.if }
     if (-not [string]::IsNullOrEmpty($settings.if) -and [System.IO.Directory]::Exists((Resolve-GnuPath -Path $settings.if))) {
         # GNU opens a directory, fails on the first read, and still creates the output and reports 0+0 records.
         Write-GnuError -Context $Context -Message "error reading '$($settings.if)': Is a directory"
-        $data = New-Object byte[] 0
+        $source = New-Object System.IO.MemoryStream
     }
     else {
-        $data = Get-GnuInputBytes -Context $Context -Operand $inputName
-        if ($null -eq $data) { return }
+        # Other writers are allowed so that if=X of=X behaves like GNU instead of failing with a sharing violation.
+        $source = Open-GnuInputStream -Context $Context -Operand $inputName -AllowWriters
+        if ($null -eq $source) { return }
     }
-    [byte[]]$data = $data
-
-    $offset = $settings.skip * $settings.ibs
-    if ($settings.iflag -contains 'skip_bytes') { $offset = $settings.skip }
-    if ($offset -gt $data.Length) {
-        Write-GnuWarning -Context $Context -Message "$($inputName): cannot skip to specified offset"
-        $offset = $data.Length
-    }
-    $limit = [long]::MaxValue
-    if ($settings.count -ge 0) {
-        if ($settings.iflag -contains 'count_bytes') { $limit = $settings.count } else { $limit = $settings.count * $settings.ibs }
-    }
-    $stats = @{ FullIn = 0; PartialIn = 0; FullOut = 0; PartialOut = 0; Bytes = [long]0 }
-    $copied = New-Object 'System.Collections.Generic.List[byte]'
-    $position = $offset
-    $consumed = [long]0
-    while ($position -lt $data.Length -and $consumed -lt $limit -and ($settings.count -lt 0 -or ($settings.iflag -contains 'count_bytes') -or $stats.FullIn + $stats.PartialIn -lt $settings.count)) {
-        $take = [Math]::Min([long]$settings.ibs, [long]($data.Length - $position))
-        if ($settings.iflag -contains 'count_bytes') { $take = [Math]::Min($take, $limit - $consumed) }
-        $block = New-Object byte[] $take
-        [array]::Copy($data, $position, $block, 0, $take)
-        $position += $take
-        $consumed += $take
-        if ($take -eq $settings.ibs) { $stats.FullIn++ } else { $stats.PartialIn++ }
-        if ($settings.conv -contains 'sync' -and $take -lt $settings.ibs) {
-            $padded = New-Object byte[] $settings.ibs
-            [array]::Copy($block, $padded, $take)
-            $block = $padded
+    $stats = @{ FullIn = [long]0; PartialIn = [long]0; FullOut = [long]0; PartialOut = [long]0; Bytes = [long]0 }
+    try {
+        if ($null -eq $settings.of) { $target = New-Object System.IO.MemoryStream }
+        else {
+            $target = Open-GnuDdOutput -Context $Context -Settings $settings
+            if ($null -eq $target) { return }
         }
-        if ($settings.conv -contains 'ucase' -or $settings.conv -contains 'lcase') {
-            for ($k = 0; $k -lt $block.Length; $k++) {
-                $b = $block[$k]
-                if ($settings.conv -contains 'ucase' -and $b -ge 97 -and $b -le 122) { $block[$k] = $b - 32 }
-                if ($settings.conv -contains 'lcase' -and $b -ge 65 -and $b -le 90) { $block[$k] = $b + 32 }
-            }
-        }
-        if ($bsGiven) {
-            if ($block.Length -eq $settings.obs) { $stats.FullOut++ } else { $stats.PartialOut++ }
-        }
-        $copied.AddRange($block)
-    }
-    $bytes = $copied.ToArray()
-    # Pairs span block boundaries: GNU holds the last byte of an odd block for the next one.
-    if ($settings.conv -contains 'swab') {
-        for ($k = 0; $k + 1 -lt $bytes.Length; $k += 2) { $swap = $bytes[$k]; $bytes[$k] = $bytes[$k + 1]; $bytes[$k + 1] = $swap }
-    }
-    $stats.Bytes = $bytes.Length
-    if (-not $bsGiven) {
-        $stats.FullOut = [long][Math]::Floor($bytes.Length / $settings.obs)
-        if ($bytes.Length % $settings.obs -ne 0) { $stats.PartialOut = 1 }
-    }
-
-    if ($null -eq $settings.of) {
-        if ($bytes.Length -gt 0) { ConvertTo-GnuOutputLine -Text $script:GnuUtf8.GetString($bytes) }
-    }
-    else {
-        if ([string]::IsNullOrEmpty($settings.of)) { Write-GnuError -Context $Context -Message "failed to open '': No such file or directory"; return }
-        $path = Resolve-GnuPath -Path $settings.of
-        if ([System.IO.Directory]::Exists($path)) { Write-GnuError -Context $Context -Message "failed to open '$($settings.of)': Is a directory"; return }
-        $exists = [System.IO.File]::Exists($path)
-        if ($settings.conv -contains 'excl' -and $exists) { Write-GnuError -Context $Context -Message "failed to open '$($settings.of)': File exists"; return }
-        if ($settings.conv -contains 'nocreat' -and -not $exists) { Write-GnuError -Context $Context -Message "failed to open '$($settings.of)': No such file or directory"; return }
-        $seek = $settings.seek * $settings.obs
-        if ($settings.oflag -contains 'seek_bytes') { $seek = $settings.seek }
         try {
-            $stream = New-Object System.IO.FileStream -ArgumentList $path, 'OpenOrCreate', 'Write', 'Read'
-            try {
-                if ($settings.oflag -contains 'append') { $seek = $stream.Length }
-                elseif ($settings.conv -notcontains 'notrunc') { $stream.SetLength([Math]::Min($stream.Length, $seek)) }
-                $stream.Position = $seek
-                $stream.Write($bytes, 0, $bytes.Length)
-                if ($settings.conv -contains 'fsync' -or $settings.conv -contains 'fdatasync') { $stream.Flush($true) }
-            }
-            finally { $stream.Dispose() }
+            $outputName = 'standard output'
+            if ($null -ne $settings.of) { $outputName = $settings.of }
+            Copy-GnuDdData -Context $Context -Settings $settings -Source $source -Target $target -Stats $stats -InputName $inputName -OutputName $outputName
+            if ($null -eq $settings.of -and $target.Length -gt 0) { ConvertTo-GnuOutputLine -Text $script:GnuUtf8.GetString($target.ToArray()) }
         }
-        catch {
-            Write-GnuError -Context $Context -Message "failed to open '$($settings.of)': $(Get-GnuErrorReason -Exception $_.Exception)"
-            return
-        }
+        finally { $target.Dispose() }
     }
+    finally { $source.Dispose() }
     Write-GnuDdStatus -Stats $stats -Level $settings.status -Seconds $clock.Elapsed.TotalSeconds
 }

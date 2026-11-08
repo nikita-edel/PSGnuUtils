@@ -52,7 +52,7 @@ Describe 'dd' {
         (Get-Item -LiteralPath (Join-Path $dir 'o')).Length | Should -Be 28
         $r = Invoke-TestDd -Arguments 'if=in', 'of=o', 'bs=1K' -Directory $dir
         $r.Info[0..1] | Should -Be @('3+1 records in', '3+1 records out')
-        $r.Info[2] | Should -Match '^3893 bytes \(3\.9 kB, 3\.9 KiB\) copied'
+        $r.Info[2] | Should -Match '^3893 bytes \(3\.9 kB, 3\.8 KiB\) copied'
     }
 
     It 'converts with conv=ucase, lcase, swab and sync' {
@@ -68,6 +68,72 @@ Describe 'dd' {
     It 'swaps pairs across odd blocks with conv=swab' {
         $null = Invoke-TestDd -Arguments 'if=txt', 'of=o', 'bs=3', 'conv=swab', 'status=none' -Directory $dir
         Get-TestBytes (Join-Path $dir 'o') | Should -Be "eHll ooWlr dba`nc"
+    }
+
+    It 'keeps the last byte of an odd input unswapped with conv=swab' {
+        $null = New-TestFile -Path (Join-Path $dir 'tri') -Content 'abc'
+        $null = Invoke-TestDd -Arguments 'if=tri', 'of=o', 'bs=2', 'conv=swab', 'status=none' -Directory $dir
+        Get-TestBytes (Join-Path $dir 'o') | Should -Be 'bac'
+    }
+
+    It 'streams files instead of loading them' {
+        Mock -ModuleName PSGnuUtils Get-GnuInputBytes { throw 'loaded' }
+        $null = Invoke-TestDd -Arguments 'if=txt', 'of=o', 'status=none' -Directory $dir
+        Get-TestBytes (Join-Path $dir 'o') | Should -Be "Hello World abc`n"
+        Should -Invoke -CommandName Get-GnuInputBytes -ModuleName PSGnuUtils -Times 0 -Exactly
+    }
+
+    It 'sizes the output with seek even when nothing is copied' {
+        $null = New-TestFile -Path (Join-Path $dir 'empty') -Content ''
+        $null = Invoke-TestDd -Arguments 'if=empty', 'of=new', 'bs=4', 'seek=2', 'status=none' -Directory $dir
+        (Get-Item -LiteralPath (Join-Path $dir 'new')).Length | Should -Be 8
+        $null = Invoke-TestDd -Arguments 'if=empty', 'of=o', 'bs=4', 'seek=1', 'status=none' -Directory $dir
+        (Get-Item -LiteralPath (Join-Path $dir 'o')).Length | Should -Be 4
+        $null = New-TestFile -Path (Join-Path $dir 'o') -Content 'ABCDEFGHIJ'
+        $null = Invoke-TestDd -Arguments 'if=empty', 'of=o', 'bs=4', 'seek=9', 'conv=notrunc', 'status=none' -Directory $dir
+        (Get-Item -LiteralPath (Join-Path $dir 'o')).Length | Should -Be 10
+    }
+
+    It 'handles the same file as input and output' {
+        $null = New-TestFile -Path (Join-Path $dir 'same') -Content 'ABCDEFGHIJ'
+        $null = Invoke-TestDd -Arguments 'if=same', 'of=same', 'bs=2', 'skip=1', 'conv=notrunc', 'status=none' -Directory $dir
+        Get-TestBytes (Join-Path $dir 'same') | Should -Be 'CDEFGHIJIJ'
+        $null = Invoke-TestDd -Arguments 'if=same', 'of=same', 'status=none' -Directory $dir
+        (Get-Item -LiteralPath (Join-Path $dir 'same')).Length | Should -Be 0
+    }
+
+    It 'reports read and write errors, then the statistics' {
+        Mock -ModuleName PSGnuUtils Write-GnuDdBlock { throw [System.IO.IOException]::new('full') }
+        $r = Invoke-TestDd -Arguments 'if=txt', 'of=o' -Directory $dir
+        $r.Errors[0] | Should -Match "^dd: error writing 'o': "
+        $r.Info[1] | Should -Be '0+0 records out'
+        $r.ExitCode | Should -Be 1
+        Mock -ModuleName PSGnuUtils Read-GnuDdBlock { throw [System.IO.IOException]::new('bad sector') }
+        (Invoke-TestDd -Arguments 'if=txt', 'of=o' -Directory $dir).Errors[0] | Should -Match "^dd: error reading 'txt': "
+    }
+
+    It 'returns a short block at the end of a stream and accepts fsync without an output file' {
+        InModuleScope PSGnuUtils {
+            $stream = [System.IO.MemoryStream]::new([byte[]](1, 2, 3))
+            (Read-GnuDdBlock -Stream $stream -Size 5).Length | Should -Be 3
+        }
+        (Invoke-TestDd -Arguments 'if=txt', 'conv=fsync', 'status=none' -Directory $dir).Output | Should -Be @('Hello World abc')
+    }
+
+    It 'closes the output again when it cannot be positioned' {
+        $r = Invoke-TestDd -Arguments 'if=txt', 'of=o', 'obs=1E', 'seek=8' -Directory $dir
+        $r.Errors[0] | Should -Match "^dd: failed to open 'o': "
+        [System.IO.File]::Delete((Join-Path $dir 'o'))
+        [System.IO.File]::Exists((Join-Path $dir 'o')) | Should -BeFalse
+    }
+
+    It 'rounds the transfer size to nearest in the statistics' -ForEach @(
+        @{ Size = 1000; Text = '1000 bytes (1.0 kB) copied' },
+        @{ Size = 1024; Text = '1024 bytes (1.0 kB, 1.0 KiB) copied' },
+        @{ Size = 1500; Text = '1500 bytes (1.5 kB, 1.5 KiB) copied' }
+    ) {
+        $null = New-TestFile -Path (Join-Path $dir 'sized') -Bytes (New-Object byte[] $Size)
+        (Invoke-TestDd -Arguments 'if=sized', 'of=o' -Directory $dir).Info[2] | Should -Match ('^' + [regex]::Escape($Text))
     }
 
     It 'reads a size without digits as one of that unit' {

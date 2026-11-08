@@ -3,6 +3,18 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-08 (later) - dd streams files, TestBuild green
+
+- dd reads and writes files block by block (read 2 MB past the 3 GB mark of a 3 GB file); pipeline data stays in
+  memory. Like GNU it now sizes the output before copying (seek extends or truncates even with nothing to copy), and
+  if=X of=X empties X while conv=notrunc copies in place. Read and write errors end the copy and print statistics.
+- dd statistics round to nearest (du/df round up) and drop the IEC form below 1024 bytes, as GNU does.
+- TestBuild: Get-GnuModuleVersion finds the manifest next to the merged psm1; the per-util origin meta test checks
+  the definition there. Was 87 failures, now 0.
+- Compared with GNU 8.32 (172 cases, 5.1 and 7.6): 169 identical; the other 3 are the ones explained below.
+- Not done: WSL. It has no pwsh, installing needs sudo, and downloading a portable pwsh was denied by the session's
+  permission rules. Linux/macOS remain unverified.
+
 ## 2026-11-08 (end of Batch D) - dd df du, unquoted comma lists
 
 - New: dd, df, du. Shared in Private/Lib/Size.ps1: Format-GnuHumanSize, ConvertFrom-GnuBlockSize (GNU's SIZE rules

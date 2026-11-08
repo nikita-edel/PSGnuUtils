@@ -25,7 +25,7 @@ implemented util is listed here).
 | `touch` | done | full | 2 | 2 | `-d` supports @SECONDS, now/today/yesterday/tomorrow, ISO dates and relative items ("2 days ago"), not all of GNU's grammar. |
 | `install` | done | subset | 2 | 2 | `-c -C -d -D -m -p -t -T -v -o -g`; octal modes; modes and `-o/-g` only on Unix; no backups or `-s`. |
 | `shred` | done | full | 2 | 2 | Random passes (no fixed patterns), `-n -s -u --remove -x -z -f -v --random-source`; not effective on SSDs / copy-on-write file systems. |
-| `dd` | done | subset | 3 | 3 | Regular files, the pipeline and the console; `bs ibs obs count skip seek conv iflag oflag status`; no `ascii ebcdic block unblock sparse` or direct I/O; statistics on the information stream (6); the whole input is held in memory (below 2 GB). No raw disk access (`\\.\PhysicalDrive`): needs admin and one bug wipes a disk. |
+| `dd` | done | subset | 3 | 3 | Regular files, the pipeline and the console; `bs ibs obs count skip seek conv iflag oflag status`; no `ascii ebcdic block unblock sparse` or direct I/O; statistics on the information stream (6); files are streamed, only pipeline data is held in memory. No raw disk access (`\\.\PhysicalDrive`): needs admin and one bug wipes a disk. |
 | `sync` | skip | - | - | - | Without FILE it must flush whole volumes, which needs administrator rights on Windows; flushing single files is rarely useful. |
 | `truncate` | done | full | 1 | 1 | An IO block (`-o`) is 4096 bytes. |
 | `mktemp` | done | full | 1 | 1 | |

@@ -53,23 +53,26 @@ function ConvertTo-GnuInt64 {
 function Format-GnuHumanSize {
     <#
     .SYNOPSIS
-    A byte count like GNU's human_readable with rounding up: 999, 1.0K, 9.9K, 10K, 3.2M (Base 1000: 1.1k, 2.0M).
+    A byte count like GNU's human_readable: 999, 1.0K, 9.9K, 10K, 3.2M (Base 1000: 1.1k, 2.0M).
+    Rounds up like du and df; -Nearest rounds to nearest like dd's statistics.
     #>
-    param([Parameter(Mandatory)][double]$Bytes, [ValidateSet(1000, 1024)][int]$Base = 1024)
+    param([Parameter(Mandatory)][double]$Bytes, [ValidateSet(1000, 1024)][int]$Base = 1024, [switch]$Nearest)
 
     $invariant = [System.Globalization.CultureInfo]::InvariantCulture
     if ($Bytes -lt $Base) { return ([Math]::Ceiling($Bytes)).ToString('0', $invariant) }
     $units = 'KMGTPEZY'
     if ($Base -eq 1000) { $units = 'kMGTPEZY' }
+    $round = 'Ceiling'
+    if ($Nearest) { $round = 'Round' }
     $value = $Bytes
     $unit = -1
     while ($value -ge $Base -and $unit -lt $units.Length - 1) { $value /= $Base; $unit++ }
     if ($value -lt 10) {
-        $rounded = [Math]::Ceiling($value * 10) / 10
+        $rounded = [Math]::$round($value * 10) / 10
         if ($rounded -lt 10) { return $rounded.ToString('0.0', $invariant) + $units[$unit] }
         $value = $rounded
     }
-    $rounded = [Math]::Ceiling($value)
+    $rounded = [Math]::$round($value)
     if ($rounded -ge $Base -and $unit -lt $units.Length - 1) { return '1.0' + $units[$unit + 1] }
     $rounded.ToString('0', $invariant) + $units[$unit]
 }

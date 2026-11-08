@@ -245,7 +245,8 @@ function Open-GnuInputStream {
     param(
         [Parameter(Mandatory)][hashtable]$Context,
         [Parameter(Mandatory)][AllowEmptyString()][string]$Operand,
-        [switch]$Quiet
+        [switch]$Quiet,
+        [switch]$AllowWriters
     )
 
     if ($Operand -eq '-') {
@@ -256,7 +257,8 @@ function Open-GnuInputStream {
     $path = Get-GnuReadablePath -Context $Context -Operand $Operand -Quiet:$Quiet
     if ($null -eq $path) { return }
     try {
-        [System.IO.File]::OpenRead($path)
+        if ($AllowWriters) { New-Object System.IO.FileStream -ArgumentList $path, 'Open', 'Read', 'ReadWrite' }
+        else { [System.IO.File]::OpenRead($path) }
     }
     catch {
         if (-not $Quiet) {
