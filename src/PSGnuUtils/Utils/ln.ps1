@@ -97,6 +97,7 @@ function New-GnuLnLink {
             }
         }
 
+        $createPath = $linkPath
         $existing = Get-Item -LiteralPath $linkPath -Force -ErrorAction SilentlyContinue
         if ($null -ne $existing) {
             if (-not $symbolic -and (Test-GnuSamePath -Left $targetPath -Right $linkPath)) {
@@ -113,8 +114,9 @@ function New-GnuLnLink {
                 Write-GnuError -Context $Context -Message "$($pair.Target): cannot overwrite directory"
                 continue
             }
-            if ($existing -is [System.IO.DirectoryInfo]) { [System.IO.Directory]::Delete($linkPath, $false) }
-            else { [System.IO.File]::Delete($linkPath) }
+            # The new link is made beside the destination first: if that fails (no symlink rights, another volume)
+            # the existing file must survive.
+            $createPath = "$linkPath.$([guid]::NewGuid().ToString('n')).tmp"
         }
 
         try {
@@ -125,16 +127,45 @@ function New-GnuLnLink {
                 # A relative link target is resolved from the link's directory, not from the current directory.
                 $resolvedTarget = $stored
                 if (-not [System.IO.Path]::IsPathRooted($stored)) { $resolvedTarget = [System.IO.Path]::Combine($linkDirectory, $stored) }
-                New-GnuSymbolicLink -Path $linkPath -Target $stored -Directory:([System.IO.Directory]::Exists($resolvedTarget))
-                if ($verbose) { "'$($pair.Target)' -> '$stored'" }
+                New-GnuSymbolicLink -Path $createPath -Target $stored -Directory:([System.IO.Directory]::Exists($resolvedTarget))
+                $report = "'$($pair.Target)' -> '$stored'"
             }
             else {
-                $null = New-Item -ItemType HardLink -Path ([System.Management.Automation.WildcardPattern]::Escape($linkPath)) -Value $targetPath -ErrorAction Stop
-                if ($verbose) { "'$($pair.Target)' => '$($pair.Source)'" }
+                $null = New-Item -ItemType HardLink -Path ([System.Management.Automation.WildcardPattern]::Escape($createPath)) -Value $targetPath -ErrorAction Stop
+                $report = "'$($pair.Target)' => '$($pair.Source)'"
             }
+            if ($createPath -ne $linkPath) { Move-GnuLnLink -From $createPath -To $linkPath }
+            if ($verbose) { $report }
         }
         catch {
             Write-GnuError -Context $Context -Message "failed to create $kind $($describe): $(Get-GnuErrorReason -Exception $_.Exception)"
         }
+    }
+}
+
+function Remove-GnuLnEntry {
+    <#
+    .SYNOPSIS
+    Removes one file or link; a link to a directory is removed without touching the directory.
+    #>
+    param([Parameter(Mandatory)][string]$Path)
+    if ([System.IO.Directory]::Exists($Path)) { [System.IO.Directory]::Delete($Path, $false) }
+    else { [System.IO.File]::Delete($Path) }
+}
+
+function Move-GnuLnLink {
+    <#
+    .SYNOPSIS
+    Replaces the entry at To with the link just created at From; the temporary link never stays behind.
+    #>
+    param([Parameter(Mandatory)][string]$From, [Parameter(Mandatory)][string]$To)
+    try {
+        Remove-GnuLnEntry -Path $To
+        if ([System.IO.Directory]::Exists($From)) { [System.IO.Directory]::Move($From, $To) }
+        else { [System.IO.File]::Move($From, $To) }
+    }
+    catch {
+        Remove-GnuLnEntry -Path $From
+        throw
     }
 }

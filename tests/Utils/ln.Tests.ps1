@@ -158,3 +158,47 @@ Describe 'Transfer helpers' {
         }
     }
 }
+
+Describe 'ln replacing a destination' {
+    It 'keeps the destination when the new link cannot be created' {
+        $dir = New-LnSandbox
+        $null = New-TestFile -Path (Join-Path $dir 'b.txt') -Content 'B'
+        Mock -ModuleName PSGnuUtils New-GnuSymbolicLink { throw [System.UnauthorizedAccessException]::new('denied') }
+        $r = Invoke-TestGnu ln '-sf', 'a.txt', 'b.txt' -WorkingDirectory $dir
+        $r.ExitCode | Should -Be 1
+        $r.ErrorText | Should -Match "failed to create symbolic link 'b.txt'"
+        Get-Content -Raw -LiteralPath (Join-Path $dir 'b.txt') | Should -Match '^B'
+    }
+
+    It 'leaves nothing behind when the destination cannot be replaced: <Name>' -ForEach @(
+        @{ Name = 'file'; Arguments = @('-f', 'a.txt', 'b.txt') },
+        @{ Name = 'directory link'; Arguments = @('-sf', 'a.txt', 'b.txt') }
+    ) {
+        $dir = New-LnSandbox
+        $null = New-TestFile -Path (Join-Path $dir 'b.txt') -Content 'B'
+        Mock -ModuleName PSGnuUtils New-GnuSymbolicLink { $null = New-Item -ItemType Directory -Path $Path -ErrorAction Stop }
+        $guard = Block-TestFileRemoval -Path (Join-Path $dir 'b.txt')
+        try { $r = Invoke-TestGnu ln $Arguments -WorkingDirectory $dir }
+        finally { $guard.Dispose() }
+        $r.ExitCode | Should -Be 1
+        Get-Content -Raw -LiteralPath (Join-Path $dir 'b.txt') | Should -Match '^B'
+        @(Get-ChildItem -LiteralPath $dir -Force | Where-Object { $_.Name -like '*.tmp' }).Count | Should -Be 0
+    }
+
+    It 'replaces a file with a hard link' {
+        $dir = New-LnSandbox
+        $null = New-TestFile -Path (Join-Path $dir 'b.txt') -Content 'B'
+        $r = Invoke-TestGnu ln '-fv', 'a.txt', 'b.txt' -WorkingDirectory $dir
+        $r.ExitCode | Should -Be 0
+        $r.Output | Should -Be @("'b.txt' => 'a.txt'")
+        Get-Content -Raw -LiteralPath (Join-Path $dir 'b.txt') | Should -Match '^A'
+    }
+
+    It 'replaces a file with a link to a directory (mocked as a directory)' {
+        $dir = New-LnSandbox
+        $null = New-TestFile -Path (Join-Path $dir 'b.txt') -Content 'B'
+        Mock -ModuleName PSGnuUtils New-GnuSymbolicLink { $null = New-Item -ItemType Directory -Path $Path -ErrorAction Stop }
+        (Invoke-TestGnu ln '-sf', 'sub', 'b.txt' -WorkingDirectory $dir).ExitCode | Should -Be 0
+        Test-Path -LiteralPath (Join-Path $dir 'b.txt') -PathType Container | Should -BeTrue
+    }
+}

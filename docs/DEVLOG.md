@@ -15,6 +15,8 @@ next. Keep entries short and factual so the next person (or LLM) can continue wi
   clean module path for 5.1; TestHelpers removes a foreign copy for direct Invoke-Pester runs.
 - Compared with real GNU 9.7 on ext4 (`gnudd gnudu gnudf`, C locale, du order ignored): 169 of 172. The other 3:
   df -i twice (.NET has no inode counts, documented) and the -0 harness artifact. WSL's plain `dd` is uutils.
+- ln -f deleted the destination before creating the link, so a failure (no symlink rights on Windows) lost the
+  file. The new link is now created beside the destination, then swapped in.
 - Not verified: macOS, and df on systems with unusual mounts.
 
 ## 2026-11-08 (later) - dd streams files, TestBuild green
