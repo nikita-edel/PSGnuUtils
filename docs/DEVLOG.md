@@ -3,6 +3,21 @@
 Newest entry first. Every work session adds an entry: what changed, what was verified, what is unverified, what is
 next. Keep entries short and factual so the next person (or LLM) can continue without guessing.
 
+## 2026-11-09 (later) - Batch C: env timeout kill id groups uptime install shred dircolors, tail -f
+
+- Skipped after review with the user: nice, nohup, sync (reasons in UTILS.md). kill stays (user request).
+- New core: Private/Core/Command.ps1 (signal table, Send-GnuSignal, child commands, Windows command-line
+  quoting, ProcessStartInfo with ArgumentList or a quoted command line), Private/Lib/Identity.ps1 (Windows SIDs,
+  Linux /proc + /etc files, other Unix via id(1); paths and commands injectable for tests),
+  Private/Lib/DircolorsDatabase.ps1 (GNU 8.32 database).
+- timeout polls ReadLineAsync (no .NET event handlers, they have no runspace); env builds a script block for
+  PowerShell commands because splatted '-Name' strings are positional; tail -f/-F/--pid/--retry/-s poll.
+- Compared with GNU 8.32: dircolors -b/-c/-p identical; install/shred/kill/timeout messages and exit codes.
+- Traps (ARCHITECTURE.md): .NET 9 keeps variables set to '' ([NullString]::Value), $? after a script block,
+  $Error.Count capped at 256 in long runs, "$x:" needs ${x}, argument-mode casts, .NET Framework misreading an
+  emptied environment block, Windows PowerShell 5.1 not escaping quotes for native programs.
+- Results: 1843 tests green on 7.6 (100% coverage, analyzer clean), 1837 + the fixed env test on 5.1.
+
 ## 2026-11-09 - Batch B: tr printf test expr date
 
 - tr: sets with ranges, C-locale classes, [c*n], [=c=], octal escapes (GNU's two-digit rule above \377),

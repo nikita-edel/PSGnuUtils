@@ -23,13 +23,13 @@ implemented util is listed here).
 | `link` | done | full | 1 | 1 | |
 | `unlink` | done | full | 1 | 1 | |
 | `touch` | done | full | 2 | 2 | `-d` supports @SECONDS, now/today/yesterday/tomorrow, ISO dates and relative items ("2 days ago"), not all of GNU's grammar. |
-| `install` | planned | subset | 2 | 2 | `-d -m -D -t -T -v`; `-o/-g` only on Unix. |
-| `shred` | planned | full | 2 | 2 | Not effective on SSDs / copy-on-write file systems (documented, like GNU). |
+| `install` | done | subset | 2 | 2 | `-c -C -d -D -m -p -t -T -v -o -g`; octal modes; modes and `-o/-g` only on Unix; no backups or `-s`. |
+| `shred` | done | full | 2 | 2 | Random passes (no fixed patterns), `-n -s -u --remove -x -z -f -v --random-source`; not effective on SSDs / copy-on-write file systems. |
 | `dd` | planned | subset | 3 | 3 | File copies with `bs count skip seek conv=notrunc`; no raw disk access (`\\.\PhysicalDrive`): needs admin and one bug wipes a disk. |
-| `sync` | planned | full | 2 | 2 | Per-file flush everywhere; whole-volume flush needs admin on Windows. |
+| `sync` | skip | - | - | - | Without FILE it must flush whole volumes, which needs administrator rights on Windows; flushing single files is rarely useful. |
 | `truncate` | done | full | 1 | 1 | An IO block (`-o`) is 4096 bytes. |
 | `mktemp` | done | full | 1 | 1 | |
-| `dircolors` | planned | full | 2 | 2 | Only useful together with `ls --color`. |
+| `dircolors` | done | full | 2 | 2 | GNU 8.32 database, output identical to GNU; PowerShell syntax when SHELL is not set. |
 | `dir`, `vdir` | skip | - | - | - | Just `ls -C -b` / `ls -l -b`; aliases add no value. |
 | `mkfifo` | skip | - | - | - | Windows has no file system FIFOs (named pipes live in `\\.\pipe\`). |
 | `mknod` | skip | - | - | - | Windows has no device nodes or major/minor numbers. |
@@ -64,7 +64,7 @@ implemented util is listed here).
 | `base32` | done | full | 1 | 1 | |
 | `basenc` | done | full | 2 | 2 | All encodings incl. base16, base2msbf/lsbf, z85; base16 decoding accepts lower case (coreutils 9.x). |
 | `head` | done | full | 1 | 1 | Cannot stop an endless producer (see ARCHITECTURE.md, "Stopping upstream"). |
-| `tail` | done | subset | 2 | 1 | `-f/-F/--pid/--retry/-s` are planned for batch 2. |
+| `tail` | done | full | 2 | 1 | `-f/-F/--follow=name/--pid/--retry/-s` poll the files; an unfinished last line is printed when the file stops growing. |
 | `split` | planned | full | 3 | 3 | |
 | `csplit` | planned | full | 3 | 3 | |
 | `fmt` | planned | full | 3 | 3 | |
@@ -134,12 +134,12 @@ implemented util is listed here).
 
 | Util | Status | Scope | Difficulty | Batch | Notes |
 |---|---|---|---|---|---|
-| `env` | planned | full | 3 | 2 | Runs native commands and PowerShell commands with a modified environment. |
+| `env` | done | full | 3 | 2 | `-i -0 -u -C -S`; runs native and PowerShell commands, restores the environment; no signal options. |
 | `printenv` | done | full | 1 | 1 | Output sorted by name (GNU prints environment order). |
-| `nice` | planned | full | 2 | 2 | Maps niceness to process priority classes on Windows. |
-| `nohup` | planned | subset | 2 | 2 | Windows has no SIGHUP; starts a detached process. |
-| `timeout` | planned | full | 3 | 2 | Signals map to termination on Windows. |
-| `kill` | planned | subset | 2 | 2 | `-l`, PIDs; signals other than TERM/KILL only on Unix. |
+| `nice` | skip | - | - | - | Windows has priority classes, not niceness, and child processes only inherit lower priorities. Use `Start-Process` and `(Get-Process).PriorityClass`. |
+| `nohup` | skip | - | - | - | Windows has no hangup signal, so only the nohup.out redirection would remain. Use `Start-Process` to keep a program running. |
+| `timeout` | done | full | 3 | 2 | External programs only; signals terminate on Windows; exit codes 124/125/126/127/137 as GNU. |
+| `kill` | done | subset | 2 | 2 | `-s -SIGNAL -l -t`; Linux signal numbers; Windows terminates the process tree; no process groups. |
 | `stdbuf` | skip | - | - | - | Works by injecting a library through `LD_PRELOAD`, which has no Windows equivalent. |
 | `chroot` | skip | - | - | - | Windows cannot change a process's file system root. |
 
@@ -148,13 +148,13 @@ implemented util is listed here).
 | Util | Status | Scope | Difficulty | Batch | Notes |
 |---|---|---|---|---|---|
 | `whoami` | done | full | 1 | 1 | No `DOMAIN\` prefix (unlike `whoami.exe`). |
-| `id` | planned | subset | 3 | 2 | SIDs on Windows instead of numeric ids. |
-| `groups` | planned | subset | 3 | 2 | |
+| `id` | done | subset | 3 | 2 | SIDs and DOMAIN\NAME on Windows; Linux reads /proc and /etc; no `-Z`. |
+| `groups` | done | subset | 3 | 2 | Same sources as `id`. |
 | `uname` | done | full | 1 | 1 | Kernel name `Windows_NT`, OS `Windows` on Windows. |
 | `arch` | done | full | 1 | 1 | |
 | `hostname` | done | subset | 1 | 1 | Setting the host name is not supported. |
 | `nproc` | done | full | 1 | 1 | `--all` equals the runtime's processor count. |
-| `uptime` | planned | subset | 2 | 2 | Load averages only on Unix. |
+| `uptime` | done | subset | 2 | 2 | coreutils line plus procps `-p -s`; no load averages on Windows. |
 | `date` | done | subset | 3 | 2 | All `+FORMAT` sequences/flags, `-d -f -r -u -I -R --rfc-3339`; no date setting, no TZ variable, `-d` subset grammar, 100 ns resolution. |
 | `users`, `who`, `pinky` | skip | - | - | - | Read the Unix utmp login records, which Windows does not have. |
 | `logname` | skip | - | - | - | No login-terminal concept on Windows; it would just duplicate `whoami`. |

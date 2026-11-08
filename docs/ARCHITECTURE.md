@@ -190,6 +190,14 @@ Ideas for later: a tiny C# cmdlet compiled with `Add-Type` that head pipes into 
   Hashtable literals are case-insensitive too, so `@{ x = 1; X = 2 }` is a duplicate-key parse error.
 * Tests that need non-ASCII text use `[char]` codes or escapes the util itself interprets (printf's Unicode escape);
   editing tools may turn a written Unicode escape into the character itself, which the ASCII meta test then rejects.
+* Splatting an array into a PowerShell command passes '-Name' strings as positional values, not parameter
+  names. Invoke-GnuChildCommand (env) builds a script block for PowerShell commands instead; native programs get
+  the array. `$?` after `& $scriptblock` ignores errors written inside it: compare `$Error.Count`.
+* .NET 9 no longer removes an environment variable set to '', and PowerShell passes `$null` to a [string]
+  parameter as ''. Remove variables with `[NullString]::Value`.
+* .NET event handlers have no runspace in PowerShell; poll `StreamReader.ReadLineAsync()` instead (timeout).
+* In "$name:" PowerShell reads a scope-qualified variable; write "${name}:".
+* In argument mode `cmd '-0', [string]$x` does not cast; use `([string]$x)`.
 * In comment-based help, a line that starts with a dot and a word (`.NET has ...`) is read as a help keyword and
   silently breaks the whole help block (no synopsis, no examples). Never start a help line with `.`.
 * Code that could run for hours must be avoided in tests: run new tests with `timeout`, and keep endless modes

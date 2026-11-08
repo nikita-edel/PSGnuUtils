@@ -20,4 +20,5 @@ All notable changes to this project are documented here. The format follows
 - Daily-use utils: `touch which ln mv cp sort ls grep`.
 - Batch A: `readlink realpath basenc unexpand tsort shuf sha224sum cksum sum factor`.
 - Batch B: `tr printf test expr date`.
+- Batch C: `env timeout kill id groups uptime install shred dircolors`, and `tail -f/-F/--pid/--retry/-s`.
 - Build script (Bootstrap, Manifest, Analyze, Test, Build, TestBuild, Install, Uninstall, Publish, Clean).

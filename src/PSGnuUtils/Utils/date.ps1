@@ -1,6 +1,6 @@
 Register-GnuUtil @{
     Name        = 'date'
-    Category    = 'System info'
+    Category    = 'User and system info'
     Synopsis    = 'Print or set the system date and time.'
     Usage       = @('date [OPTION]... [+FORMAT]', 'date [-u|--utc|--universal] [MMDDhhmm[[CC]YY][.ss]]')
     Description = @('Display date and time in the given FORMAT.')
