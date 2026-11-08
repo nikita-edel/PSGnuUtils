@@ -37,6 +37,7 @@ function Initialize-GnuUtil {
         Name           = $Name
         Spec           = $spec
         Options        = @{}
+        Spellings      = @{}
         Operands       = [string[]]@()
         ExitCode       = 0
         ErrorCount     = 0
@@ -48,7 +49,7 @@ function Initialize-GnuUtil {
         StdinConsumed  = $false
     }
 
-    $argv = [string[]]@(ConvertTo-GnuArgumentList -Arguments $Arguments)
+    $argv = [string[]]@(ConvertTo-GnuArgumentList -Arguments $Arguments -Spec $spec)
 
     if ($spec.RawArguments) {
         if ($argv.Length -eq 1 -and $argv[0] -eq '--help') { Set-GnuHelpOutput -Context $context }
@@ -72,6 +73,7 @@ function Initialize-GnuUtil {
     }
 
     $context.Options = $parsed.Options
+    $context.Spellings = $parsed.Spellings
     $operands = [string[]]$parsed.Operands.ToArray()
     if ($spec.FileOperands) { $operands = [string[]]@(Expand-GnuWildcard -Operands $operands) }
     $context.Operands = $operands

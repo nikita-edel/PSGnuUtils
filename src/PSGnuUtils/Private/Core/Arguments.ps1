@@ -22,19 +22,46 @@ function ConvertTo-GnuArgumentList {
     PowerShell passes numbers as numbers (-5 arrives as [int]) and comma lists as arrays,
     so every element is flattened and converted with invariant culture.
     #>
-    param([AllowNull()][AllowEmptyCollection()][object[]]$Arguments)
+    param([AllowNull()][AllowEmptyCollection()][object[]]$Arguments, [hashtable]$Spec)
 
+    $previous = $null
     foreach ($argument in $Arguments) {
         if ($null -eq $argument) { continue }
         if ($argument -is [System.Collections.IEnumerable] -and $argument -isnot [string]) {
-            foreach ($element in $argument) {
-                if ($null -ne $element) { [string]$element }
-            }
+            $items = @(foreach ($element in $argument) { if ($null -ne $element) { [string]$element } })
+            # An unquoted 'cut -f 1,3' or '--output=a,b' arrives as an array: rejoin it when GNU reads it
+            # as one option value; anything else (cat $files) stays separate operands.
+            $join = $items.Count -gt 1 -and ($items[0] -match '^-[^-]|^--.+=' -or (Test-GnuOptionNeedsValue -Spec $Spec -Token $previous))
+            if ($join) { $previous = $items -join ','; $previous }
+            else { foreach ($item in $items) { $previous = $item; $item } }
         }
         else {
-            [string]$argument
+            $previous = [string]$argument
+            $previous
         }
     }
+}
+
+function Test-GnuOptionNeedsValue {
+    <#
+    .SYNOPSIS
+    $true if Token is an option (-f, -nf, --field) whose required value is the next argument.
+    #>
+    param([hashtable]$Spec, [AllowNull()][string]$Token)
+
+    if ($null -eq $Spec -or $Spec.RawArguments -or [string]::IsNullOrEmpty($Token) -or $Token.Length -lt 2 -or $Token[0] -ne '-' -or $Token -eq '--') { return $false }
+    $definitions = @($Spec.Options)
+    if ($Token.StartsWith('--', [System.StringComparison]::Ordinal)) {
+        if ($Token.Contains('=')) { return $false }
+        $found = Find-GnuLongOption -Definitions $definitions -Name $Token.Substring(2)
+        return $null -ne $found.Option -and [bool]$found.Option.Arg -and -not $found.Option.OptionalArg
+    }
+    for ($i = 1; $i -lt $Token.Length; $i++) {
+        $definition = $definitions | Where-Object { $_.Short -ceq [string]$Token[$i] } | Select-Object -First 1
+        if ($null -eq $definition) { return $false }
+        if ($definition.Arg) { return $i -eq $Token.Length - 1 -and -not $definition.OptionalArg }
+    }
+    $false
 }
 
 function Find-GnuLongOption {
@@ -130,6 +157,8 @@ function ConvertFrom-GnuArgument {
         Options  = New-Object System.Collections.Hashtable -ArgumentList ([System.StringComparer]::Ordinal)
         Operands = New-Object 'System.Collections.Generic.List[string]'
         Error    = $null
+        # How each option was last written (-B or --block-size): GNU quotes that form in some messages.
+        Spellings = New-Object System.Collections.Hashtable -ArgumentList ([System.StringComparer]::Ordinal)
     }
     $definitions = @($Spec.Options) + @(Get-GnuStandardOption)
     $count = $Arguments.Length
@@ -186,6 +215,7 @@ function ConvertFrom-GnuArgument {
             }
 
             Set-GnuOptionValue -Options $result.Options -Definition $definition -Value $value
+            $result.Spellings[$definition.Key] = "--$($definition.Long)"
             if ($definition.Key -like '__*') { return $result }
             continue
         }
@@ -230,6 +260,7 @@ function ConvertFrom-GnuArgument {
                 }
             }
             Set-GnuOptionValue -Options $result.Options -Definition $definition -Value $value
+            $result.Spellings[$definition.Key] = "-$letter"
         }
     }
 

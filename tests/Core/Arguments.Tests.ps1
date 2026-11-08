@@ -161,3 +161,37 @@ Describe 'Option definitions' {
         }
     }
 }
+
+Describe 'Unquoted comma lists' {
+    It 'rejoins a comma list that is an option value' {
+        InModuleScope PSGnuUtils {
+            $spec = Get-GnuUtilSpec -Name 'cut'
+            # cut -f 1,3 file  (PowerShell passes 1,3 as an array)
+            @(ConvertTo-GnuArgumentList -Arguments @('-f', @(1, 3), 'file') -Spec $spec) | Should -Be @('-f', '1,3', 'file')
+            @(ConvertTo-GnuArgumentList -Arguments @('--fields', @('1', '3')) -Spec $spec) | Should -Be @('--fields', '1,3')
+            @(ConvertTo-GnuArgumentList -Arguments @('-sf', @(2, 4)) -Spec $spec) | Should -Be @('-sf', '2,4')
+            @(ConvertTo-GnuArgumentList -Arguments @(, @('--fields=1', '2')) -Spec $spec) | Should -Be @('--fields=1,2')
+            @(ConvertTo-GnuArgumentList -Arguments @(, @('-f1', '2')) -Spec $spec) | Should -Be @('-f1,2')
+        }
+    }
+
+    It 'keeps arrays of operands separate' {
+        InModuleScope PSGnuUtils {
+            $spec = Get-GnuUtilSpec -Name 'cut'
+            @(ConvertTo-GnuArgumentList -Arguments @('-s', @('a', 'b')) -Spec $spec) | Should -Be @('-s', 'a', 'b')
+            @(ConvertTo-GnuArgumentList -Arguments @(, @('a', 'b')) -Spec $spec) | Should -Be @('a', 'b')
+            @(ConvertTo-GnuArgumentList -Arguments @('-f1', @('a', 'b')) -Spec $spec) | Should -Be @('-f1', 'a', 'b')
+            @(ConvertTo-GnuArgumentList -Arguments @('--fields=1', @('a', 'b')) -Spec $spec) | Should -Be @('--fields=1', 'a', 'b')
+            @(ConvertTo-GnuArgumentList -Arguments @('-x', @('a', 'b')) -Spec $spec) | Should -Be @('-x', 'a', 'b')
+            @(ConvertTo-GnuArgumentList -Arguments @('--', @('a', 'b')) -Spec $spec) | Should -Be @('--', 'a', 'b')
+            @(ConvertTo-GnuArgumentList -Arguments @('--nosuch', @('a', 'b')) -Spec $spec) | Should -Be @('--nosuch', 'a', 'b')
+            @(ConvertTo-GnuArgumentList -Arguments @('-f', @('a', 'b'))) | Should -Be @('-f', 'a', 'b')
+            @(ConvertTo-GnuArgumentList -Arguments @('-n', @('a', 'b')) -Spec (Get-GnuUtilSpec -Name 'echo')) | Should -Be @('-n', 'a', 'b')
+            @(ConvertTo-GnuArgumentList -Arguments @('--header', @('a', 'b')) -Spec (Get-GnuUtilSpec -Name 'numfmt')) | Should -Be @('--header', 'a', 'b')
+        }
+    }
+
+    It 'works end to end' {
+        (Invoke-TestGnu cut '-d', ' ', '-f', @(1, 3) -InputObject 'a b c').Output | Should -Be @('a c')
+    }
+}
