@@ -68,6 +68,7 @@
         'Invoke-GnuRealpath',
         'Invoke-GnuRm',
         'Invoke-GnuRmdir',
+        'Invoke-GnuSed',
         'Invoke-GnuSeq',
         'Invoke-GnuSha1sum',
         'Invoke-GnuSha224sum',

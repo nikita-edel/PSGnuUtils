@@ -166,7 +166,7 @@ implemented util is listed here).
 | Util | Status | Scope | Difficulty | Batch | Notes |
 |---|---|---|---|---|---|
 | `grep` | done | full | 4 | 4 | BRE/ERE translated to .NET regex (POSIX classes, `\<` `\>`, backreferences); `-P` is .NET syntax; pipeline objects are matched as displayed; piped input is searched as it arrives. |
-| `sed` | planned | subset | 4 | 4 | `s///` with flags, `d p q a i c y =`, addresses and ranges, `-n -i -E -s`; no hold space (`h H g G x`), labels/branching (`b t :`) or `N D P`. |
+| `sed` | done | subset | 4 | 4 | All addresses and commands including hold space and branching; `-n -e -f -E -r -i -s -z -l -b --sandbox`; `.NET` regular expressions; input is read before the script starts; no `e` command. |
 | `find` | planned | subset | 4 | 4 | Expression parser (`! -o -a ( )`), `-name -iname -path -type -size -mtime -mmin -newer -maxdepth -mindepth -empty -print -print0 -exec -delete`; no `-printf -perm -user -group -newerXY`. |
 | `xargs` | planned | full | 4 | 4 | Windows command-line quoting rules make it tricky but it is essential for pipelines. |
 | `diff` | planned | subset | 4 | 4 | Myers algorithm, normal / unified / context output, `-r -u -q -i -w -b -N`. |

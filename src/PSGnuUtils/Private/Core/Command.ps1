@@ -134,7 +134,8 @@ function Invoke-GnuChildCommand {
         Write-GnuError -Context $Context -Message $_.Exception.Message -ExitCode 126
         return
     }
-    if ($Command.CommandType -eq 'Application') { $Context.ExitCode = $global:LASTEXITCODE }
+    # This module's utils set $LASTEXITCODE like a native program; other PowerShell commands only report errors.
+    if ($Command.CommandType -eq 'Application' -or $Command.Name -like 'Invoke-Gnu*') { $Context.ExitCode = $global:LASTEXITCODE }
     elseif ($failed) { $Context.ExitCode = 1 }
 }
 

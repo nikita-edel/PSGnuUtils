@@ -35,6 +35,7 @@ function ConvertTo-GnuOptionDefinition {
       Arg         argument placeholder for --help (e.g. 'NUM'); presence means the option takes a value
       OptionalArg the value is optional and can only be given as --long=VALUE
       Multi       collect every occurrence into a list instead of keeping the last value
+      Prefix      text put before a Multi value (tells options apart that share a Key and an order, sed -e / -f)
       Value       constant stored under Key when the option is given (flags only)
       Sets        hashtable of additional Key = Value pairs set when the option is given
       Hidden      do not show the option in --help
@@ -49,6 +50,7 @@ function ConvertTo-GnuOptionDefinition {
         Arg         = $null
         OptionalArg = $false
         Multi       = $false
+        Prefix      = ''
         Value       = $null
         HasValue    = $Option.ContainsKey('Value')
         Sets        = @{}

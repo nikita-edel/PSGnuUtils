@@ -27,6 +27,8 @@ function ConvertTo-GnuArgumentList {
     $previous = $null
     foreach ($argument in $Arguments) {
         if ($null -eq $argument) { continue }
+        # An unquoted {} (find -exec, xargs -I) arrives as a script block whose text is empty.
+        if ($argument -is [scriptblock]) { $argument = '{' + $argument.ToString() + '}' }
         if ($argument -is [System.Collections.IEnumerable] -and $argument -isnot [string]) {
             $items = @(foreach ($element in $argument) { if ($null -ne $element) { [string]$element } })
             # An unquoted 'cut -f 1,3' or '--output=a,b' arrives as an array: rejoin it when GNU reads it
@@ -115,7 +117,7 @@ function Set-GnuOptionValue {
     if ($Definition.Arg) {
         if ($Definition.Multi) {
             if (-not $Options.ContainsKey($key)) { $Options[$key] = New-Object 'System.Collections.Generic.List[string]' }
-            $Options[$key].Add([string]$Value)
+            $Options[$key].Add($Definition.Prefix + [string]$Value)
         }
         else {
             $Options[$key] = $Value

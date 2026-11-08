@@ -64,8 +64,14 @@ function ConvertTo-GnuDotNetRegex {
     <#
     .SYNOPSIS
     Converts a POSIX BRE (default) or ERE (-Extended) to .NET syntax. Returns @{ Regex } or @{ Error }.
+    .PARAMETER AbsoluteEnd
+    '$' only matches at the very end. A .NET '$' also matches before a final newline, which is wrong when
+    the text can hold newlines (sed's pattern space).
     #>
-    param([Parameter(Mandatory)][AllowEmptyString()][string]$Pattern, [switch]$Extended)
+    param([Parameter(Mandatory)][AllowEmptyString()][string]$Pattern, [switch]$Extended, [switch]$AbsoluteEnd)
+
+    $endAnchor = '$'
+    if ($AbsoluteEnd) { $endAnchor = '\z' }
 
     $builder = New-Object System.Text.StringBuilder
     $atStart = $true      # where '*' is literal and a BRE '^' is an anchor
@@ -86,6 +92,7 @@ function ConvertTo-GnuDotNetRegex {
             $next = [string]$Pattern[$i + 1]
             $i += 2
             if (-not $Extended -and '(){}|+?'.Contains($next)) {
+                if ($next -ceq '{' -and $Pattern.IndexOf('\}', $i, [System.StringComparison]::Ordinal) -lt 0) { return @{ Error = 'Unmatched \{' } }
                 [void]$builder.Append($next)
                 $atStart = $next -eq '(' -or $next -eq '|'
                 continue
@@ -123,7 +130,7 @@ function ConvertTo-GnuDotNetRegex {
         if ($char -eq '$') {
             $rest = $Pattern.Substring($i)
             $anchor = $Extended -or $rest.Length -eq 0 -or $rest.StartsWith('\)', [System.StringComparison]::Ordinal) -or $rest.StartsWith('\|', [System.StringComparison]::Ordinal)
-            if ($anchor) { [void]$builder.Append('$') } else { [void]$builder.Append('\$') }
+            if ($anchor) { [void]$builder.Append($endAnchor) } else { [void]$builder.Append('\$') }
             $atStart = $false
             continue
         }

@@ -38,6 +38,8 @@ function Initialize-GnuUtil {
         Spec           = $spec
         Options        = @{}
         Spellings      = @{}
+        Argv           = [string[]]@()
+        RawOperands    = [string[]]@()
         Operands       = [string[]]@()
         ExitCode       = 0
         ErrorCount     = 0
@@ -75,6 +77,8 @@ function Initialize-GnuUtil {
     $context.Options = $parsed.Options
     $context.Spellings = $parsed.Spellings
     $operands = [string[]]$parsed.Operands.ToArray()
+    $context.Argv = $argv
+    $context.RawOperands = $operands
     if ($spec.FileOperands) { $operands = [string[]]@(Expand-GnuWildcard -Operands $operands) }
     $context.Operands = $operands
     $context
