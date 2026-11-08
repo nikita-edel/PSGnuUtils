@@ -24,6 +24,7 @@
         'Invoke-GnuCmp',
         'Invoke-GnuComm',
         'Invoke-GnuCp',
+        'Invoke-GnuCsplit',
         'Invoke-GnuCut',
         'Invoke-GnuDate',
         'Invoke-GnuDircolors',

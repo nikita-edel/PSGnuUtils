@@ -4,7 +4,7 @@ GNU coreutils (`cat`, `head`, `tail`, `wc`, `seq`, `sha256sum`, `base64`, ...) i
 GNU option syntax, GNU output and GNU exit codes, on **Windows PowerShell 5.1 and PowerShell 7+** on Windows, Linux
 and macOS. Nothing changes until you opt in, per command.
 
-> Status: early development. 80 utils are implemented; see [docs/UTILS.md](docs/UTILS.md) for every util,
+> Status: early development. 81 utils are implemented; see [docs/UTILS.md](docs/UTILS.md) for every util,
 > what is planned and what is deliberately skipped.
 
 ## Install
